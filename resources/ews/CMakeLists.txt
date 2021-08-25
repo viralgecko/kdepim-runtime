@@ -31,6 +31,10 @@ set(ewsresource_SRCS
     contact/ewscreatecontactjob.cpp
     contact/ewsfetchcontactdetailjob.cpp
     contact/ewsmodifycontactjob.cpp
+    itemtype/ewsitemtypehandler.cpp
+    itemtype/ewscreateitemtypejob.cpp
+    itemtype/ewsfetchitemtypedetailjob.cpp
+    itemtype/ewsmodifyitemtypejob.cpp
     mail/ewscreatemailjob.cpp
     mail/ewsfetchmaildetailjob.cpp
     mail/ewsmailhandler.cpp

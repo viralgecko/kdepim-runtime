@@ -22,6 +22,8 @@ EwsFetchContactDetailJob::EwsFetchContactDetailJob(EwsClient &client, QObject *p
     EwsItemShape shape(EwsShapeIdOnly);
     shape << EwsPropertyField(QStringLiteral("item:Body"));
     shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
+    shape << EwsPropertyField(QStringLiteral("contacts:SpouseName"));
+    shape << EwsPropertyField(QStringLiteral("contacts:WeddingAnniversary"));
     mRequest->setItemShape(shape);
 }
 
