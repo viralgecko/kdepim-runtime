@@ -45,9 +45,36 @@ QString EwsTaskHandler::mimeType()
 
 bool EwsTaskHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
 {
-    Q_UNUSED(item)
-    Q_UNUSED(ewsItem)
-
+    KCalendarCore::Todo::Ptr todo = KCalendarCore::Todo::Ptr(new KCalendarCore::Todo());
+    QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
+    QDateTime dtDue = ewsItem[EwsItemFieldDueDate].toDateTime();
+    QDateTime dtStart = ewsItem[EwsItemFieldStartDate].toDateTime();
+    QDateTime dtCompleted = ewsItem[EwsItemFieldCompleteDate].toDateTime();
+    if(!dtDue.isNull())
+    {
+        todo->setDtDue(dtDue);
+    }
+    if(!dtStart.isNull())
+    {
+        todo->setDtStart(dtStart);
+    }
+    if(dtStart.isValid() && dtDue.isValid())
+    {
+        KCalendarCore::Duration duration = KCalendarCore::Duration(dtStart,dtDue,KCalendarCore::Duration::Type::Days);
+        todo->setDuration(duration);
+    }
+    if(!dtCompleted.isNull())
+    {
+        todo->setCompleted(dtCompleted);
+    }
+    else
+    {
+        todo->setCompleted(ewsItem[EwsItemFieldIsComplete].toBool());
+    }
+    todo->setSummary(ewsItem[EwsItemFieldSubject].toString());
+    todo->setPercentComplete(ewsItem[EwsItemFieldPercentComplete].toUInt());
+    todo->setOrganizer(ewsItem[EwsItemFieldOwner].toString());
+    item.setPayload<KCalendarCore::Todo::Ptr>(todo);
     return true;
 }
 
