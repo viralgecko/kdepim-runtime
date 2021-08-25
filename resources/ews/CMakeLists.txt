@@ -52,6 +52,7 @@ set(ewsresource_SRCS
     ewsconfigdialog.cpp
     ewscreateitemjob.cpp
     ewsfolderclassattribute.cpp
+    ewsitemclassattribute.cpp
     ewsfetchfoldersjob.cpp
     ewsfetchfoldersincrjob.cpp
     ewsfetchitemsjob.cpp

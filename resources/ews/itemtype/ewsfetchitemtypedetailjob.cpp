@@ -12,6 +12,7 @@
 #include "ewsitemshape.h"
 #include "ewsmailbox.h"
 #include "ewsresource_debug.h"
+#include "ewsitemclassattribute.h"
 
 using namespace Akonadi;
 
@@ -81,10 +82,9 @@ void EwsFetchItemTypeDetailsJob::processItems(const QList<EwsGetItemRequest::Res
             }
         }
         msg->assemble();
+        QString itemClass = ewsItem[EwsItemFieldItemClass].toString();
+        item.addAttribute(new ewsItemClassAttribute(itemClass));
         item.setPayload<KMime::Message::Ptr>(msg);
-
-
-
 
         ++it;
     }
