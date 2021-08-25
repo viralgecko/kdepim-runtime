@@ -11,6 +11,7 @@
 #include "ewscreateabchpersonjob.h"
 #include "ewsfetchabchpersondetailjob.h"
 #include "ewsmodifyabchpersonjob.h"
+#include "ewsresource_debug.h"
 
 using namespace Akonadi;
 
@@ -40,8 +41,7 @@ void EwsAbchPersonHandler::setSeenFlag(Item &item, bool value)
 
 QString EwsAbchPersonHandler::mimeType()
 {
-    std::string mime = "abchPerson";
-    return QString::fromStdString(mime);
+    return KContacts::Addressee::mimeType();
 }
 
 bool EwsAbchPersonHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)

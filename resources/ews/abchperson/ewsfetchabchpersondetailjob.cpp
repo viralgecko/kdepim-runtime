@@ -19,6 +19,7 @@ EwsFetchAbchContactDetailsJob::EwsFetchAbchContactDetailsJob(EwsClient &client, 
     EwsItemShape shape(EwsShapeIdOnly);
     shape << EwsPropertyField(QStringLiteral("item:Body"));
     shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
+    shape << EwsPropertyField(QStringLiteral("item:ItemClass"));
     mRequest->setItemShape(shape);
 }
 
@@ -41,6 +42,9 @@ void EwsFetchAbchContactDetailsJob::processItems(const QList<EwsGetItemRequest::
         // const EwsItem &ewsItem = resp.item();
 
         // TODO: Implement
+
+
+
 
         ++it;
     }
