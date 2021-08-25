@@ -1,0 +1,27 @@
+/*
+    SPDX-FileCopyrightText: 2008 Omat Holding B.V. <info@omat.nl>
+
+    SPDX-License-Identifier: LGPL-2.0-or-later
+*/
+
+#ifndef UIDNEXTATTRIBUTE_H
+#define UIDNEXTATTRIBUTE_H
+
+#include <attribute.h>
+
+class UidNextAttribute : public Akonadi::Attribute
+{
+public:
+    explicit UidNextAttribute(int uidnext = 0);
+    void setUidNext(int uidnext);
+    int uidNext() const;
+    QByteArray type() const override;
+    Attribute *clone() const override;
+    QByteArray serialized() const override;
+    void deserialize(const QByteArray &data) override;
+
+private:
+    int mUidNext;
+};
+
+#endif

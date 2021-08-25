@@ -1,0 +1,34 @@
+/*
+    SPDX-FileCopyrightText: 2011-2013 Daniel Vrátil <dvratil@redhat.com>
+
+    SPDX-License-Identifier: GPL-3.0-or-later
+*/
+
+#ifndef GOOGLE_CALENDAR_DEFAULTREMINDERATTRIBUTE_H
+#define GOOGLE_CALENDAR_DEFAULTREMINDERATTRIBUTE_H
+
+#include <AkonadiCore/Attribute>
+
+#include <KGAPI/Types>
+
+#include <KCalendarCore/Alarm>
+#include <KCalendarCore/Incidence>
+
+class DefaultReminderAttribute : public Akonadi::Attribute
+{
+public:
+    explicit DefaultReminderAttribute();
+
+    Attribute *clone() const override;
+    void deserialize(const QByteArray &data) override;
+    QByteArray serialized() const override;
+    QByteArray type() const override;
+
+    void setReminders(const KGAPI2::RemindersList &reminders);
+    KCalendarCore::Alarm::List alarms(KCalendarCore::Incidence *incidence) const;
+
+private:
+    KGAPI2::RemindersList m_reminders;
+};
+
+#endif // DEFAULTREMINDERATTRIBUTE_H

@@ -1,0 +1,33 @@
+/*
+ *  alarmtypewidget.h  -  KAlarm Akonadi configuration alarm type selection widget
+ *  Program:  kalarm
+ *  SPDX-FileCopyrightText: 2011 David Jarvie <djarvie@kde.org>
+ *
+ *  SPDX-License-Identifier: LGPL-2.0-or-later
+ */
+
+#ifndef ALARMTYPEWIDGET_H
+#define ALARMTYPEWIDGET_H
+
+#include "ui_alarmtypewidget.h"
+
+#include <kalarmcal/kacalendar.h>
+
+using namespace KAlarmCal;
+
+class AlarmTypeWidget : public QWidget
+{
+    Q_OBJECT
+public:
+    AlarmTypeWidget(QWidget *parent, QLayout *layout);
+    void setAlarmTypes(CalEvent::Types);
+    CalEvent::Types alarmTypes() const;
+
+Q_SIGNALS:
+    void changed();
+
+private:
+    Ui::AlarmTypeWidget ui;
+};
+
+#endif // ALARMTYPEWIDGET_H

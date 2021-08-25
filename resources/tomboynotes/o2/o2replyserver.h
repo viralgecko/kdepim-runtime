@@ -1,0 +1,38 @@
+/*
+    SPDX-License-Identifier: BSD-2-Clause
+*/
+
+#ifndef O2REPLYSERVER_H
+#define O2REPLYSERVER_H
+
+#include <QByteArray>
+#include <QMap>
+#include <QString>
+#include <QTcpServer>
+
+/// HTTP server to process authentication response.
+class O2ReplyServer : public QTcpServer
+{
+    Q_OBJECT
+
+public:
+    explicit O2ReplyServer(QObject *parent = nullptr);
+
+    /// Page content on local host after successful oauth - in case you do not want to close the browser, but display something
+    Q_PROPERTY(QByteArray replyContent READ replyContent WRITE setReplyContent)
+    QByteArray replyContent() const;
+    void setReplyContent(const QByteArray &value);
+
+Q_SIGNALS:
+    void verificationReceived(QMap<QString, QString>);
+
+public Q_SLOTS:
+    void onIncomingConnection();
+    void onBytesReady();
+    QMap<QString, QString> parseQueryParams(QByteArray *data);
+
+protected:
+    QByteArray replyContent_;
+};
+
+#endif // O2REPLYSERVER_H
