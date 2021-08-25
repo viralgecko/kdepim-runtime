@@ -31,7 +31,6 @@ EwsCreateTaskJob::~EwsCreateTaskJob()
 
 void EwsCreateTaskJob::doStart()
 {
-    qCWarning(EWSRES_LOG) << QStringLiteral("Task item creation not implemented!");
     if (!mItem.hasPayload<KCalendarCore::Todo::Ptr>()) {
         setErrorMsg(QStringLiteral("Expected MIME message payload"));
         emitResult();
