@@ -5,7 +5,6 @@
 */
 
 #include "ewsfetchabchpersondetailjob.h"
-#include <KMime/Message>
 
 #include "ewsgetitemrequest.h"
 #include "ewsitemshape.h"
@@ -18,10 +17,6 @@ EwsFetchAbchContactDetailsJob::EwsFetchAbchContactDetailsJob(EwsClient &client, 
     : EwsFetchItemDetailJob(client, parent, collection)
 {
     EwsItemShape shape(EwsShapeIdOnly);
-    shape << EwsPropertyField(QStringLiteral("item:Body"));
-    shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
-    shape << EwsPropertyField(QStringLiteral("item:ItemClass"));
-    shape << EwsPropertyField(QStringLiteral("item:Subject"));
     mRequest->setItemShape(shape);
 }
 

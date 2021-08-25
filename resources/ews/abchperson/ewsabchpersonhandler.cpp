@@ -6,12 +6,11 @@
 
 #include "ewsabchpersonhandler.h"
 
-#include <KMime/Message>
+#include <KCalendarCore/Todo>
 
 #include "ewscreateabchpersonjob.h"
 #include "ewsfetchabchpersondetailjob.h"
 #include "ewsmodifyabchpersonjob.h"
-#include "ewsresource_debug.h"
 
 using namespace Akonadi;
 
@@ -41,13 +40,14 @@ void EwsAbchPersonHandler::setSeenFlag(Item &item, bool value)
 
 QString EwsAbchPersonHandler::mimeType()
 {
-    return KMime::Message::mimeType();
+    return KCalendarCore::Todo::todoMimeType();
 }
 
 bool EwsAbchPersonHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
 {
     Q_UNUSED(item)
     Q_UNUSED(ewsItem)
+
     return true;
 }
 
