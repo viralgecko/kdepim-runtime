@@ -179,6 +179,14 @@ bool ewsXmlDateTimeReader(QXmlStreamReader &reader, QVariant &val)
     return true;
 }
 
+bool ewsXmlDateTimeWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    QDateTime dt = val.toDateTime();
+    writer.writeCharacters(dt.toString(Qt::ISODate));
+
+    return true;
+}
+
 bool ewsXmlItemReader(QXmlStreamReader &reader, QVariant &val)
 {
     QString elmName = reader.name().toString();
