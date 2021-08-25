@@ -24,6 +24,7 @@ EwsFetchContactDetailJob::EwsFetchContactDetailJob(EwsClient &client, QObject *p
     shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
     shape << EwsPropertyField(QStringLiteral("contacts:SpouseName"));
     shape << EwsPropertyField(QStringLiteral("contacts:WeddingAnniversary"));
+    shape << EwsPropertyField(QStringLiteral("contacts:ImAddresses"));
     mRequest->setItemShape(shape);
 }
 
@@ -55,6 +56,7 @@ void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Respo
         contact = Convert->parseVCard(mimeContent.toUtf8());
         contact.setSpousesName(ewsItem[EwsItemFieldSpouseName].toString());
         contact.setAnniversary(ewsItem[EwsItemFieldWeddingAnniversary].toDate());
+        contact.setImppList(ewsItem[EwsItemFieldImAddresses].value<KContacts::Impp::List>());
         item.setPayload<Addressee>(contact);
 
         ++it;

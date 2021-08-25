@@ -47,14 +47,7 @@ void EwsCreateContactJob::doStart()
     QStringList imAddresses;
     item.setType(EwsItemTypeContact);
     item.setField(EwsItemFieldEmailAddresses, QVariant::fromValue(Contact.emailList()));
-    for( const QString &custome : customes)
-    {
-        if(custome.contains(QString::fromUtf8("X-MS-IMADDRESS")))
-        {
-            imAddresses.append(custome.split(QChar::fromLatin1(':'))[1]);
-        }
-    }
-    item.setField(EwsItemFieldImAddresses, imAddresses);
+    item.setField(EwsItemFieldImAddresses, QVariant::fromValue(Contact.imppList()));
     item.setField(EwsItemFieldGivenName, Contact.givenName());
     item.setField(EwsItemFieldSurname, Contact.familyName());
     item.setField(EwsItemFieldNickname, Contact.nickName());

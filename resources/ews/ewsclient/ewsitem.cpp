@@ -12,6 +12,7 @@
 #include <KContacts/Address>
 #include <KCalendarCore/Todo>
 #include <KContacts/PhoneNumber>
+#include <KContacts/Impp>
 
 #include "ewsattachment.h"
 #include "ewsattendee.h"
@@ -476,7 +477,7 @@ bool EwsItemPrivate::emailAddressesWriter(QXmlStreamWriter &writer, const QVaria
 
 bool EwsItemPrivate::imAddressesReader(QXmlStreamReader &reader, QVariant &val)
 {
-    QStringList imaddressList;
+    KContacts::Impp::List imAddressList;
     while (reader.readNextStartElement()) {
         if (reader.namespaceUri() != ewsTypeNsUri) {
             qCWarningNC(EWSCLI_LOG) << QStringLiteral("Unexpected namespace in %1 element:").arg(reader.name().toString()) << reader.namespaceUri();
@@ -484,23 +485,23 @@ bool EwsItemPrivate::imAddressesReader(QXmlStreamReader &reader, QVariant &val)
         }
 
         if (reader.name() == QLatin1String("Entry")) {
-            imaddressList.append(reader.readElementText());
+            imAddressList.append(KContacts::Impp(QUrl(QString::fromUtf8("skype:") + reader.readElementText())));
             if (reader.error() != QXmlStreamReader::NoError) {
                 qCWarning(EWSCLI_LOG) << QStringLiteral("Failed to read EWS request - invalid %1 element.").arg(QStringLiteral("EmailAddresses/Value"));
                 return false;
             }
         }
     }
-    val = QVariant::fromValue(imaddressList);
+    val = QVariant::fromValue(imAddressList);
     return true;
 }
 
 bool EwsItemPrivate::imAddressesWriter(QXmlStreamWriter &writer, const QVariant &val)
 {
-    const QStringList list = val.toStringList();
+    const KContacts::Impp::List list = val.value<KContacts::Impp::List>();
     int i = 1;
 
-    for (const QString &imAddress : list) {
+    for (const KContacts::Impp &imAddress : list) {
         if(i > 3)
         {
             qCWarning(EWSCLI_LOG) << QStringLiteral("Failed to write EWS request - to many Email Addresses (only 3 supported).");
@@ -508,7 +509,10 @@ bool EwsItemPrivate::imAddressesWriter(QXmlStreamWriter &writer, const QVariant 
         }
         writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Entry"));
         writer.writeAttribute(QString::fromUtf8("Key"),QString::fromUtf8("ImAddress").append(QString::number(i)));
-        writer.writeCharacters(imAddress);
+        QStringList urlSplit = imAddress.address().toString().split(QChar::fromLatin1(':'));
+        if(urlSplit[0] != QString::fromUtf8("skype"))
+            return false;
+        writer.writeCharacters(urlSplit[1]);
         writer.writeEndElement();
         i++;
     }

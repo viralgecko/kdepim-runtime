@@ -56,10 +56,7 @@ bool EwsContactHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsIt
         qCWarning(EWSRES_LOG) << QStringLiteral("MIME content is empty!");
         return false;
     }
-    contact = Convert->parseVCard(mimeContent);
-    contact.setSpousesName(ewsItem[EwsItemFieldSpouseName].toString());
-    contact.setAnniversary(ewsItem[EwsItemFieldWeddingAnniversary].toDate());
-    item.setPayload<KContacts::Addressee>(contact);
+    item.setPayload<KContacts::Addressee>(Convert->parseVCard(mimeContent));
 
 
     return true;
