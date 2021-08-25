@@ -16,6 +16,8 @@ public:
     EwsModifyTaskJob(EwsClient &client, const Akonadi::Item::List &items, const QSet<QByteArray> &parts, QObject *parent);
     ~EwsModifyTaskJob() override;
     void start() override;
+private Q_SLOTS:
+    void updateItemFinished(KJob *job);
 };
 
 #endif
