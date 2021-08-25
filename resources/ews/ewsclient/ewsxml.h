@@ -167,6 +167,8 @@ extern bool ewsXmlTextReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlTextWriter(QXmlStreamWriter &writer, const QVariant &val);
 extern bool ewsXmlUIntReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlUIntWriter(QXmlStreamWriter &writer, const QVariant &val);
+extern bool ewsXmlIntReader(QXmlStreamReader &reader, QVariant &val);
+extern bool ewsXmlIntWriter(QXmlStreamWriter &writer, const QVariant &val);
 extern bool ewsXmlDateTimeReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlItemReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlFolderReader(QXmlStreamReader &reader, QVariant &val);

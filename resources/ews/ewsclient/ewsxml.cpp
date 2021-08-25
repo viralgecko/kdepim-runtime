@@ -148,6 +148,25 @@ bool ewsXmlUIntWriter(QXmlStreamWriter &writer, const QVariant &val)
     return true;
 }
 
+bool ewsXmlIntReader(QXmlStreamReader &reader, QVariant &val)
+{
+    QString elmName = reader.name().toString();
+    bool ok;
+    val = reader.readElementText().toInt(&ok);
+    if (reader.error() != QXmlStreamReader::NoError || !ok) {
+        qCWarningNC(EWSCLI_LOG) << QStringLiteral("Failed to read %1 element - invalid content.").arg(elmName);
+        return false;
+    }
+    return true;
+}
+
+bool ewsXmlIntWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    writer.writeCharacters(QString::number(val.toInt()));
+
+    return true;
+}
+
 bool ewsXmlDateTimeReader(QXmlStreamReader &reader, QVariant &val)
 {
     QString elmName = reader.name().toString();
