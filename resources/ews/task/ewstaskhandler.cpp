@@ -89,4 +89,38 @@ EwsTaskHandler::createItemJob(EwsClient &client, const Akonadi::Item &item, cons
     return new EwsCreateTaskJob(client, item, collection, tagStore, parent);
 }
 
+QHash<EwsPropertyField, QVariant> EwsTaskHandler::writeProperties(const Akonadi::Item &item)
+{
+    KCalendarCore::Todo::Ptr task = item.payload<KCalendarCore::Todo::Ptr>();
+    QHash<EwsPropertyField, QVariant> propertyHash;
+
+    if(task->completed().isValid())
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:CompleteDate")),task->completed().toString(Qt::ISODate));
+    }
+    else
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:CompleteDate")),QVariant());
+    }
+    if(task->dtStart().isValid())
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:StartDate")),task->dtStart().toString(Qt::ISODate));
+    }
+    else
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:StartDate")),QVariant());
+    }
+    if(task->dtDue().isValid())
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:DueDate")),task->dtDue().toString(Qt::ISODate));
+    }
+    else
+    {
+        propertyHash.insert(EwsPropertyField(QStringLiteral("task:DueDate")),QVariant());
+    }
+    propertyHash.insert(EwsPropertyField(QStringLiteral("item:Subject")),task->summary());
+    propertyHash.insert(EwsPropertyField(QStringLiteral("task:PercentComplete")),QString::number(task->percentComplete()));
+    return propertyHash;
+}
+
 EWS_DECLARE_ITEM_HANDLER(EwsTaskHandler, EwsItemTypeTask)

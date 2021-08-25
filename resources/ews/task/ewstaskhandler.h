@@ -23,6 +23,7 @@ public:
     EwsCreateItemJob *
     createItemJob(EwsClient &client, const Akonadi::Item &item, const Akonadi::Collection &collection, EwsTagStore *tagStore, EwsResource *parent) override;
     static EwsItemHandler *factory();
+    static QHash<EwsPropertyField, QVariant> writeProperties(const Akonadi::Item &item);
 };
 
 #endif
