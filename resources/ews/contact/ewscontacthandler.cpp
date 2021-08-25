@@ -6,12 +6,15 @@
 
 #include "ewscontacthandler.h"
 
+#include <AkonadiCore/Item>
 #include <KContacts/Addressee>
 #include <KContacts/ContactGroup>
+#include <KContacts/VCardConverter>
 
 #include "ewscreatecontactjob.h"
 #include "ewsfetchcontactdetailjob.h"
 #include "ewsmodifycontactjob.h"
+#include "ewsresource_debug.h"
 
 using namespace Akonadi;
 
@@ -46,8 +49,14 @@ QString EwsContactHandler::mimeType()
 
 bool EwsContactHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
 {
-    Q_UNUSED(item)
-    Q_UNUSED(ewsItem)
+    QByteArray mimeContent = ewsItem[EwsItemFieldMimeContent].toByteArray();
+    KContacts::VCardConverter *Convert = new KContacts::VCardConverter();
+    if (mimeContent.isEmpty()) {
+        qCWarning(EWSRES_LOG) << QStringLiteral("MIME content is empty!");
+        return false;
+    }
+    item.setPayload<KContacts::Addressee>(Convert->parseVCard(mimeContent));
+
 
     return true;
 }

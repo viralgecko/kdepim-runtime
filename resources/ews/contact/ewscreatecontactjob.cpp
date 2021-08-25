@@ -54,14 +54,13 @@ void EwsCreateContactJob::doStart()
     populateCommonProperties(item);
 
     req->setItems(EwsItem::List() << item);
-    //req->setMessageDisposition(mSend ? EwsDispSendOnly : EwsDispSaveOnly);
+    req->setMessageDisposition(EwsDispSaveOnly);
     connect(req,
             &EwsCreateItemRequest::finished,
             this,
             &EwsCreateContactJob::contactCreateFinished);
     addSubjob(req);
     req->start();
-    emitResult();
 }
 
 void EwsCreateContactJob::contactCreateFinished(KJob *job)
@@ -92,6 +91,7 @@ void EwsCreateContactJob::contactCreateFinished(KJob *job)
         mItem.setRemoteRevision(id.changeKey());
         mItem.setParentCollection(mCollection);
     } else {
+        qCWarning(EWSRES_LOG) << QStringLiteral("Error Message: %1").arg(resp.responseMessage());
         setErrorMsg(i18n("Failed to create contact item"));
     }
 
