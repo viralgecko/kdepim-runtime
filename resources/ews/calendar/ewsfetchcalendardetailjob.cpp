@@ -17,6 +17,7 @@
 #include "ewsmailbox.h"
 #include "ewsoccurrence.h"
 #include "ewsresource_debug.h"
+#include "ewsfolderclassattribute.h"
 
 using namespace Akonadi;
 
@@ -115,6 +116,18 @@ void EwsFetchCalendarDetailJob::processItems(const QList<EwsGetItemRequest::Resp
             dt = incidence->recurrenceId();
             if (dt.isValid()) {
                 incidence->setRecurrenceId(dt);
+            }
+
+            if(mCollection.hasAttribute("FolderClass"))
+            {
+                QByteArray folderClass = mCollection.attribute(QByteArray("FolderClass"))->serialized();
+                if(QString::fromUtf8(folderClass)==QString::fromUtf8("IPF.Appointment.Birthday"))
+                {
+                    QStringList categories = incidence->categories();
+                    categories.append(QString::fromUtf8("Birthday"));
+                    incidence->setCategories(categories);
+                    incidence->setCustomProperty("KABC", "BIRTHDAY", QStringLiteral("YES"));
+                }
             }
 
             item.setPayload<KCalendarCore::Incidence::Ptr>(incidence);
