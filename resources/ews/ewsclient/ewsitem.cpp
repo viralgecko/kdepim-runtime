@@ -52,7 +52,14 @@ public:
     static const Reader mStaticEwsXml;
     Reader mEwsXml;
 };
-
+// Todo
+// figure out:
+// task:Contacts (CSV)
+// task:DelegationState
+// task:Milage (XML of Contact)
+// task:Status
+//
+// task:Recurrence is quiet different from a CalendarItem:Recurrence
 static const QVector<EwsItemPrivate::Reader::Item> ewsItemItems = {
     // Item fields
     {EwsItemFieldMimeContent, QStringLiteral("MimeContent"), &ewsXmlBase64Reader, &ewsXmlBase64Writer},
@@ -85,6 +92,29 @@ static const QVector<EwsItemPrivate::Reader::Item> ewsItemItems = {
     {EwsItemFieldIsRead, QStringLiteral("IsRead"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
     {EwsItemFieldReferences, QStringLiteral("References"), &ewsXmlTextReader},
     {EwsItemFieldReplyTo, QStringLiteral("ReplyTo"), &EwsItemPrivate::mailboxReader},
+    // Task fields
+    {EwsItemFieldActualWork, QStringLiteral("ActualWork"), &ewsXmlIntReader, &ewsXmlIntWriter},
+    {EwsItemFieldAssignedTime, QStringLiteral("AssignedTime"), &ewsXmlDateTimeReader},
+    {EwsItemFieldBillingInformation, QStringLiteral("BillingInformation"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldChangeCount, QStringLiteral("ChangeCount"), &ewsXmlUIntReader, &ewsXmlUIntWriter},
+    {EwsItemFieldCompanies, QStringLiteral("Companies"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldCompleteDate, QStringLiteral("CompleteDate"), &ewsXmlDateTimeReader},
+    //{EwsItemFieldContacts, QStringLiteral("Contacts"), },
+    //{EwsItemFieldDelegationState, QStringLiteral("DelegationState"), },
+    {EwsItemFieldDelegator, QStringLiteral("Delegator"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldDueDate, QStringLiteral("DueDate"), &ewsXmlDateTimeReader},
+    {EwsItemFieldIsAssignmentEditable, QStringLiteral("IsAssignmentEditable"), &ewsXmlUIntReader, &ewsXmlUIntWriter },
+    {EwsItemFieldIsComplete, QStringLiteral("IsComplete"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
+    {EwsItemFieldIsRecurring, QStringLiteral("IsRecurring"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
+    {EwsItemFieldIsTeamTask, QStringLiteral("IsTeamTask"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
+    //{EwsItemFieldMileage, QStringLiteral("Mileage"), },
+    {EwsItemFieldOwner, QStringLiteral("Owner"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldPercentComplete, QStringLiteral("PercentComplete"), &ewsXmlUIntReader},
+    //{EwsItemFieldRecurrence, QStringLiteral("Recurrence"), },
+    {EwsItemFieldStartDate, QStringLiteral("StartDate"), &ewsXmlDateTimeReader},
+    //{EwsItemFieldStatus, QStringLiteral("Status"), },
+    {EwsItemFieldStatusDescription, QStringLiteral("StatusDescription"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldTotalWork, QStringLiteral("TotalWork"), &ewsXmlIntReader, &ewsXmlIntWriter},
     // CalendarItem fields
     {EwsItemFieldCalendarItemType, QStringLiteral("CalendarItemType"), &ewsXmlCalendarItemTypeReader},
     {EwsItemFieldUID, QStringLiteral("UID"), &ewsXmlTextReader},
