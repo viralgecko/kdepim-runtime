@@ -465,8 +465,10 @@ bool EwsItemPrivate::emailAddressesWriter(QXmlStreamWriter &writer, const QVaria
             qCWarning(EWSCLI_LOG) << QStringLiteral("Failed to write EWS request - to many Email Addresses (only 3 supported).");
             return false;
         }
-        writer.writeTextElement(ewsTypeNsUri, QStringLiteral("Entry"), email.toString());
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Entry"));
         writer.writeAttribute(QString::fromUtf8("Key"),QString::fromUtf8("EmailAddress").append(QString::number(i)));
+        writer.writeCharacters(email.mail());
+        writer.writeEndElement();
         i++;
     }
     return true;
@@ -504,8 +506,10 @@ bool EwsItemPrivate::imAddressesWriter(QXmlStreamWriter &writer, const QVariant 
             qCWarning(EWSCLI_LOG) << QStringLiteral("Failed to write EWS request - to many Email Addresses (only 3 supported).");
             return false;
         }
-        writer.writeTextElement(ewsTypeNsUri, QStringLiteral("Entry"), imAddress);
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Entry"));
         writer.writeAttribute(QString::fromUtf8("Key"),QString::fromUtf8("ImAddress").append(QString::number(i)));
+        writer.writeCharacters(imAddress);
+        writer.writeEndElement();
         i++;
     }
     return true;
@@ -586,7 +590,7 @@ bool EwsItemPrivate::phoneNumberWriter(QXmlStreamWriter &writer, const QVariant 
     int i = 1;
 
     for (const KContacts::PhoneNumber &phoneNumber : list) {
-        writer.writeTextElement(ewsTypeNsUri, QStringLiteral("Entry"), phoneNumber.number());
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Entry"));
         switch (phoneNumber.type())
         {
             case KContacts::PhoneNumber::TypeFlag::Home:
@@ -614,6 +618,8 @@ bool EwsItemPrivate::phoneNumberWriter(QXmlStreamWriter &writer, const QVariant 
                 writer.writeAttribute(QString::fromUtf8("Key"),QString::fromUtf8("OtherTelephone"));
                 break;
         }
+        writer.writeCharacters(phoneNumber.number());
+        writer.writeEndElement();
         i++;
     }
     return true;

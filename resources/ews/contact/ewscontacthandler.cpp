@@ -51,11 +51,15 @@ bool EwsContactHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsIt
 {
     QByteArray mimeContent = ewsItem[EwsItemFieldMimeContent].toByteArray();
     KContacts::VCardConverter *Convert = new KContacts::VCardConverter();
+    KContacts::Addressee contact;
     if (mimeContent.isEmpty()) {
         qCWarning(EWSRES_LOG) << QStringLiteral("MIME content is empty!");
         return false;
     }
-    item.setPayload<KContacts::Addressee>(Convert->parseVCard(mimeContent));
+    contact = Convert->parseVCard(mimeContent);
+    contact.setSpousesName(ewsItem[EwsItemFieldSpouseName].toString());
+    contact.setAnniversary(ewsItem[EwsItemFieldWeddingAnniversary].toDate());
+    item.setPayload<KContacts::Addressee>(contact);
 
 
     return true;
