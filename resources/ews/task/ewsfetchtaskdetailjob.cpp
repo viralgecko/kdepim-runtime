@@ -68,8 +68,7 @@ void EwsFetchTaskDetailJob::processItems(const QList<EwsGetItemRequest::Response
         // TODO: Implement
 
         const EwsItem &ewsItem = resp.item();
-        KCalendarCore::Todo *todo = new KCalendarCore::Todo();
-        KCalendarCore::Todo::Ptr todoPtr;
+        KCalendarCore::Todo::Ptr todo = KCalendarCore::Todo::Ptr(new KCalendarCore::Todo());
         QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
         QDateTime dtDue = ewsItem[EwsItemFieldDueDate].toDateTime();
         QDateTime dtStart = ewsItem[EwsItemFieldStartDate].toDateTime();
@@ -98,8 +97,7 @@ void EwsFetchTaskDetailJob::processItems(const QList<EwsGetItemRequest::Response
         todo->setSummary(ewsItem[EwsItemFieldSubject].toString());
         todo->setPercentComplete(ewsItem[EwsItemFieldPercentComplete].toUInt());
         todo->setOrganizer(ewsItem[EwsItemFieldOwner].toString());
-        todoPtr = QSharedPointer<KCalendarCore::Todo>(todo);
-        item.setPayload<KCalendarCore::Todo::Ptr>(todoPtr);
+        item.setPayload<KCalendarCore::Todo::Ptr>(todo);
 
 
         ++it;
