@@ -28,6 +28,7 @@ EwsFetchItemTypeDetailsJob::EwsFetchItemTypeDetailsJob(EwsClient &client, QObjec
     shape << EwsPropertyField(QStringLiteral("item:InReplyTo"));
     shape << EwsPropertyField(QStringLiteral("item:Size"));
     shape << EwsPropertyField(QStringLiteral("item:InternetMessageHeaders"));
+    shape << EwsPropertyField(QStringLiteral("item:DateTimeReceived"));
     mRequest->setItemShape(shape);
 }
 
@@ -80,7 +81,7 @@ void EwsFetchItemTypeDetailsJob::processItems(const QList<EwsGetItemRequest::Res
             }
         }
         msg->assemble();
-        item.setPayload(KMime::Message::Ptr(msg));
+        item.setPayload<KMime::Message::Ptr>(msg);
 
 
 

@@ -46,35 +46,8 @@ QString EwsAbchPersonHandler::mimeType()
 
 bool EwsAbchPersonHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
 {
-    KMime::Message::Ptr msg(new KMime::Message);
-    QByteArray mimeContent = ewsItem[EwsItemFieldMimeContent].toByteArray();
-
-    QVariant v = ewsItem[EwsItemFieldSubject];
-    if (Q_LIKELY(v.isValid())) {
-        msg->subject()->fromUnicodeString(v.toString(), "utf-8");
-    }
-
-    v = ewsItem[EwsItemFieldInReplyTo];
-    if (v.isValid()) {
-        msg->inReplyTo()->from7BitString(v.toString().toLatin1());
-    }
-
-    v = ewsItem[EwsItemFieldDateTimeReceived];
-    if (v.isValid()) {
-        msg->date()->setDateTime(v.toDateTime());
-    }
-    mimeContent.replace("\r\n", "\n");
-    msg->setContent(mimeContent);
-    QVariantList Body = ewsItem[EwsItemFieldBody].toList();
-    if(!Body.isEmpty())
-    {
-        if (Body[0].toString().isEmpty()) {
-            msg->setBody("\n");
-        }
-    }
-    msg->assemble();
-    item.setPayload<KMime::Message::Ptr>(msg);
-
+    Q_UNUSED(item)
+    Q_UNUSED(ewsItem)
     return true;
 }
 
