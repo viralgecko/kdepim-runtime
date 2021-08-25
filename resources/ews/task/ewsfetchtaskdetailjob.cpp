@@ -14,7 +14,6 @@
 #include "ewsresource_debug.h"
 
 using namespace Akonadi;
-using namespace KCalendarCore;
 
 EwsFetchTaskDetailJob::EwsFetchTaskDetailJob(EwsClient &client, QObject *parent, const Akonadi::Collection &collection)
     : EwsFetchItemDetailJob(client, parent, collection)
@@ -69,37 +68,33 @@ void EwsFetchTaskDetailJob::processItems(const QList<EwsGetItemRequest::Response
         // TODO: Implement
 
         const EwsItem &ewsItem = resp.item();
-        KCalendarCore::Todo::Ptr todo;
+        KCalendarCore::Todo *todo = new KCalendarCore::Todo();
+        KCalendarCore::Todo::Ptr todoPtr;
         QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
-        QString subject = ewsItem[EwsItemFieldSubject].value<QString>();
+        QString subject = ewsItem[EwsItemFieldSubject].toString();
         QDateTime dtDue;
         QDateTime dtStart;
         //int percentComplete = ewsItem[EwsItemFieldPercentComplete].toInt();
         //QString status = ewsItem[EwsItemFieldStatus].toString();
         if(!ewsItem[EwsItemFieldDueDate].isNull())
         {
-            dtDue = ewsItem[EwsItemFieldDueDate].toDateTime();
-            qCWarningNC(EWSRES_LOG) << QStringLiteral("Due: %1").arg(dtDue.toString());
-            todo->setDtDue(dtDue);
+            todo->setDtDue(ewsItem[EwsItemFieldDueDate].toDateTime());
         }
         if(!ewsItem[EwsItemFieldStartDate].isNull())
         {
-            dtStart = ewsItem[EwsItemFieldStartDate].toDateTime();
-            qCWarningNC(EWSRES_LOG) << QStringLiteral("Start: %1").arg(dtStart.toString());
-            todo->setDtStart(dtStart);
+            todo->setDtStart(ewsItem[EwsItemFieldStartDate].toDateTime());
         }
 
         //todo->setPercentComplete(percentComplete);
 
         if(dtStart.isValid() && dtDue.isValid())
         {
-            Duration duration = Duration(dtStart,dtDue,Duration::Type::Days);
+            KCalendarCore::Duration duration = KCalendarCore::Duration(dtStart,dtDue,KCalendarCore::Duration::Type::Days);
             todo->setDuration(duration);
         }
-        qCWarningNC(EWSRES_LOG) << QStringLiteral("Subject: %1").arg(subject);
-        //todo->setSummary(subject, false);
-
-        item.setPayload<KCalendarCore::Todo::Ptr>(todo);
+        todo->setSummary(subject);
+        todoPtr = QSharedPointer<KCalendarCore::Todo>(todo);
+        item.setPayload<KCalendarCore::Todo::Ptr>(todoPtr);
 
 
         ++it;

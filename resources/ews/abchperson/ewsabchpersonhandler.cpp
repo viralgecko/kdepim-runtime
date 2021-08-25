@@ -6,7 +6,7 @@
 
 #include "ewsabchpersonhandler.h"
 
-#include <KCalendarCore/Todo>
+#include <KContacts/Addressee>
 
 #include "ewscreateabchpersonjob.h"
 #include "ewsfetchabchpersondetailjob.h"
@@ -40,7 +40,8 @@ void EwsAbchPersonHandler::setSeenFlag(Item &item, bool value)
 
 QString EwsAbchPersonHandler::mimeType()
 {
-    return KCalendarCore::Todo::todoMimeType();
+    std::string mime = "abchPerson";
+    return QString::fromStdString(mime);
 }
 
 bool EwsAbchPersonHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
