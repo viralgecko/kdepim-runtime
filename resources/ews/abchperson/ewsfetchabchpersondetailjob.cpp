@@ -10,8 +10,12 @@
 #include "ewsitemshape.h"
 #include "ewsmailbox.h"
 #include "ewsresource_debug.h"
+#include <KContacts/Addressee>
+#include <KContacts/AddresseeList>
+#include <KContacts/VCardConverter>
 
 using namespace Akonadi;
+using namespace KContacts;
 
 EwsFetchAbchContactDetailsJob::EwsFetchAbchContactDetailsJob(EwsClient &client, QObject *parent, const Akonadi::Collection &collection)
     : EwsFetchItemDetailJob(client, parent, collection)
@@ -27,6 +31,7 @@ EwsFetchAbchContactDetailsJob::~EwsFetchAbchContactDetailsJob()
 void EwsFetchAbchContactDetailsJob::processItems(const QList<EwsGetItemRequest::Response> &responses)
 {
     Item::List::iterator it = mChangedItems.begin();
+    VCardConverter *Convert = new VCardConverter();
 
     for (const EwsGetItemRequest::Response &resp : responses) {
         Item &item = *it;
@@ -39,6 +44,11 @@ void EwsFetchAbchContactDetailsJob::processItems(const QList<EwsGetItemRequest::
         // const EwsItem &ewsItem = resp.item();
 
         // TODO: Implement
+
+        const EwsItem &ewsItem = resp.item();
+        QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
+        qCWarningNC(EWSRES_LOG) << QStringLiteral("Conctact mimeContent: %1").arg(mimeContent);
+        item.setPayload<Addressee>(Convert->parseVCard(mimeContent.toUtf8()));
 
         ++it;
     }
