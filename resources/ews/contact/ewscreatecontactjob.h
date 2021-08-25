@@ -19,6 +19,11 @@ public:
 
 protected:
     void doStart() override;
+private Q_SLOTS:
+    void contactCreateFinished(KJob *job);
+
+private:
+    bool mSend = false;
 };
 
 #endif
