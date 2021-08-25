@@ -49,7 +49,6 @@ void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Respo
 
         const EwsItem &ewsItem = resp.item();
         QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
-        qCWarningNC(EWSRES_LOG) << QStringLiteral("Conctact mimeContent: %1").arg(mimeContent);
         item.setPayload<Addressee>(Convert->parseVCard(mimeContent.toUtf8()));
 
         ++it;
