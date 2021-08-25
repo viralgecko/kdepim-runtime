@@ -27,10 +27,11 @@ parserArgumentsOpenCL=-ferror-limit=100 -fspell-checking -Wdocumentation -Wunuse
 Name=Clang
 
 [CustomDefinesAndIncludes][ProjectPath0][Includes]
-1=/media/data/programs/akonadi_resource_ews/
-2=/usr/include/qt/
-3=/usr/include/qt/QtCore/
-4=/usr/include/KF5/
+1=/usr/include/qt/
+2=/usr/include/qt/QtCore/
+3=/usr/include/KF5/
+4=/media/data/programs/akonadi_resource_ews
+5=/media/data/programs/akonadi_resource_ews/resources/ews
 
 [CustomDefinesAndIncludes][ProjectPath1]
 Path=resources/ews
