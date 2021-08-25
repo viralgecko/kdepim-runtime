@@ -54,6 +54,9 @@ void EwsCreateTaskJob::doStart()
     }
     item.setField(EwsItemFieldPercentComplete,Task->percentComplete());
     item.setField(EwsItemFieldOwner,Task->organizer().fullName());
+    item.setField(EwsItemFieldDelegationState, Task->customStatus());
+    item.setField(EwsItemFieldStatus, Task->status());
+    item.setField(EwsItemFieldContacts, Task->contacts());
     req->setSavedFolderId(EwsId(mCollection.remoteId(), mCollection.remoteRevision()));
     populateCommonProperties(item);
 

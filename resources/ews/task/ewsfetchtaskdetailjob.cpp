@@ -28,7 +28,7 @@ EwsFetchTaskDetailJob::EwsFetchTaskDetailJob(EwsClient &client, QObject *parent,
     shape << EwsPropertyField(QStringLiteral("task:ChangeCount"));
     shape << EwsPropertyField(QStringLiteral("task:Companies"));
     shape << EwsPropertyField(QStringLiteral("task:CompleteDate"));
-    //shape << EwsPropertyField(QStringLiteral("task:Contacts"));
+    shape << EwsPropertyField(QStringLiteral("task:Contacts"));
     //shape << EwsPropertyField(QStringLiteral("task:DelegationState"));
     shape << EwsPropertyField(QStringLiteral("task:Delegator"));
     shape << EwsPropertyField(QStringLiteral("task:DueDate"));
@@ -36,7 +36,7 @@ EwsFetchTaskDetailJob::EwsFetchTaskDetailJob(EwsClient &client, QObject *parent,
     shape << EwsPropertyField(QStringLiteral("task:IsComplete"));
     shape << EwsPropertyField(QStringLiteral("task:IsRecurring"));
     shape << EwsPropertyField(QStringLiteral("task:IsTeamTask"));
-    //shape << EwsPropertyField(QStringLiteral("task:Mileage"));
+    shape << EwsPropertyField(QStringLiteral("task:Mileage"));
     shape << EwsPropertyField(QStringLiteral("task:Owner"));
     shape << EwsPropertyField(QStringLiteral("task:PercentComplete"));
     //shape << EwsPropertyField(QStringLiteral("task:Recurrence"));
@@ -73,6 +73,7 @@ void EwsFetchTaskDetailJob::processItems(const QList<EwsGetItemRequest::Response
         QDateTime dtDue = ewsItem[EwsItemFieldDueDate].toDateTime();
         QDateTime dtStart = ewsItem[EwsItemFieldStartDate].toDateTime();
         QDateTime dtCompleted = ewsItem[EwsItemFieldCompleteDate].toDateTime();
+        QStringList contacts = ewsItem[EwsItemFieldContacts].toStringList();
         if(!dtDue.isNull())
         {
             todo->setDtDue(dtDue);
@@ -97,6 +98,13 @@ void EwsFetchTaskDetailJob::processItems(const QList<EwsGetItemRequest::Response
         todo->setSummary(ewsItem[EwsItemFieldSubject].toString());
         todo->setPercentComplete(ewsItem[EwsItemFieldPercentComplete].toUInt());
         todo->setOrganizer(ewsItem[EwsItemFieldOwner].toString());
+        todo->setCustomStatus(ewsItem[EwsItemFieldDelegationState].toString());
+        todo->setStatus(ewsItem[EwsItemFieldStatus].value<KCalendarCore::Todo::Status>());
+        for(const QString &contact : contacts)
+        {
+            todo->addContact(contact);
+        }
+
         item.setPayload<KCalendarCore::Todo::Ptr>(todo);
 
 

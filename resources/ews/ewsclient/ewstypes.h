@@ -395,6 +395,15 @@ typedef enum {
     EwsItemFieldSpouseName,
     EwsItemFieldSurname,
     EwsItemFieldWeddingAnniversary,
+    EwsItemFieldHasPicture,
+    EwsItemFieldPhoneticFullName,
+    EwsItemFieldPhoneticFirstName,
+    EwsItemFieldPhoneticLastName,
+    EwsItemFieldAlias,
+    EwsItemFieldNotes,
+    EwsItemFieldPhoto,
+    EwsItemFieldUserSMIMECertificate,
+    EwsItemFieldMSExchangeCertificate,
     // DistributionList
     // EwsItemFieldDisplayName,              DUPLICATE
     // EwsItemFieldFileAs,                   DUPLICATE

@@ -102,7 +102,8 @@ target_link_libraries(ewsclient
     KF5::Codecs
     KF5::I18n
     KF5::Mime
-    KF5::CalendarCore)
+    KF5::CalendarCore
+    KF5::Contacts)
 
 if (Qt5NetworkAuth_FOUND)
     target_link_libraries(ewsclient

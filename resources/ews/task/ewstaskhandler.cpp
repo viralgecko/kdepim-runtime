@@ -50,6 +50,7 @@ bool EwsTaskHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
     QDateTime dtDue = ewsItem[EwsItemFieldDueDate].toDateTime();
     QDateTime dtStart = ewsItem[EwsItemFieldStartDate].toDateTime();
     QDateTime dtCompleted = ewsItem[EwsItemFieldCompleteDate].toDateTime();
+    QStringList contacts = ewsItem[EwsItemFieldContacts].toStringList();
     if(!dtDue.isNull())
     {
         todo->setDtDue(dtDue);
@@ -74,6 +75,12 @@ bool EwsTaskHandler::setItemPayload(Akonadi::Item &item, const EwsItem &ewsItem)
     todo->setSummary(ewsItem[EwsItemFieldSubject].toString());
     todo->setPercentComplete(ewsItem[EwsItemFieldPercentComplete].toUInt());
     todo->setOrganizer(ewsItem[EwsItemFieldOwner].toString());
+    todo->setCustomStatus(ewsItem[EwsItemFieldDelegationState].toString());
+    todo->setStatus(ewsItem[EwsItemFieldStatus].value<KCalendarCore::Todo::Status>());
+    for(const QString &contact : contacts)
+    {
+        todo->addContact(contact);
+    }
     item.setPayload<KCalendarCore::Todo::Ptr>(todo);
     return true;
 }

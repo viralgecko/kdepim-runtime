@@ -42,14 +42,30 @@ void EwsCreateContactJob::doStart()
     }
     auto req = new EwsCreateItemRequest(mClient, this);
     Addressee Contact = mItem.payload<Addressee>();
-    VCardConverter *Convert = new VCardConverter();
-    QByteArray mimeContent = Convert->createVCard(Contact);
     EwsItem item;
+    QStringList customes = Contact.customs();
+    QStringList imAddresses;
     item.setType(EwsItemTypeContact);
-    item.setField(EwsItemFieldMimeContent, mimeContent);
-    /*if (!mSend) {
-        req->setSavedFolderId(EwsId(mCollection.remoteId(), mCollection.remoteRevision()));
-    }*/
+    item.setField(EwsItemFieldEmailAddresses, QVariant::fromValue(Contact.emailList()));
+    for( const QString &custome : customes)
+    {
+        if(custome.contains(QString::fromUtf8("X-MS-IMADDRESS")))
+        {
+            imAddresses.append(custome.split(QChar::fromLatin1(':'))[1]);
+        }
+    }
+    item.setField(EwsItemFieldImAddresses, imAddresses);
+    item.setField(EwsItemFieldGivenName, Contact.givenName());
+    item.setField(EwsItemFieldSurname, Contact.familyName());
+    item.setField(EwsItemFieldNickname, Contact.nickName());
+    if(Contact.birthday().isValid())
+        item.setField(EwsItemFieldBirthday,Contact.birthday());
+    item.setField(EwsItemFieldMiddleName,Contact.additionalName());
+    item.setField(EwsItemFieldSpouseName,Contact.spousesName());
+    item.setField(EwsItemFieldNotes,Contact.note());
+    if(Contact.anniversary().isValid())
+        item.setField(EwsItemFieldWeddingAnniversary,Contact.anniversary());
+    item.setField(EwsItemFieldPhoto,Contact.photo().rawData());
     req->setSavedFolderId(EwsId(mCollection.remoteId(), mCollection.remoteRevision()));
     populateCommonProperties(item);
 

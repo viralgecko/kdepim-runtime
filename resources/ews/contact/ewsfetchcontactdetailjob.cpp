@@ -33,6 +33,7 @@ void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Respo
 {
     Item::List::iterator it = mChangedItems.begin();
     VCardConverter *Convert = new VCardConverter();
+    Addressee contact;
 
     for (const EwsGetItemRequest::Response &resp : responses) {
         Item &item = *it;
@@ -49,7 +50,10 @@ void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Respo
 
         const EwsItem &ewsItem = resp.item();
         QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
-        item.setPayload<Addressee>(Convert->parseVCard(mimeContent.toUtf8()));
+        contact = Convert->parseVCard(mimeContent.toUtf8());
+        contact.setSpousesName(ewsItem[EwsItemFieldSpouseName].toString());
+        contact.setAnniversary(ewsItem[EwsItemFieldWeddingAnniversary].toDate());
+        item.setPayload<Addressee>(contact);
 
         ++it;
     }
