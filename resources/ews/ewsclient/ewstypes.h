@@ -455,6 +455,17 @@ typedef enum {
     EwsUnknownEvent
 } EwsEventType;
 
+typedef enum {
+    AllOccurrences = 0,
+    SpecifiedOccurrenceOnly
+} EwsAffectedTaskOccurenceType;
+
+typedef enum {
+    SendToNone = 0,
+    SendOnlyToAll,
+    SendToAllAndSaveCopy
+} EwsSendMeetingCancellationsType;
+
 template<typename T> T decodeEnumString(const QString &str, const QString *table, unsigned count, bool *ok)
 {
     unsigned i;

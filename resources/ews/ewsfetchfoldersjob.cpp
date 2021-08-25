@@ -21,6 +21,7 @@
 #include "ewsgetfolderrequest.h"
 #include "ewsresource_debug.h"
 #include "ewssyncfolderhierarchyrequest.h"
+#include "ewsfolderclassattribute.h"
 
 using namespace Akonadi;
 
@@ -311,7 +312,7 @@ Collection EwsFetchFoldersJobPrivate::createFolderCollection(const EwsFolder &fo
     EwsEffectiveRights ewsRights = folder[EwsFolderFieldEffectiveRights].value<EwsEffectiveRights>();
     // FIXME: For now full read/write support is only implemented for e-mail. In order to avoid
     // potential problems block write access to all other folder types.
-    if (folder.type() == EwsFolderTypeMail) {
+    //if (folder.type() == EwsFolderTypeMail) {
         if (ewsRights.canDelete()) {
             colRights |= Collection::CanDeleteCollection | Collection::CanDeleteItem;
         }
@@ -324,11 +325,12 @@ Collection EwsFetchFoldersJobPrivate::createFolderCollection(const EwsFolder &fo
         if (ewsRights.canCreateHierarchy()) {
             colRights |= Collection::CanCreateCollection;
         }
-    }
+    //}
     collection.setRights(colRights);
     EwsId id = folder[EwsFolderFieldFolderId].value<EwsId>();
     collection.setRemoteId(id.id());
     collection.setRemoteRevision(id.changeKey());
+    collection.addAttribute(new ewsFolderClassAttribute(contClass));
 
     return collection;
 }

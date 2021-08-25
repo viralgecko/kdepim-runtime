@@ -47,6 +47,7 @@ set(ewsresource_SRCS
     ewsautodiscoveryjob.cpp
     ewsconfigdialog.cpp
     ewscreateitemjob.cpp
+    ewsfolderclassattribute.cpp
     ewsfetchfoldersjob.cpp
     ewsfetchfoldersincrjob.cpp
     ewsfetchitemsjob.cpp
