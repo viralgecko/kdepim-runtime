@@ -8,10 +8,14 @@
 #include "ewsclient_debug.h"
 
 static const QVector<QString> deleteTypes = {QStringLiteral("HardDelete"), QStringLiteral("SoftDelete"), QStringLiteral("MoveToDeletedItems")};
+static const QVector<QString> affectedOccurenceTypes = {QStringLiteral("AllOccurrences"), QStringLiteral("SpecifiedOccurrenceOnly")};
+static const QVector<QString> sendMeetingCancellationsType = {QStringLiteral("SendToNone"), QStringLiteral("SendOnlyToAll"), QStringLiteral("SendToAllAndSaveCopy")};
 
 EwsDeleteItemRequest::EwsDeleteItemRequest(EwsClient &client, QObject *parent)
     : EwsRequest(client, parent)
     , mType(SoftDelete)
+    , mAffectedTaskOccurrences(AllOccurrences)
+    , mSendMeetingCancellations(SendToNone)
 {
 }
 
@@ -29,6 +33,8 @@ void EwsDeleteItemRequest::start()
     writer.writeStartElement(ewsMsgNsUri, QStringLiteral("DeleteItem"));
 
     writer.writeAttribute(QStringLiteral("DeleteType"), deleteTypes[mType]);
+    writer.writeAttribute(QStringLiteral("AffectedTaskOccurrences"), affectedOccurenceTypes[mAffectedTaskOccurrences]);
+    writer.writeAttribute(QStringLiteral("SendMeetingCancellations"), sendMeetingCancellationsType[mSendMeetingCancellations]);
 
     writer.writeStartElement(ewsMsgNsUri, QStringLiteral("ItemIds"));
     for (const EwsId &id : qAsConst(mIds)) {

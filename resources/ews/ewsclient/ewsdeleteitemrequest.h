@@ -43,6 +43,16 @@ public:
         mType = type;
     }
 
+    void setAffectedTaskOccurences(EwsAffectedTaskOccurenceType Occurence)
+    {
+        mAffectedTaskOccurrences = Occurence;
+    }
+
+    void setSendMeetingCancellations(EwsSendMeetingCancellationsType MeetingCancelation)
+    {
+        mSendMeetingCancellations = MeetingCancelation;
+    }
+
     void start() override;
 
     const QList<Response> &responses() const
@@ -57,6 +67,8 @@ protected:
 private:
     EwsId::List mIds;
     Type mType;
+    EwsAffectedTaskOccurenceType mAffectedTaskOccurrences;
+    EwsSendMeetingCancellationsType mSendMeetingCancellations;
     QList<Response> mResponses;
 };
 
