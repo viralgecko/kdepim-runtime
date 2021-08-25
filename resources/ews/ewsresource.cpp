@@ -397,7 +397,10 @@ void EwsResource::getItemsRequestFinished(KJob *job)
             cancelTask(i18nc("@info:status", "Failed to retrieve items - Unknown item type for item %1", id.id()));
             return;
         }
-        if (!EwsItemHandler::itemHandler(type)->setItemPayload(*it, ewsItem)) {
+        EwsItemHandler *Handler = EwsItemHandler::itemHandler(type);
+        if( Handler == nullptr)
+            return;
+        if (!Handler->setItemPayload(*it, ewsItem)) {
             qCWarningNC(EWSRES_AGENTIF_LOG) << "retrieveItems: Failed to fetch item payload";
             cancelTask(i18nc("@info:status", "Failed to fetch item payload"));
             return;

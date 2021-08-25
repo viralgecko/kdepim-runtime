@@ -9,13 +9,19 @@
 #include "ewsitemshape.h"
 #include "ewsmailbox.h"
 #include "ewsresource_debug.h"
+#include <KContacts/Addressee>
+#include <KContacts/AddresseeList>
+#include <KContacts/VCardConverter>
 
 using namespace Akonadi;
+using namespace KContacts;
 
 EwsFetchContactDetailJob::EwsFetchContactDetailJob(EwsClient &client, QObject *parent, const Akonadi::Collection &collection)
     : EwsFetchItemDetailJob(client, parent, collection)
 {
     EwsItemShape shape(EwsShapeIdOnly);
+    shape << EwsPropertyField(QStringLiteral("item:Body"));
+    shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
     mRequest->setItemShape(shape);
 }
 
@@ -26,6 +32,7 @@ EwsFetchContactDetailJob::~EwsFetchContactDetailJob()
 void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Response> &responses)
 {
     Item::List::iterator it = mChangedItems.begin();
+    VCardConverter *Convert = new VCardConverter();
 
     for (const EwsGetItemRequest::Response &resp : responses) {
         Item &item = *it;
@@ -38,6 +45,12 @@ void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Respo
         // const EwsItem &ewsItem = resp.item();
 
         // TODO: Implement
+
+
+        const EwsItem &ewsItem = resp.item();
+        QString mimeContent = ewsItem[EwsItemFieldMimeContent].toString();
+        qCWarningNC(EWSRES_LOG) << QStringLiteral("Conctact mimeContent: %1").arg(mimeContent);
+        item.setPayload<Addressee>(Convert->parseVCard(mimeContent.toUtf8()));
 
         ++it;
     }
