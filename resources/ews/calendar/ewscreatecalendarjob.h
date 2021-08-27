@@ -17,6 +17,9 @@ public:
     ~EwsCreateCalendarJob() override;
     bool setSend(bool send = true) override;
 
+private Q_SLOTS:
+    void calendarCreateFinished(KJob *job);
+
 protected:
     void doStart() override;
 };

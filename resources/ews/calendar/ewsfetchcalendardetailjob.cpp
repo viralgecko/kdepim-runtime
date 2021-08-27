@@ -52,6 +52,9 @@ EwsFetchCalendarDetailJob::EwsFetchCalendarDetailJob(EwsClient &client, QObject 
     //    shape << EwsPropertyField(QStringLiteral("item:Attachments"));
     shape << EwsPropertyField(QStringLiteral("calendar:ModifiedOccurrences"));
     shape << EwsPropertyField(QStringLiteral("calendar:DeletedOccurrences"));
+    shape << EwsPropertyField(QStringLiteral("calendar:RequiredAttendees"));
+    shape << EwsPropertyField(QStringLiteral("calendar:OptionalAttendees"));
+    shape << EwsPropertyField(QStringLiteral("calendar:LegacyFreeBusyStatus"));
     shape << EwsPropertyField(QStringLiteral("item:Body"));
     //    shape << EwsPropertyField(QStringLiteral("item:Culture"));
     shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
@@ -129,6 +132,55 @@ void EwsFetchCalendarDetailJob::processItems(const QList<EwsGetItemRequest::Resp
                     incidence->setCustomProperty("KABC", "BIRTHDAY", QStringLiteral("YES"));
                 }
             }
+            int freeBusy = ewsItem[EwsItemFieldLegacyFreeBusyStatus].toInt();
+            switch(freeBusy)
+            {
+                case EwsLegacyFreeBusyStatus::EwsLfbNoData:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusNone);
+                    break;
+                case EwsLegacyFreeBusyStatus::EwsLfbStatusBusy:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusConfirmed);
+                    break;
+                case EwsLegacyFreeBusyStatus::EwsLfbStatusFree:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusNone);
+                    break;
+                case EwsLegacyFreeBusyStatus::EwsLfbStatusTentative:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusTentative);
+                    break;
+                case EwsLegacyFreeBusyStatus::EwsLfbOutOfOffice:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusX);
+                    incidence->setCustomStatus(QStringLiteral("Out of Office"));
+                    break;
+                case EwsLegacyFreeBusyStatus::EwsLfbStatusWorkingElsewhere:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusX);
+                    incidence->setCustomStatus(QStringLiteral("Working Elsewhere"));
+                    break;
+                default:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusConfirmed);
+                    break;
+            }
+
+            incidence->clearAttendees();
+            KCalendarCore::Attendee::List requiredList = ewsItem[EwsItemFieldRequiredAttendees].value<KCalendarCore::Attendee::List>();
+            KCalendarCore::Attendee::List optionalList = ewsItem[EwsItemFieldOptionalAttendees].value<KCalendarCore::Attendee::List>();
+            KCalendarCore::Attendee::List attendees;
+            for( KCalendarCore::Attendee &attendee : requiredList)
+            {
+                if(attendee.role() != KCalendarCore::Attendee::Role::Chair)
+                {
+                    attendee.setRole(KCalendarCore::Attendee::Role::ReqParticipant);
+                }
+                attendees.append(attendee);
+            }
+            for( KCalendarCore::Attendee &attendee : optionalList)
+            {
+                if(attendee.role() != KCalendarCore::Attendee::Role::Chair)
+                {
+                    attendee.setRole(KCalendarCore::Attendee::Role::OptParticipant);
+                }
+                attendees.append(attendee);
+            }
+            incidence->setAttendees(attendees);
 
             item.setPayload<KCalendarCore::Incidence::Ptr>(incidence);
         }
@@ -144,6 +196,9 @@ void EwsFetchCalendarDetailJob::processItems(const QList<EwsGetItemRequest::Resp
         //        shape << EwsPropertyField(QStringLiteral("item:Attachments"));
         shape << EwsPropertyField(QStringLiteral("item:Body"));
         shape << EwsPropertyField(QStringLiteral("item:MimeContent"));
+        shape << EwsPropertyField(QStringLiteral("calendar:RequiredAttendees"));
+        shape << EwsPropertyField(QStringLiteral("calendar:OptionalAttendees"));
+        shape << EwsPropertyField(QStringLiteral("calendar:LegacyFreeBusyStatus"));
         //        shape << EwsPropertyField(QStringLiteral("calendar:TimeZone"));
         //        shape << EwsPropertyField(QStringLiteral("item:Culture"));
         req->setItemShape(shape);
@@ -207,6 +262,54 @@ void EwsFetchCalendarDetailJob::exceptionItemsFetched(KJob *job)
         if (dt.isValid()) {
             incidence->setRecurrenceId(dt);
         }
+        int freeBusy = ewsItem[EwsItemFieldLegacyFreeBusyStatus].toInt();
+        switch(freeBusy)
+        {
+            case EwsLegacyFreeBusyStatus::EwsLfbNoData:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusNone);
+                break;
+            case EwsLegacyFreeBusyStatus::EwsLfbStatusBusy:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusConfirmed);
+                break;
+            case EwsLegacyFreeBusyStatus::EwsLfbStatusFree:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusNone);
+                break;
+            case EwsLegacyFreeBusyStatus::EwsLfbStatusTentative:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusTentative);
+                break;
+            case EwsLegacyFreeBusyStatus::EwsLfbOutOfOffice:
+                    incidence->setStatus(KCalendarCore::Incidence::Status::StatusX);
+                    incidence->setCustomStatus(QStringLiteral("Out of Office"));
+                    break;
+            case EwsLegacyFreeBusyStatus::EwsLfbStatusWorkingElsewhere:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusX);
+                incidence->setCustomStatus(QStringLiteral("Working Elsewhere"));
+                break;
+            default:
+                incidence->setStatus(KCalendarCore::Incidence::Status::StatusConfirmed);
+                break;
+        }
+        incidence->clearAttendees();
+        KCalendarCore::Attendee::List requiredList = ewsItem[EwsItemFieldRequiredAttendees].value<KCalendarCore::Attendee::List>();
+        KCalendarCore::Attendee::List optionalList = ewsItem[EwsItemFieldOptionalAttendees].value<KCalendarCore::Attendee::List>();
+        KCalendarCore::Attendee::List attendees;
+        for( KCalendarCore::Attendee &attendee : requiredList)
+        {
+            if(attendee.role() != KCalendarCore::Attendee::Role::Chair)
+            {
+                attendee.setRole(KCalendarCore::Attendee::Role::ReqParticipant);
+            }
+            attendees.append(attendee);
+        }
+        for( KCalendarCore::Attendee &attendee : optionalList)
+        {
+            if(attendee.role() != KCalendarCore::Attendee::Role::Chair)
+            {
+                attendee.setRole(KCalendarCore::Attendee::Role::OptParticipant);
+            }
+            attendees.append(attendee);
+        }
+        incidence->setAttendees(attendees);
 
         item.setPayload<KCalendarCore::Incidence::Ptr>(incidence);
 

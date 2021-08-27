@@ -178,7 +178,10 @@ extern bool ewsXmlEnumReader(QXmlStreamReader &reader, QVariant &val, const QVec
 extern bool ewsXmlSensitivityReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlImportanceReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlCalendarItemTypeReader(QXmlStreamReader &reader, QVariant &val);
+extern bool ewsXmlCalendarItemTypeWriter(QXmlStreamWriter &writer, const QVariant &val);
 extern bool ewsXmlLegacyFreeBusyStatusReader(QXmlStreamReader &reader, QVariant &val);
+extern bool ewsXmlLegacyFreeBusyStatusWriter(QXmlStreamWriter &writer, const QVariant &val);
 extern bool ewsXmlResponseTypeReader(QXmlStreamReader &reader, QVariant &val);
+extern bool ewsXmlMyResponseTypeWriter(QXmlStreamWriter &writer, const QVariant &val);
 
 #endif

@@ -41,9 +41,11 @@ public:
     static bool bodyReader(QXmlStreamReader &reader, QVariant &val);
     static bool messageHeadersReader(QXmlStreamReader &reader, QVariant &val);
     static bool mailboxReader(QXmlStreamReader &reader, QVariant &val);
+    static bool mailboxWriter(QXmlStreamWriter &writer, const QVariant &val);
     static bool recipientsReader(QXmlStreamReader &reader, QVariant &val);
     static bool timezoneReader(QXmlStreamReader &reader, QVariant &val);
     static bool attendeesReader(QXmlStreamReader &reader, QVariant &val);
+    static bool attendeesWriter(QXmlStreamWriter &writer, const QVariant &val);
     static bool occurrenceReader(QXmlStreamReader &reader, QVariant &val);
     static bool occurrencesReader(QXmlStreamReader &reader, QVariant &val);
     static bool recurrenceReader(QXmlStreamReader &reader, QVariant &val);
@@ -65,11 +67,7 @@ public:
     static const Reader mStaticEwsXml;
     Reader mEwsXml;
 };
-// Todo
-// figure out:
-// task:Status
-//
-// task:Recurrence is quiet different from a CalendarItem:Recurrence
+
 static const QVector<EwsItemPrivate::Reader::Item> ewsItemItems = {
     // Item fields
     {EwsItemFieldMimeContent, QStringLiteral("MimeContent"), &ewsXmlBase64Reader, &ewsXmlBase64Writer},
@@ -120,35 +118,34 @@ static const QVector<EwsItemPrivate::Reader::Item> ewsItemItems = {
     {EwsItemFieldMileage, QStringLiteral("Mileage"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldOwner, QStringLiteral("Owner"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldPercentComplete, QStringLiteral("PercentComplete"), &ewsXmlUIntReader, &ewsXmlUIntWriter},
-    //{EwsItemFieldRecurrence, QStringLiteral("Recurrence"), },
     {EwsItemFieldStartDate, QStringLiteral("StartDate"), &ewsXmlDateTimeReader, &ewsXmlDateTimeWriter},
     {EwsItemFieldStatus, QStringLiteral("Status"), &EwsItemPrivate::taskStatusReader, &EwsItemPrivate::taskStatusWriter},
     {EwsItemFieldStatusDescription, QStringLiteral("StatusDescription"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldTotalWork, QStringLiteral("TotalWork"), &ewsXmlIntReader, &ewsXmlIntWriter},
     // CalendarItem fields
-    {EwsItemFieldCalendarItemType, QStringLiteral("CalendarItemType"), &ewsXmlCalendarItemTypeReader},
+    {EwsItemFieldCalendarItemType, QStringLiteral("CalendarItemType"), &ewsXmlCalendarItemTypeReader, &ewsXmlCalendarItemTypeWriter},
     {EwsItemFieldUID, QStringLiteral("UID"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldCulture, QStringLiteral("Culture"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldStartTimeZone, QStringLiteral("StartTimeZone"), &EwsItemPrivate::timezoneReader},
-    {EwsItemFieldOrganizer, QStringLiteral("Organizer"), &EwsItemPrivate::mailboxReader},
-    {EwsItemFieldRequiredAttendees, QStringLiteral("RequiredAttendees"), &EwsItemPrivate::attendeesReader},
-    {EwsItemFieldOptionalAttendees, QStringLiteral("OptionalAttendees"), &EwsItemPrivate::attendeesReader},
-    {EwsItemFieldResources, QStringLiteral("Resources"), &EwsItemPrivate::attendeesReader},
+    {EwsItemFieldOrganizer, QStringLiteral("Organizer"), &EwsItemPrivate::mailboxReader, &EwsItemPrivate::mailboxWriter},
+    {EwsItemFieldRequiredAttendees, QStringLiteral("RequiredAttendees"), &EwsItemPrivate::attendeesReader, &EwsItemPrivate::attendeesWriter},
+    {EwsItemFieldOptionalAttendees, QStringLiteral("OptionalAttendees"), &EwsItemPrivate::attendeesReader, &EwsItemPrivate::attendeesWriter},
+    {EwsItemFieldResources, QStringLiteral("Resources"), &EwsItemPrivate::attendeesReader, &EwsItemPrivate::attendeesWriter},
     {EwsItemFieldStart, QStringLiteral("Start"), &ewsXmlDateTimeReader, &ewsXmlDateTimeWriter},
     {EwsItemFieldEnd, QStringLiteral("End"), &ewsXmlDateTimeReader, &ewsXmlDateTimeWriter},
     {EwsItemFieldRecurrenceId, QStringLiteral("RecurrenceId"), &ewsXmlDateTimeReader, &ewsXmlDateTimeWriter},
     {EwsItemFieldIsAllDayEvent, QStringLiteral("IsAllDayEvent"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
-    {EwsItemFieldLegacyFreeBusyStatus, QStringLiteral("LegacyFreeBusyStatus"), &ewsXmlLegacyFreeBusyStatusReader},
-    {EwsItemFieldMyResponseType, QStringLiteral("MyResponseType"), &ewsXmlResponseTypeReader},
-    {EwsItemFieldAppointmentSequenceNumber, QStringLiteral("AppointmentSequenceNumber"), &ewsXmlUIntReader},
+    {EwsItemFieldLegacyFreeBusyStatus, QStringLiteral("LegacyFreeBusyStatus"), &ewsXmlLegacyFreeBusyStatusReader, &ewsXmlLegacyFreeBusyStatusWriter},
+    {EwsItemFieldMyResponseType, QStringLiteral("MyResponseType"), &ewsXmlResponseTypeReader, &ewsXmlMyResponseTypeWriter},
+    {EwsItemFieldAppointmentSequenceNumber, QStringLiteral("AppointmentSequenceNumber"), &ewsXmlUIntReader, &ewsXmlUIntWriter},
     {EwsItemFieldRecurrence, QStringLiteral("Recurrence"), &EwsItemPrivate::recurrenceReader},
     {EwsItemFieldFirstOccurrence, QStringLiteral("FirstOccurrence"), &EwsItemPrivate::occurrenceReader},
     {EwsItemFieldLastOccurrence, QStringLiteral("LastOccurrence"), &EwsItemPrivate::occurrenceReader},
     {EwsItemFieldModifiedOccurrences, QStringLiteral("ModifiedOccurrences"), &EwsItemPrivate::occurrencesReader},
     {EwsItemFieldDeletedOccurrences, QStringLiteral("DeletedOccurrences"), &EwsItemPrivate::occurrencesReader},
     {EwsItemFieldTimeZone, QStringLiteral("TimeZone"), &ewsXmlTextReader},
-    {EwsItemFieldExchangePersonIdGuid, QStringLiteral("ExchangePersonIdGuid"), &ewsXmlTextReader},
-    {EwsItemFieldDoNotForwardMeeting, QStringLiteral("DoNotForwardMeeting"), &ewsXmlBoolReader},
+    {EwsItemFieldExchangePersonIdGuid, QStringLiteral("ExchangePersonIdGuid"), &ewsXmlTextReader, &ewsXmlTextWriter},
+    {EwsItemFieldDoNotForwardMeeting, QStringLiteral("DoNotForwardMeeting"), &ewsXmlBoolReader, &ewsXmlBoolWriter},
     // Contacts fields
     {EwsItemFieldFileAs, QStringLiteral("FileAs"), &ewsXmlTextReader, &ewsXmlTextWriter},
     {EwsItemFieldFileAsMapping, QStringLiteral("FileAsMapping"), &ewsXmlTextReader, &ewsXmlTextWriter},
@@ -304,6 +301,18 @@ bool EwsItemPrivate::mailboxReader(QXmlStreamReader &reader, QVariant &val)
     return true;
 }
 
+bool EwsItemPrivate::mailboxWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    KCalendarCore::Person person = val.value<KCalendarCore::Person>();
+    writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Name"));
+    writer.writeCharacters(person.fullName());
+    writer.writeEndElement();
+    writer.writeStartElement(ewsTypeNsUri, QStringLiteral("EmailAddress"));
+    writer.writeCharacters(person.email());
+    writer.writeEndElement();
+    return true;
+}
+
 bool EwsItemPrivate::timezoneReader(QXmlStreamReader &reader, QVariant &val)
 {
     // TODO: This only reads the timezone identifier.
@@ -322,6 +331,7 @@ bool EwsItemPrivate::timezoneReader(QXmlStreamReader &reader, QVariant &val)
 bool EwsItemPrivate::attendeesReader(QXmlStreamReader &reader, QVariant &val)
 {
     EwsAttendee::List attList;
+    KCalendarCore::Attendee::List list;
 
     while (reader.readNextStartElement()) {
         if (reader.namespaceUri() != ewsTypeNsUri) {
@@ -329,14 +339,93 @@ bool EwsItemPrivate::attendeesReader(QXmlStreamReader &reader, QVariant &val)
             return false;
         }
         EwsAttendee att(reader);
+        KCalendarCore::Attendee attendee = KCalendarCore::Attendee();
         if (!att.isValid()) {
             return false;
         }
+        attendee.setName(att.mailbox().name());
+        attendee.setEmail(att.mailbox().email());
+        int responceInt = att.response();
+        switch(responceInt)
+        {
+            case EwsEventResponseType::EwsEventResponseUnknown:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::None);
+                break;
+            case EwsEventResponseType::EwsEventResponseOrganizer:
+                attendee.setRole(KCalendarCore::Attendee::Role::Chair);
+                break;
+            case EwsEventResponseType::EwsEventResponseTentative:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::Tentative);
+                break;
+            case EwsEventResponseType::EwsEventResponseAccept:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::Accepted);
+                break;
+            case EwsEventResponseType::EwsEventResponseDecline:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::Declined);
+                break;
+            case EwsEventResponseType::EwsEventResponseNotReceived:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::NeedsAction);
+                break;
+            default:
+                attendee.setStatus(KCalendarCore::Attendee::PartStat::NeedsAction);
+                break;
+        }
+
         attList.append(att);
+        list.append(attendee);
     }
 
-    val = QVariant::fromValue<EwsAttendee::List>(attList);
+    val = QVariant::fromValue<KCalendarCore::Attendee::List>(list);
 
+    return true;
+}
+
+bool EwsItemPrivate::attendeesWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    const KCalendarCore::Attendee::List list = val.value<KCalendarCore::Attendee::List>();
+    QString responseType;
+    for (const KCalendarCore::Attendee &attendee : list) {
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Attendee"));
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Mailbox"));
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("Name"));
+        writer.writeCharacters(attendee.fullName());
+        writer.writeEndElement();
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("EmailAddress"));
+        writer.writeCharacters(attendee.email());
+        writer.writeEndElement();
+        writer.writeEndElement();
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("ResponseType"));
+        if(attendee.role()==KCalendarCore::Attendee::Role::Chair)
+        {
+            responseType = QStringLiteral("Organizer");
+        }
+        else
+        {
+            switch(attendee.status())
+            {
+                case KCalendarCore::Attendee::PartStat::Accepted:
+                    responseType = QStringLiteral("Accept");
+                    break;
+                case KCalendarCore::Attendee::PartStat::Declined:
+                    responseType = QStringLiteral("Decline");
+                    break;
+                case KCalendarCore::Attendee::PartStat::Tentative:
+                    responseType = QStringLiteral("Tentative");
+                    break;
+                case KCalendarCore::Attendee::PartStat::NeedsAction:
+                    responseType = QStringLiteral("NoResponseReceived");
+                    break;
+                default:
+                    responseType = QStringLiteral("Unknown");
+                    break;
+            }
+        }
+        writer.writeCharacters(responseType);
+        writer.writeEndElement();
+        writer.writeStartElement(ewsTypeNsUri, QStringLiteral("LastResponseTime"));
+        writer.writeEndElement();
+        writer.writeEndElement();
+    }
     return true;
 }
 

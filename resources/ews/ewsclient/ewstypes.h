@@ -429,7 +429,7 @@ typedef enum {
     EwsEventResponseNotReceived
 } EwsEventResponseType;
 
-typedef enum { EwsLfbStatusFree = 0, EwsLfbStatusTentative, EwsLfbStatusBusy, EwsLfbOutOfOffice, EwsLfbNoData } EwsLegacyFreeBusyStatus;
+typedef enum { EwsLfbStatusFree = 0, EwsLfbStatusTentative, EwsLfbStatusBusy, EwsLfbOutOfOffice, EwsLfbStatusWorkingElsewhere, EwsLfbNoData } EwsLegacyFreeBusyStatus;
 
 typedef enum {
     EwsDispSaveOnly = 0,

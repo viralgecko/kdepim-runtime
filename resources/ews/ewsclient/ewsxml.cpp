@@ -28,6 +28,7 @@ static const QVector<QString> legacyFreeBusyStatusNames = {QStringLiteral("Free"
                                                            QStringLiteral("Tentative"),
                                                            QStringLiteral("Busy"),
                                                            QStringLiteral("OOF"),
+                                                           QStringLiteral("WorkingElsewhere"),
                                                            QStringLiteral("NoData")};
 
 static const QVector<QString> responseTypeNames = {QStringLiteral("Unknown"),
@@ -261,6 +262,24 @@ bool ewsXmlLegacyFreeBusyStatusReader(QXmlStreamReader &reader, QVariant &val)
 bool ewsXmlResponseTypeReader(QXmlStreamReader &reader, QVariant &val)
 {
     return ewsXmlEnumReader(reader, val, responseTypeNames);
+}
+
+bool ewsXmlCalendarItemTypeWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    writer.writeCharacters(calendarItemTypeNames[val.toInt()]);
+    return true;
+}
+
+bool ewsXmlLegacyFreeBusyStatusWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    writer.writeCharacters(calendarItemTypeNames[val.toInt()]);
+    return true;
+}
+
+bool ewsXmlMyResponseTypeWriter(QXmlStreamWriter &writer, const QVariant &val)
+{
+    writer.writeCharacters(responseTypeNames[val.toInt()]);
+    return true;
 }
 
 template<> QString readXmlElementValue(QXmlStreamReader &reader, bool &ok, const QString &parentElement)
