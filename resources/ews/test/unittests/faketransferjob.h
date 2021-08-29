@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef FAKETRANSFERJOB_H
-#define FAKETRANSFERJOB_H
+#pragma once
 
 #include <functional>
 
@@ -41,7 +40,7 @@ class FakeTransferJob : public KIO::SpecialJob
 {
     Q_OBJECT
 public:
-    typedef std::function<void(FakeTransferJob *, const QByteArray &)> VerifierFn;
+    using VerifierFn = std::function<void(FakeTransferJob *, const QByteArray &)>;
 
     struct Verifier {
         QObject *object;
@@ -69,4 +68,3 @@ private:
     static QQueue<Verifier> mVerifierQueue;
 };
 
-#endif

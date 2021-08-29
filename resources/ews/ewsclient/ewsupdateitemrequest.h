@@ -4,11 +4,10 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSUPDATEITEMREQUEST_H
-#define EWSUPDATEITEMREQUEST_H
+#pragma once
 
-#include <QList>
 #include <QSharedPointer>
+#include <QVector>
 
 #include "ewsitem.h"
 #include "ewsitemshape.h"
@@ -28,7 +27,12 @@ public:
         bool write(QXmlStreamWriter &writer, EwsItemType itemType) const;
 
     protected:
-        enum Type { Append = 0, Set, Delete, Unknown };
+        enum Type {
+            Append = 0,
+            Set,
+            Delete,
+            Unknown,
+        };
 
         Update(const EwsPropertyField &field, const QVariant &val, Type type)
             : mField(field)
@@ -72,6 +76,8 @@ public:
     class ItemChange
     {
     public:
+        typedef QVector<ItemChange> List;
+
         ItemChange(const EwsId &itemId, EwsItemType type)
             : mId(itemId)
             , mType(type)
@@ -88,12 +94,14 @@ public:
     private:
         EwsId mId;
         EwsItemType mType;
-        QList<QSharedPointer<const Update>> mUpdates;
+        QVector<QSharedPointer<const Update>> mUpdates;
     };
 
     class Response : public EwsRequest::Response
     {
     public:
+        typedef QVector<Response> List;
+
         const EwsId &itemId() const
         {
             return mId;
@@ -121,6 +129,14 @@ public:
         mChanges.append(change);
     }
 
+    void addItemChanges(ItemChange::List::const_iterator firstChange, ItemChange::List::const_iterator lastChange)
+    {
+        mChanges.reserve(mChanges.size() + lastChange - firstChange);
+        for (auto it = firstChange; it != lastChange; ++it) {
+            mChanges.append(*it);
+        }
+    }
+
     void setMessageDisposition(EwsMessageDisposition disp)
     {
         mMessageDisp = disp;
@@ -143,7 +159,7 @@ public:
 
     void start() override;
 
-    const QList<Response> &responses() const
+    const Response::List &responses() const
     {
         return mResponses;
     }
@@ -153,12 +169,11 @@ protected:
     bool parseItemsResponse(QXmlStreamReader &reader);
 
 private:
-    QList<ItemChange> mChanges;
+    ItemChange::List mChanges;
     EwsMessageDisposition mMessageDisp;
     EwsConflictResolution mConflictResol;
     EwsMeetingDisposition mMeetingDisp;
     EwsId mSavedFolderId;
-    QList<Response> mResponses;
+    Response::List mResponses;
 };
 
-#endif

@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSFETCHMAILDETAILJOB_H
-#define EWSFETCHMAILDETAILJOB_H
+#pragma once
 
 #include "ewsfetchitemdetailjob.h"
 
@@ -17,7 +16,6 @@ public:
     ~EwsFetchMailDetailJob() override;
 
 protected:
-    void processItems(const QList<EwsGetItemRequest::Response> &responses) override;
+    void processItems(const EwsGetItemRequest::Response::List &responses) override;
 };
 
-#endif

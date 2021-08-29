@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2015-2017 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
@@ -17,11 +17,11 @@
 #include <QPointer>
 
 // TODO: Allow customization
-static Q_CONSTEXPR uint pollInterval = 10; /* seconds */
+static constexpr uint pollInterval = 10; /* seconds */
 
-static Q_CONSTEXPR uint streamingTimeout = 30; /* minutes */
+static constexpr uint streamingTimeout = 30; /* minutes */
 
-static Q_CONSTEXPR uint streamingConnTimeout = 60; /* seconds */
+static constexpr uint streamingConnTimeout = 60; /* seconds */
 
 EwsSubscriptionManager::EwsSubscriptionManager(EwsClient &client, const EwsId &rootId, EwsSettings *settings, QObject *parent)
     : QObject(parent)
@@ -238,16 +238,6 @@ void EwsSubscriptionManager::processEvents(EwsEventRequestBase *req, bool finish
         Q_FOREACH (const EwsGetEventsRequest::Notification &nfy, resp.notifications()) {
             Q_FOREACH (const EwsGetEventsRequest::Event &event, nfy.events()) {
                 bool skip = false;
-                EwsId id = event.itemId();
-                for (auto it = mQueuedUpdates.find(id.id()); it != mQueuedUpdates.end(); ++it) {
-                    if (it->type == event.type() && (it->type == EwsDeletedEvent || it->changeKey == id.changeKey())) {
-                        qCDebugNC(EWSRES_LOG) << QStringLiteral("Skipped queued update type %1 for item %2");
-                        skip = true;
-                        mQueuedUpdates.erase(it);
-                        break;
-                    }
-                }
-
                 mSettings->setEventSubscriptionWatermark(event.watermark());
                 if (!skip) {
                     switch (event.type()) {
@@ -297,13 +287,9 @@ void EwsSubscriptionManager::processEvents(EwsEventRequestBase *req, bool finish
         }
         if (!mUpdatedFolderIds.isEmpty()) {
             qCDebugNC(EWSRES_LOG) << QStringLiteral("Found %1 modified folders").arg(mUpdatedFolderIds.size());
-            Q_EMIT foldersModified(mUpdatedFolderIds.values());
+            const auto updated = mUpdatedFolderIds.values();
+            Q_EMIT foldersModified(EwsId::List(updated.cbegin(), updated.cend()));
             mUpdatedFolderIds.clear();
         }
     }
-}
-
-void EwsSubscriptionManager::queueUpdate(EwsEventType type, const QString &id, const QString &changeKey)
-{
-    mQueuedUpdates.insert(id, {type, changeKey});
 }

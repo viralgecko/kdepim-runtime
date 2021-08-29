@@ -27,7 +27,7 @@ using namespace Akonadi;
 
 static const EwsPropertyField propPidTagContainerClass(0x3613, EwsPropTypeString);
 
-static Q_CONSTEXPR int fetchBatchSize = 50;
+static constexpr int fetchBatchSize = 50;
 
 class EwsFetchFoldersJobPrivate : public QObject
 {
@@ -251,7 +251,7 @@ void EwsFetchFoldersJobPrivate::processRemoteFolders()
          * which will cause the parent->child relationship to be broken. This happens because the
          * collection object holds a copy of the parent collection object. An update to that
          * object in the list will not be visible in the copy inside of the child object. */
-        EwsId parentId = folder[EwsFolderFieldParentFolderId].value<EwsId>();
+        auto parentId = folder[EwsFolderFieldParentFolderId].value<EwsId>();
         mParentMap.insert(parentId.id(), c.remoteId());
     }
 }
@@ -309,25 +309,23 @@ Collection EwsFetchFoldersJobPrivate::createFolderCollection(const EwsFolder &fo
     }
     collection.setContentMimeTypes(mimeTypes);
     Collection::Rights colRights;
-    EwsEffectiveRights ewsRights = folder[EwsFolderFieldEffectiveRights].value<EwsEffectiveRights>();
+    auto ewsRights = folder[EwsFolderFieldEffectiveRights].value<EwsEffectiveRights>();
     // FIXME: For now full read/write support is only implemented for e-mail. In order to avoid
     // potential problems block write access to all other folder types.
-    //if (folder.type() == EwsFolderTypeMail) {
-        if (ewsRights.canDelete()) {
-            colRights |= Collection::CanDeleteCollection | Collection::CanDeleteItem;
-        }
-        if (ewsRights.canModify()) {
-            colRights |= Collection::CanChangeCollection | Collection::CanChangeItem;
-        }
-        if (ewsRights.canCreateContents()) {
-            colRights |= Collection::CanCreateItem;
-        }
-        if (ewsRights.canCreateHierarchy()) {
-            colRights |= Collection::CanCreateCollection;
-        }
-    //}
+    if (ewsRights.canDelete()) {
+        colRights |= Collection::CanDeleteCollection | Collection::CanDeleteItem;
+    }
+    if (ewsRights.canModify()) {
+        colRights |= Collection::CanChangeCollection | Collection::CanChangeItem;
+    }
+    if (ewsRights.canCreateContents()) {
+        colRights |= Collection::CanCreateItem;
+    }
+    if (ewsRights.canCreateHierarchy()) {
+        colRights |= Collection::CanCreateCollection;
+    }
     collection.setRights(colRights);
-    EwsId id = folder[EwsFolderFieldFolderId].value<EwsId>();
+    auto id = folder[EwsFolderFieldFolderId].value<EwsId>();
     collection.setRemoteId(id.id());
     collection.setRemoteRevision(id.changeKey());
     collection.addAttribute(new ewsFolderClassAttribute(contClass));

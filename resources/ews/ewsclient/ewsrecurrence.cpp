@@ -27,28 +27,32 @@ static const QString dayOfWeekNames[] = {
     QStringLiteral("Weekday"),
     QStringLiteral("WeekendDay"),
 };
-Q_CONSTEXPR unsigned dayOfWeekNameCount = sizeof(dayOfWeekNames) / sizeof(dayOfWeekNames[0]);
+constexpr unsigned dayOfWeekNameCount = sizeof(dayOfWeekNames) / sizeof(dayOfWeekNames[0]);
 
-static const QString dayOfWeekIndexNames[] = {QStringLiteral("First"),
-                                              QStringLiteral("Second"),
-                                              QStringLiteral("Third"),
-                                              QStringLiteral("Fourth"),
-                                              QStringLiteral("Last")};
-Q_CONSTEXPR unsigned dayOfWeekIndexNameCount = sizeof(dayOfWeekIndexNames) / sizeof(dayOfWeekIndexNames[0]);
+static const QString dayOfWeekIndexNames[] = {
+    QStringLiteral("First"),
+    QStringLiteral("Second"),
+    QStringLiteral("Third"),
+    QStringLiteral("Fourth"),
+    QStringLiteral("Last"),
+};
+constexpr unsigned dayOfWeekIndexNameCount = sizeof(dayOfWeekIndexNames) / sizeof(dayOfWeekIndexNames[0]);
 
-static const QString monthNames[] = {QStringLiteral("January"),
-                                     QStringLiteral("February"),
-                                     QStringLiteral("March"),
-                                     QStringLiteral("April"),
-                                     QStringLiteral("May"),
-                                     QStringLiteral("June"),
-                                     QStringLiteral("July"),
-                                     QStringLiteral("August"),
-                                     QStringLiteral("September"),
-                                     QStringLiteral("October"),
-                                     QStringLiteral("November"),
-                                     QStringLiteral("December")};
-Q_CONSTEXPR unsigned monthNameCount = sizeof(monthNames) / sizeof(monthNames[0]);
+static const QString monthNames[] = {
+    QStringLiteral("January"),
+    QStringLiteral("February"),
+    QStringLiteral("March"),
+    QStringLiteral("April"),
+    QStringLiteral("May"),
+    QStringLiteral("June"),
+    QStringLiteral("July"),
+    QStringLiteral("August"),
+    QStringLiteral("September"),
+    QStringLiteral("October"),
+    QStringLiteral("November"),
+    QStringLiteral("December"),
+};
+constexpr unsigned monthNameCount = sizeof(monthNames) / sizeof(monthNames[0]);
 
 EwsRecurrence::EwsRecurrence()
     : Recurrence()

@@ -31,7 +31,7 @@ EwsFetchContactDetailJob::~EwsFetchContactDetailJob()
 {
 }
 
-void EwsFetchContactDetailJob::processItems(const QList<EwsGetItemRequest::Response> &responses)
+void EwsFetchContactDetailJob::processItems(const EwsGetItemRequest::Response::List &responses)
 {
     Item::List::iterator it = mChangedItems.begin();
     VCardConverter *Convert = new VCardConverter();

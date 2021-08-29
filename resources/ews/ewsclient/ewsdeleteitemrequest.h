@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSDELETEITEMREQUEST_H
-#define EWSDELETEITEMREQUEST_H
+#pragma once
 
 #include <QList>
 
@@ -19,7 +18,11 @@ class EwsDeleteItemRequest : public EwsRequest
 {
     Q_OBJECT
 public:
-    enum Type { HardDelete = 0, SoftDelete, MoveToDeletedItems };
+    enum Type {
+        HardDelete = 0,
+        SoftDelete,
+        MoveToDeletedItems,
+    };
 
     class Response : public EwsRequest::Response
     {
@@ -67,9 +70,9 @@ protected:
 private:
     EwsId::List mIds;
     Type mType;
+    QList<Response> mResponses;
     EwsAffectedTaskOccurenceType mAffectedTaskOccurrences;
     EwsSendMeetingCancellationsType mSendMeetingCancellations;
-    QList<Response> mResponses;
+
 };
 
-#endif

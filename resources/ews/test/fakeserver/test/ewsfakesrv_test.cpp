@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2015-2017 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2019 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
@@ -26,6 +26,7 @@ private Q_SLOTS:
     void invalidMethod();
     void emptyRequest();
     void defaultCallback();
+    void overrideCallback();
     void simpleResponse();
     void callbackResponse();
     void multipleResponses();
@@ -40,7 +41,7 @@ private Q_SLOTS:
     void xqueryResultsInCallback();
 
 private:
-    QPair<QString, ushort> synchronousHttpReq(const QString &content, ushort port, std::function<bool(const QString &)> chunkFn = nullptr);
+    QPair<QString, ushort> synchronousHttpReq(const QString &content, ushort port, const std::function<bool(const QString &)> &chunkFn = nullptr);
 };
 
 void UtEwsFakeSrvTest::emptyDialog()
@@ -151,6 +152,25 @@ void UtEwsFakeSrvTest::defaultCallback()
     QCOMPARE(resp.second, static_cast<ushort>(200));
 }
 
+void UtEwsFakeSrvTest::overrideCallback()
+{
+    const FakeEwsServer::DialogEntry::List dialog = {
+        {QStringLiteral("if (//test1/a = <a />) then (<b/>) else ()"), FakeEwsServer::DialogEntry::ReplyCallback(), QStringLiteral("Sample request 1")}};
+
+    QString receivedReq;
+    QScopedPointer<FakeEwsServer> srv(new FakeEwsServer(this));
+    srv->setDialog(dialog);
+    srv->setOverrideReplyCallback([&receivedReq](const QString &req, QXmlResultItems &, const QXmlNamePool &) {
+        receivedReq = req;
+        return FakeEwsServer::DialogEntry::HttpResponse(QStringLiteral("testresp"), 200);
+    });
+    QVERIFY(srv->start());
+
+    auto resp = synchronousHttpReq(QStringLiteral("<test1><a /></test1>"), srv->portNumber());
+    QCOMPARE(resp.first, QStringLiteral("testresp"));
+    QCOMPARE(resp.second, static_cast<ushort>(200));
+}
+
 void UtEwsFakeSrvTest::simpleResponse()
 {
     const FakeEwsServer::DialogEntry::List dialog = {
@@ -232,7 +252,7 @@ void UtEwsFakeSrvTest::emptyResponse()
 
 void UtEwsFakeSrvTest::getEventsRequest()
 {
-    const FakeEwsServer::DialogEntry::List emptyDialog;
+    // const FakeEwsServer::DialogEntry::List emptyDialog;
 
     const QFETCH(QString, request);
     const QFETCH(QStringList, events);
@@ -515,7 +535,7 @@ void UtEwsFakeSrvTest::getEventsRequest_data()
 void UtEwsFakeSrvTest::getStreamingEventsRequest()
 {
     bool callbackCalled = false;
-    const FakeEwsServer::DialogEntry::List emptyDialog;
+    // const FakeEwsServer::DialogEntry::List emptyDialog;
 
     QScopedPointer<FakeEwsServer> srv(new FakeEwsServer(this));
     QVERIFY(srv->start());
@@ -791,7 +811,7 @@ void UtEwsFakeSrvTest::xqueryResultsInCallback()
     QCOMPARE(resp.second, static_cast<ushort>(200));
 }
 
-QPair<QString, ushort> UtEwsFakeSrvTest::synchronousHttpReq(const QString &content, ushort port, std::function<bool(const QString &)> chunkFn)
+QPair<QString, ushort> UtEwsFakeSrvTest::synchronousHttpReq(const QString &content, ushort port, const std::function<bool(const QString &)> &chunkFn)
 {
     QNetworkAccessManager nam(this);
     QUrl url(QStringLiteral("http://127.0.0.1:%1/EWS/Exchange.asmx").arg(port));

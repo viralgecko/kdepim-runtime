@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSCREATECONTACTJOB_H
-#define EWSCREATECONTACTJOB_H
+#pragma once
 
 #include "ewscreateitemjob.h"
 
@@ -17,13 +16,10 @@ public:
     ~EwsCreateContactJob() override;
     bool setSend(bool send = true) override;
 
-protected:
-    void doStart() override;
 private Q_SLOTS:
     void contactCreateFinished(KJob *job);
 
-private:
-    bool mSend = false;
+protected:
+    void doStart() override;
 };
 
-#endif

@@ -29,6 +29,14 @@ void QWebEngineUrlRequestInfo::block(bool)
     mBlocked = true;
 }
 
+void QWebEngineUrlRequestInfo::redirect(const QUrl &)
+{
+}
+
+void QWebEngineUrlRequestInfo::setHttpHeader(const QByteArray &header, const QByteArray &value)
+{
+}
+
 QWebEngineUrlRequestInterceptor::QWebEngineUrlRequestInterceptor(QObject *parent)
     : QObject(parent)
 {
@@ -320,7 +328,7 @@ QUrlQuery QOAuth2AuthorizationCodeFlow::mapToSortedQuery(QMap<QString, QVariant>
     QUrlQuery query;
     QStringList keys = map.keys();
     keys.sort();
-    for (const auto &key : qAsConst(keys)) {
+    for (const auto &key : std::as_const(keys)) {
         query.addQueryItem(key, map[key].toString());
     }
     return query;
@@ -456,8 +464,7 @@ QString tokenCallbackString(const QString &accessToken,
         .arg(extTokenLifetime)
         .arg(idToken)
         .arg(time)
-        .arg(refreshToken)
-        .arg(resource);
+        .arg(refreshToken, resource);
 }
 
 QString requestWalletMapString()
@@ -484,5 +491,10 @@ const QUrl &EwsPKeyAuthJob::resultUri() const
 {
     static const QUrl empty;
     return empty;
+}
+
+QString EwsPKeyAuthJob::getAuthHeader()
+{
+    return QString();
 }
 }

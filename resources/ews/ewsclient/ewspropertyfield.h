@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSPROPERTYFIELD_H
-#define EWSPROPERTYFIELD_H
+#pragma once
 
 #include <QSharedDataPointer>
 #include <QXmlStreamWriter>
@@ -17,7 +16,12 @@ class EwsPropertyFieldPrivate;
 class EwsPropertyField
 {
 public:
-    enum Type { Field, ExtendedField, IndexedField, UnknownField };
+    enum Type {
+        Field,
+        ExtendedField,
+        IndexedField,
+        UnknownField,
+    };
 
     EwsPropertyField();
     explicit EwsPropertyField(const QString &uri); // FieldURI
@@ -57,4 +61,3 @@ uint qHash(const EwsPropertyField &prop, uint seed);
 
 QDebug operator<<(QDebug debug, const EwsPropertyField &prop);
 
-#endif

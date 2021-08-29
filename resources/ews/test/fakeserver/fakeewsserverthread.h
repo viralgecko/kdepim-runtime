@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef FAKEEWSSERVERTHREAD_H
-#define FAKEEWSSERVERTHREAD_H
+#pragma once
 
 #include <QMutex>
 #include <QThread>
@@ -33,6 +32,7 @@ public:
 
     void setDialog(const FakeEwsServer::DialogEntry::List &dialog);
     void setDefaultReplyCallback(const FakeEwsServer::DialogEntry::ReplyCallback &defaultReplyCallback);
+    void setOverrideReplyCallback(const FakeEwsServer::DialogEntry::ReplyCallback &overrideReplyCallback);
     void queueEventsXml(const QStringList &events);
     bool waitServerStarted() const;
 Q_SIGNALS:
@@ -50,4 +50,3 @@ private:
     mutable QMutex mMutex;
 };
 
-#endif

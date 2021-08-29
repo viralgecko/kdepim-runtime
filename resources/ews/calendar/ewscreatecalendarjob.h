@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSCREATECALENDARJOB_H
-#define EWSCREATECALENDARJOB_H
+#pragma once
 
 #include "ewscreateitemjob.h"
 
@@ -16,7 +15,7 @@ public:
     EwsCreateCalendarJob(EwsClient &client, const Akonadi::Item &item, const Akonadi::Collection &collection, EwsTagStore *tagStore, EwsResource *parent);
     ~EwsCreateCalendarJob() override;
     bool setSend(bool send = true) override;
-
+  
 private Q_SLOTS:
     void calendarCreateFinished(KJob *job);
 
@@ -24,4 +23,3 @@ protected:
     void doStart() override;
 };
 
-#endif

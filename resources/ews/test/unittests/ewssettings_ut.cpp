@@ -222,7 +222,7 @@ void UtEwsSettings::readNoPassword()
         password = p;
         loop.exit(0);
     });
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.requestPassword(false);
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -319,7 +319,7 @@ void UtEwsSettings::readTimeout()
         password = p;
         loop.exit(0);
     });
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.requestPassword(false);
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -380,7 +380,7 @@ void UtEwsSettings::readTimeoutInterrupted()
             loop.exit(1);
         }
     });
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.requestPassword(false);
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -395,7 +395,7 @@ void UtEwsSettings::readTimeoutInterrupted()
             return false;
         };
     });
-    QTimer::singleShot(1000, [&]() {
+    QTimer::singleShot(1000, this, [&]() {
         settings.setTestPassword(QStringLiteral("foo"));
     });
     QTimer timeoutTimer;
@@ -443,7 +443,7 @@ void UtEwsSettings::readValidPassword()
         password = p;
         loop.exit(0);
     });
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.requestPassword(false);
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -503,7 +503,7 @@ void UtEwsSettings::writeNullPassword()
     };
 
     EwsSettings settings(0);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.setPassword(QString());
         if (wallet) {
             qDebug() << "Wallet is not null";
@@ -543,7 +543,7 @@ void UtEwsSettings::writeNullWallet()
     };
 
     EwsSettings settings(0);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.setPassword(QStringLiteral("foo"));
         if (wallet) {
             qDebug() << "Wallet is not null";
@@ -588,7 +588,7 @@ void UtEwsSettings::writeTimeout()
     bool setFolderCalled = false;
     QString password;
     EwsSettings settings(0);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.setPassword(QStringLiteral("foo"));
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -654,7 +654,7 @@ void UtEwsSettings::writeValidPassword()
     bool setFolderCalled = false;
     QString password;
     EwsSettings settings(0);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.setPassword(QStringLiteral("foo"));
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -719,13 +719,16 @@ void UtEwsSettings::readValidMap()
     bool hasFolderCalled = false;
     bool setFolderCalled = false;
     QMap<QString, QString> map;
-    const QMap<QString, QString> expectedMap = {{accessTokenMapKey, QStringLiteral("afoo")}, {refreshTokenMapKey, QStringLiteral("rfoo")}};
+    const QMap<QString, QString> expectedMap = {
+        {accessTokenMapKey, QStringLiteral("afoo")},
+        {refreshTokenMapKey, QStringLiteral("rfoo")},
+    };
     EwsSettings settings(0);
     connect(&settings, &EwsSettings::mapRequestFinished, this, [&](const QMap<QString, QString> &m) {
         map = m;
         loop.exit(0);
     });
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.requestMap();
         if (!wallet) {
             qDebug() << "Wallet is null";
@@ -791,7 +794,7 @@ void UtEwsSettings::writeValidMap()
     const QMap<QString, QString> expectedMap = {{accessTokenMapKey, QStringLiteral("afoo")}, {refreshTokenMapKey, QStringLiteral("rfoo")}};
     QMap<QString, QString> map;
     EwsSettings settings(0);
-    QTimer::singleShot(100, [&]() {
+    QTimer::singleShot(100, this, [&]() {
         settings.setMap(expectedMap);
         if (!wallet) {
             qDebug() << "Wallet is null";

@@ -1,13 +1,12 @@
 /*
-    SPDX-FileCopyrightText: 2015-2017 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2019 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSTYPES_H
-#define EWSTYPES_H
+#pragma once
 
-#include <QString>
+class QString;
 #include <QVector>
 
 extern const QString soapEnvNsUri;
@@ -475,6 +474,13 @@ typedef enum {
     SendToAllAndSaveCopy
 } EwsSendMeetingCancellationsType;
 
+typedef enum {
+    EwsResponseCodeNoError = 0,
+    EwsResponseCodeErrorServerBusy,
+    EwsResponseCodeUnauthorized,
+    EwsResponseCodeUnknown,
+} EwsResponseCode;
+
 template<typename T> T decodeEnumString(const QString &str, const QString *table, unsigned count, bool *ok)
 {
     unsigned i;
@@ -496,4 +502,5 @@ inline bool isEwsMessageItemType(EwsItemType type)
 
 extern const QVector<QString> ewsItemTypeNames;
 
-#endif
+EwsResponseCode decodeEwsResponseCode(const QString &code);
+bool isEwsResponseCodeTemporaryError(EwsResponseCode code);

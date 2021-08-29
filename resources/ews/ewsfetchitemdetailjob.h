@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSFETCHITEMDETAILJOB_H
-#define EWSFETCHITEMDETAILJOB_H
+#pragma once
 
 #include <QPointer>
 
@@ -16,9 +15,10 @@
 #include "ewsgetitemrequest.h"
 #include "ewsid.h"
 #include "ewsitem.h"
+#include "ewsjob.h"
 #include "ewstypes.h"
 
-class EwsFetchItemDetailJob : public KCompositeJob
+class EwsFetchItemDetailJob : public EwsJob
 {
     Q_OBJECT
 public:
@@ -35,7 +35,7 @@ public:
     void start() override;
 
 protected:
-    virtual void processItems(const QList<EwsGetItemRequest::Response> &responses) = 0;
+    virtual void processItems(const EwsGetItemRequest::Response::List &responses) = 0;
 
     QPointer<EwsGetItemRequest> mRequest;
     Akonadi::Item::List mChangedItems;
@@ -46,4 +46,3 @@ private Q_SLOTS:
     void itemDetailFetched(KJob *job);
 };
 
-#endif

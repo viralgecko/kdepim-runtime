@@ -1,13 +1,15 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSUPDATEITEMSTAGSJOB_H
-#define EWSUPDATEITEMSTAGSJOB_H
+#pragma once
 
+#include "ewsabstractchunkedjob.h"
 #include "ewsjob.h"
+#include "ewsupdateitemrequest.h"
+
 #include <AkonadiCore/Item>
 
 class EwsTagStore;
@@ -15,7 +17,7 @@ class EwsClient;
 class EwsResource;
 
 /**
- *  @brief  Job used to update Exchange items wit tag information from Akonadi
+ *  @brief  Job used to update Exchange items with tag information from Akonadi
  *
  *  This job cycles through all items and updates the Exchange database with tag information from
  *  the items.
@@ -44,12 +46,18 @@ private Q_SLOTS:
     void updateItemsTagsRequestFinished(KJob *job);
     void globalTagsWriteFinished(KJob *job);
 
+Q_SIGNALS:
+    void reportStatus(int status, const QString &message = QString());
+    void reportPercent(int progress);
+
 private:
+    void updateItemsTagsRequestFinished(bool success, const QString &error);
     void doUpdateItemsTags();
 
     Akonadi::Item::List mItems;
     EwsTagStore *mTagStore = nullptr;
     EwsClient &mClient;
+
+    EwsAbstractChunkedJob<EwsUpdateItemRequest, EwsUpdateItemRequest::ItemChange, EwsUpdateItemRequest::Response> mChunkedJob;
 };
 
-#endif

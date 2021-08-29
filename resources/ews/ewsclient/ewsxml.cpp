@@ -12,31 +12,39 @@
 #include "ewsid.h"
 #include "ewsitem.h"
 
-static const QVector<QString> messageSensitivityNames = {QStringLiteral("Normal"),
-                                                         QStringLiteral("Personal"),
-                                                         QStringLiteral("Private"),
-                                                         QStringLiteral("Confidential")};
+static const QVector<QString> messageSensitivityNames = {
+    QStringLiteral("Normal"),
+    QStringLiteral("Personal"),
+    QStringLiteral("Private"),
+    QStringLiteral("Confidential"),
+};
 
 static const QVector<QString> messageImportanceNames = {QStringLiteral("Low"), QStringLiteral("Normal"), QStringLiteral("High")};
 
-static const QVector<QString> calendarItemTypeNames = {QStringLiteral("Single"),
-                                                       QStringLiteral("Occurrence"),
-                                                       QStringLiteral("Exception"),
-                                                       QStringLiteral("RecurringMaster")};
+static const QVector<QString> calendarItemTypeNames = {
+    QStringLiteral("Single"),
+    QStringLiteral("Occurrence"),
+    QStringLiteral("Exception"),
+    QStringLiteral("RecurringMaster"),
+};
 
-static const QVector<QString> legacyFreeBusyStatusNames = {QStringLiteral("Free"),
-                                                           QStringLiteral("Tentative"),
-                                                           QStringLiteral("Busy"),
-                                                           QStringLiteral("OOF"),
-                                                           QStringLiteral("WorkingElsewhere"),
-                                                           QStringLiteral("NoData")};
+static const QVector<QString> legacyFreeBusyStatusNames = {
+    QStringLiteral("Free"),
+    QStringLiteral("Tentative"),
+    QStringLiteral("Busy"),
+    QStringLiteral("OOF"),
+    QStringLiteral("WorkingElsewhere"),
+    QStringLiteral("NoData"),
+};
 
-static const QVector<QString> responseTypeNames = {QStringLiteral("Unknown"),
-                                                   QStringLiteral("Organizer"),
-                                                   QStringLiteral("Tentative"),
-                                                   QStringLiteral("Accept"),
-                                                   QStringLiteral("Decline"),
-                                                   QStringLiteral("NoResponseReceived")};
+static const QVector<QString> responseTypeNames = {
+    QStringLiteral("Unknown"),
+    QStringLiteral("Organizer"),
+    QStringLiteral("Tentative"),
+    QStringLiteral("Accept"),
+    QStringLiteral("Decline"),
+    QStringLiteral("NoResponseReceived"),
+};
 
 bool ewsXmlBoolReader(QXmlStreamReader &reader, QVariant &val)
 {

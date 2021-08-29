@@ -1,11 +1,10 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSMODIFYITEMFLAGSJOB_H
-#define EWSMODIFYITEMFLAGSJOB_H
+#pragma once
 
 #include <AkonadiCore/Collection>
 #include <AkonadiCore/Item>
@@ -32,6 +31,10 @@ public:
 
     void start() override;
 
+Q_SIGNALS:
+    void reportStatus(int status, const QString &message = QString());
+    void reportPercent(int progress);
+
 protected:
     Akonadi::Item::List mItems;
     Akonadi::Item::List mResultItems;
@@ -42,4 +45,3 @@ private Q_SLOTS:
     void itemModifyFinished(KJob *job);
 };
 
-#endif

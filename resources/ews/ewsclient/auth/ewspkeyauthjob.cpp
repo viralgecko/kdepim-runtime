@@ -13,18 +13,21 @@
 
 #include <QtCrypto>
 
-static const QMap<QString, QCA::CertificateInfoTypeKnown> stringToKnownCertInfoType = {{QStringLiteral("CN"), QCA::CommonName},
-                                                                                       {QStringLiteral("L"), QCA::Locality},
-                                                                                       {QStringLiteral("ST"), QCA::State},
-                                                                                       {QStringLiteral("O"), QCA::Organization},
-                                                                                       {QStringLiteral("OU"), QCA::OrganizationalUnit},
-                                                                                       {QStringLiteral("C"), QCA::Country},
-                                                                                       {QStringLiteral("emailAddress"), QCA::EmailLegacy}};
+static const QMap<QString, QCA::CertificateInfoTypeKnown> stringToKnownCertInfoType = {
+    {QStringLiteral("CN"), QCA::CommonName},
+    {QStringLiteral("L"), QCA::Locality},
+    {QStringLiteral("ST"), QCA::State},
+    {QStringLiteral("O"), QCA::Organization},
+    {QStringLiteral("OU"), QCA::OrganizationalUnit},
+    {QStringLiteral("C"), QCA::Country},
+    {QStringLiteral("emailAddress"), QCA::EmailLegacy},
+};
 
 static QMultiMap<QCA::CertificateInfoType, QString> parseCertSubjectInfo(const QString &info)
 {
     QMultiMap<QCA::CertificateInfoType, QString> map;
-    for (const auto &token : info.split(QLatin1Char(','), Qt::SkipEmptyParts)) {
+    const auto infos{info.split(QLatin1Char(','), Qt::SkipEmptyParts)};
+    for (const auto &token : infos) {
         const auto keyval = token.trimmed().split(QLatin1Char('='));
         if (keyval.count() == 2) {
             if (stringToKnownCertInfoType.contains(keyval[0])) {
@@ -169,4 +172,27 @@ QByteArray EwsPKeyAuthJob::buildAuthResponse(const QMap<QString, QString> &param
 const QUrl &EwsPKeyAuthJob::resultUri() const
 {
     return mResultUri;
+}
+
+QString EwsPKeyAuthJob::getAuthHeader()
+{
+    const QUrlQuery query(mPKeyUri);
+    QMap<QString, QString> params;
+    for (const auto &it : query.queryItems()) {
+        params[it.first.toLower()] = QUrl::fromPercentEncoding(it.second.toLatin1());
+    }
+
+    if (params.contains(QStringLiteral("submiturl")) && params.contains(QStringLiteral("nonce")) && params.contains(QStringLiteral("certauthorities"))
+        && params.contains(QStringLiteral("context")) && params.contains(QStringLiteral("version"))) {
+        const auto respToken = buildAuthResponse(params);
+
+        if (!respToken.isEmpty()) {
+            return QLatin1String("PKeyAuth AuthToken=\"%1\",Context=\"%2\",Version=\"1.0\"")
+                .arg(QString::fromLatin1(respToken), params[QStringLiteral("context")]);
+        } else {
+            return {};
+        }
+    } else {
+        return {};
+    }
 }

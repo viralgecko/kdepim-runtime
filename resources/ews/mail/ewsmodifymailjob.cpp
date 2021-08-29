@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2021 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
@@ -8,6 +8,8 @@
 
 #include <Akonadi/KMime/MessageFlags>
 
+#include <KLocalizedString>
+
 #include "ewsmailhandler.h"
 #include "ewsupdateitemrequest.h"
 
@@ -15,8 +17,11 @@
 
 using namespace Akonadi;
 
+constexpr unsigned ChunkSize = 10;
+
 EwsModifyMailJob::EwsModifyMailJob(EwsClient &client, const Akonadi::Item::List &items, const QSet<QByteArray> &parts, QObject *parent)
     : EwsModifyItemJob(client, items, parts, parent)
+    , mChunkedJob(ChunkSize)
 {
 }
 
@@ -27,10 +32,11 @@ EwsModifyMailJob::~EwsModifyMailJob()
 void EwsModifyMailJob::start()
 {
     bool doSubmit = false;
-    auto req = new EwsUpdateItemRequest(mClient, this);
     EwsId itemId;
 
-    for (const Item &item : qAsConst(mItems)) {
+    EwsUpdateItemRequest::ItemChange::List itemChanges;
+    itemChanges.reserve(mItems.size());
+    for (const Item &item : std::as_const(mItems)) {
         itemId = EwsId(item.remoteId(), item.remoteRevision());
 
         if (mParts.contains("FLAGS")) {
@@ -47,47 +53,59 @@ void EwsModifyMailJob::start()
                 ic.addUpdate(upd);
             }
 
-            req->addItemChange(ic);
+            itemChanges.append(ic);
             doSubmit = true;
         }
     }
 
     if (doSubmit) {
-        connect(req, &KJob::result, this, &EwsModifyMailJob::updateItemFinished);
-        req->start();
+        mChunkedJob.setItems(itemChanges);
+        mChunkedJob.start(
+            [this](EwsUpdateItemRequest::ItemChange::List::const_iterator firstChange, EwsUpdateItemRequest::ItemChange::List::const_iterator lastChange) {
+                auto req = new EwsUpdateItemRequest(mClient, this);
+                req->addItemChanges(firstChange, lastChange);
+                return req;
+            },
+            [](EwsUpdateItemRequest *req) {
+                return req->responses();
+            },
+            [this](unsigned int progress) {
+                Q_EMIT setPercent(progress);
+            },
+            [this](bool success, const QString &error) {
+                updateItemFinished(success, error);
+            });
     } else {
-        delete req;
         emitResult();
     }
 }
 
-void EwsModifyMailJob::updateItemFinished(KJob *job)
+void EwsModifyMailJob::updateItemFinished(bool success, const QString &error)
 {
-    if (job->error()) {
-        setErrorText(job->errorString());
+    if (!success) {
+        setErrorText(error);
         emitResult();
         return;
     }
-
-    auto req = qobject_cast<EwsUpdateItemRequest *>(job);
-    if (!req) {
-        setErrorText(QStringLiteral("Invalid EwsUpdateItemRequest job object"));
-        emitResult();
-        return;
-    }
-
-    Q_ASSERT(req->responses().size() == mItems.size());
 
     Item::List::iterator it = mItems.begin();
-    Q_FOREACH (const EwsUpdateItemRequest::Response &resp, req->responses()) {
+    for (const auto &resp : mChunkedJob.responses()) {
         if (!resp.isSuccess()) {
-            setErrorText(QStringLiteral("Item update failed: ") + resp.responseMessage());
+            setErrorText(i18nc("@info:status", "Item update failed: ") + resp.responseMessage());
             emitResult();
             return;
         }
 
-        it->setRemoteRevision(resp.itemId().changeKey());
+        /* In general EWS guarantees that the order of response items will match the order of request items.
+         * It is therefore safe to iterate these in parallel. */
+        if (it->remoteId() == resp.itemId().id()) {
+            it->setRemoteRevision(resp.itemId().changeKey());
+            ++it;
+        } else {
+            setErrorText(i18nc("@info:status", "Item out of order while processing update item response."));
+            emitResult();
+            return;
+        }
     }
-
     emitResult();
 }

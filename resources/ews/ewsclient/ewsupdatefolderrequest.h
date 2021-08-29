@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSUPDATEFOLDERREQUEST_H
-#define EWSUPDATEFOLDERREQUEST_H
+#pragma once
 
 #include <QList>
 #include <QSharedPointer>
@@ -28,7 +27,12 @@ public:
         bool write(QXmlStreamWriter &writer, EwsFolderType folderType) const;
 
     protected:
-        enum Type { Append = 0, Set, Delete, Unknown };
+        enum Type {
+            Append = 0,
+            Set,
+            Delete,
+            Unknown,
+        };
 
         Update(const EwsPropertyField &field, const QVariant &val, Type type)
             : mField(field)
@@ -131,4 +135,3 @@ private:
     QList<Response> mResponses;
 };
 
-#endif

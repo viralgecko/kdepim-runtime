@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSPOXAUTODISCOVERREQUEST_H
-#define EWSPOXAUTODISCOVERREQUEST_H
+#pragma once
 
 #include <QHash>
 #include <QString>
@@ -30,7 +29,12 @@ public:
         Settings,
     };
 
-    enum ProtocolType { ExchangeProto, ExchangeProxyProto, ExchangeWebProto, UnknownProto };
+    enum ProtocolType {
+        ExchangeProto,
+        ExchangeProxyProto,
+        ExchangeWebProto,
+        UnknownProto,
+    };
 
     class Protocol
     {
@@ -132,4 +136,3 @@ private:
     QUrl mLastUrl;
 };
 
-#endif

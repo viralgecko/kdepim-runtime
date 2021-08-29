@@ -4,10 +4,9 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef ISOLATEDTESTBASE_H
-#define ISOLATEDTESTBASE_H
+#pragma once
 
-#include <QObject>
+class QObject;
 #include <QString>
 
 #include <Akonadi/KMime/SpecialMailCollections>
@@ -21,6 +20,7 @@ class AgentInstance;
 class FakeEwsServerThread;
 class OrgKdeAkonadiEwsSettingsInterface;
 class OrgKdeAkonadiEwsWalletInterface;
+class OrgKdeAkonadiEwsResourceInterface;
 
 class IsolatedTestBase : public QObject
 {
@@ -29,7 +29,19 @@ public:
     class Folder
     {
     public:
-        enum DistinguishedType { None, Root, Inbox, Outbox, Sent, Trash, Drafts, Templates, Calendar, Tasks, Contacts };
+        enum DistinguishedType {
+            None,
+            Root,
+            Inbox,
+            Outbox,
+            Sent,
+            Trash,
+            Drafts,
+            Templates,
+            Calendar,
+            Tasks,
+            Contacts,
+        };
 
         QString id;
         QString name;
@@ -37,7 +49,7 @@ public:
         QString parentId;
     };
 
-    typedef QVector<Folder> FolderList;
+    using FolderList = QVector<Folder>;
 
     explicit IsolatedTestBase(QObject *parent = nullptr);
     ~IsolatedTestBase() override;
@@ -64,10 +76,16 @@ public:
     bool setOnline(bool online, bool wait);
     bool isValid() const;
 
+    OrgKdeAkonadiEwsSettingsInterface &settingsInterface() const;
+    OrgKdeAkonadiEwsWalletInterface &walletInterface() const;
+    OrgKdeAkonadiEwsResourceInterface &resourceInterface() const;
+    Akonadi::AgentInstance &instance() const;
+
 private:
     QScopedPointer<Akonadi::AgentInstance> mEwsInstance;
     QScopedPointer<OrgKdeAkonadiEwsSettingsInterface> mEwsSettingsInterface;
     QScopedPointer<OrgKdeAkonadiEwsWalletInterface> mEwsWalletInterface;
+    QScopedPointer<OrgKdeAkonadiEwsResourceInterface> mEwsResourceInterface;
     QString mIdentifier;
 };
 
@@ -141,4 +159,3 @@ public:
                                           const ReplyCallback &callback = ReplyCallback());
 };
 
-#endif

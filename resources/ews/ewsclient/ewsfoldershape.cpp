@@ -6,7 +6,11 @@
 
 #include "ewsfoldershape.h"
 
-static const QString shapeNames[] = {QStringLiteral("IdOnly"), QStringLiteral("Default"), QStringLiteral("AllProperties")};
+static const QString shapeNames[] = {
+    QStringLiteral("IdOnly"),
+    QStringLiteral("Default"),
+    QStringLiteral("AllProperties"),
+};
 
 void EwsFolderShape::write(QXmlStreamWriter &writer) const
 {
@@ -31,7 +35,7 @@ void EwsFolderShape::writeProperties(QXmlStreamWriter &writer) const
     if (!mProps.isEmpty()) {
         writer.writeStartElement(ewsTypeNsUri, QStringLiteral("AdditionalProperties"));
 
-        for (const EwsPropertyField &prop : qAsConst(mProps)) {
+        for (const EwsPropertyField &prop : std::as_const(mProps)) {
             prop.write(writer);
         }
 

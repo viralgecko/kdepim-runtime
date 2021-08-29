@@ -30,8 +30,11 @@ Name=Clang
 1=/usr/include/qt/
 2=/usr/include/qt/QtCore/
 3=/usr/include/KF5/
-4=/media/data/programs/akonadi_resource_ews
-5=/media/data/programs/akonadi_resource_ews/resources/ews
+4=/usr/include/KF5/KCalendarCore
+5=/media/data/programs/akonadi_resource_ews
+6=/media/data/programs/akonadi_resource_ews/resources/ews
+7=/usr/include/KF5/KContacts
+8=/media/data/programs/akonadi_resource_ews/resources/ews/ewsclient
 
 [CustomDefinesAndIncludes][ProjectPath1]
 Path=resources/ews

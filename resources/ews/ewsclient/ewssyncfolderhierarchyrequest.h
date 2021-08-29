@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSSYNCFOLDERHIERARCHYREQUEST_H
-#define EWSSYNCFOLDERHIERARCHYREQUEST_H
+#pragma once
 
 #include "ewsfolder.h"
 #include "ewsfoldershape.h"
@@ -16,7 +15,12 @@ class EwsSyncFolderHierarchyRequest : public EwsRequest
 {
     Q_OBJECT
 public:
-    enum ChangeType { Create, Update, Delete, Unknown };
+    enum ChangeType {
+        Create,
+        Update,
+        Delete,
+        Unknown,
+    };
 
     class Response;
 
@@ -92,4 +96,3 @@ private:
 
 Q_DECLARE_METATYPE(EwsSyncFolderHierarchyRequest::Change::List)
 
-#endif

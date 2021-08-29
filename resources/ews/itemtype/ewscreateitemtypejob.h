@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSCREATEITEMTYPEJOB_H
-#define EWSCREATEITEMTYPEJOB_H
+#pragma once
 
 #include "ewscreateitemjob.h"
 
@@ -20,5 +19,3 @@ public:
 protected:
     void doStart() override;
 };
-
-#endif

@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2015-2017 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2019 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
@@ -30,7 +30,7 @@ bool FakeEwsServer::start()
 
     int retries = 3;
     bool ok;
-    auto *generator = QRandomGenerator::global();
+    auto generator = QRandomGenerator::global();
     do {
         mPortNumber = (generator->bounded(10000)) + 10000;
         qCInfoNC(EWSFAKE_LOG) << QStringLiteral("Starting fake EWS server at 127.0.0.1:%1").arg(mPortNumber);
@@ -59,6 +59,13 @@ void FakeEwsServer::setDefaultReplyCallback(const DialogEntry::ReplyCallback &de
     QMutexLocker lock(&mMutex);
 
     mDefaultReplyCallback = defaultReplyCallback;
+}
+
+void FakeEwsServer::setOverrideReplyCallback(const DialogEntry::ReplyCallback &overrideReplyCallback)
+{
+    QMutexLocker lock(&mMutex);
+
+    mOverrideReplyCallback = overrideReplyCallback;
 }
 
 void FakeEwsServer::queueEventsXml(const QStringList &events)
@@ -105,6 +112,13 @@ const FakeEwsServer::DialogEntry::ReplyCallback FakeEwsServer::defaultReplyCallb
     QMutexLocker lock(&mMutex);
 
     return mDefaultReplyCallback;
+}
+
+const FakeEwsServer::DialogEntry::ReplyCallback FakeEwsServer::overrideReplyCallback() const
+{
+    QMutexLocker lock(&mMutex);
+
+    return mOverrideReplyCallback;
 }
 
 void FakeEwsServer::streamingConnectionStarted(FakeEwsConnection *conn)

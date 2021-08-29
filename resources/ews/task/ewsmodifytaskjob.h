@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSMODIFYTASKJOB_H
-#define EWSMODIFYTASKJOB_H
+#pragma once
 
 #include "ewsmodifyitemjob.h"
 
@@ -19,5 +18,3 @@ public:
 private Q_SLOTS:
     void updateItemFinished(KJob *job);
 };
-
-#endif

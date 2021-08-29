@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef TEST_STATEMONITOR_H
-#define TEST_STATEMONITOR_H
+#pragma once
 
 #include <functional>
 
@@ -34,7 +33,7 @@ Q_SIGNALS:
 template<typename T> class CollectionStateMonitor : public StateMonitorBase
 {
 public:
-    typedef std::function<bool(const Akonadi::Collection &col, const T &state)> StateComparisonFunc;
+    using StateComparisonFunc = std::function<bool(const Akonadi::Collection &, const T &)>;
     CollectionStateMonitor(QObject *parent,
                            const QHash<QString, T> &stateHash,
                            const QString &inboxId,
@@ -120,4 +119,3 @@ template<typename T> void CollectionStateMonitor<T>::forceRecheck()
     }
 }
 
-#endif

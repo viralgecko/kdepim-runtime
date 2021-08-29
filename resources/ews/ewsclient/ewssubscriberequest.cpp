@@ -10,17 +10,21 @@
 
 #include "ewsclient_debug.h"
 
-static const QVector<QString> subscribeTypeNames = {QStringLiteral("PullSubscriptionRequest"),
-                                                    QStringLiteral("PushSubscriptionRequest"),
-                                                    QStringLiteral("StreamingSubscriptionRequest")};
+static const QVector<QString> subscribeTypeNames = {
+    QStringLiteral("PullSubscriptionRequest"),
+    QStringLiteral("PushSubscriptionRequest"),
+    QStringLiteral("StreamingSubscriptionRequest"),
+};
 
-static const QVector<QString> eventTypeNames = {QStringLiteral("CopiedEvent"),
-                                                QStringLiteral("CreatedEvent"),
-                                                QStringLiteral("DeletedEvent"),
-                                                QStringLiteral("ModifiedEvent"),
-                                                QStringLiteral("MovedEvent"),
-                                                QStringLiteral("NewMailEvent"),
-                                                QStringLiteral("FreeBusyChangedEvent")};
+static const QVector<QString> eventTypeNames = {
+    QStringLiteral("CopiedEvent"),
+    QStringLiteral("CreatedEvent"),
+    QStringLiteral("DeletedEvent"),
+    QStringLiteral("ModifiedEvent"),
+    QStringLiteral("MovedEvent"),
+    QStringLiteral("NewMailEvent"),
+    QStringLiteral("FreeBusyChangedEvent"),
+};
 
 EwsSubscribeRequest::EwsSubscribeRequest(EwsClient &client, QObject *parent)
     : EwsRequest(client, parent)
@@ -57,13 +61,13 @@ void EwsSubscribeRequest::start()
     }
 
     writer.writeStartElement(ewsTypeNsUri, QStringLiteral("FolderIds"));
-    for (const EwsId &id : qAsConst(mFolderIds)) {
+    for (const EwsId &id : std::as_const(mFolderIds)) {
         id.writeFolderIds(writer);
     }
     writer.writeEndElement();
 
     writer.writeStartElement(ewsTypeNsUri, QStringLiteral("EventTypes"));
-    for (const EwsEventType type : qAsConst(mEventTypes)) {
+    for (const EwsEventType type : std::as_const(mEventTypes)) {
         writer.writeTextElement(ewsTypeNsUri, QStringLiteral("EventType"), eventTypeNames[type]);
     }
     writer.writeEndElement(); // EventTypes

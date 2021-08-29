@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSCREATETASKJOB_H
-#define EWSCREATETASKJOB_H
+#pragma once
 
 #include "ewscreateitemjob.h"
 
@@ -22,5 +21,3 @@ private Q_SLOTS:
 protected:
     void doStart() override;
 };
-
-#endif

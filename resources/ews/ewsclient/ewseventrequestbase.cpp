@@ -8,10 +8,25 @@
 #include "ewsclient_debug.h"
 #include "ewsxml.h"
 
-enum NotificationElementType { SubscriptionId, PreviousWatermark, MoreEvents, Events };
+enum NotificationElementType {
+    SubscriptionId,
+    PreviousWatermark,
+    MoreEvents,
+    Events,
+};
 typedef EwsXml<NotificationElementType> NotificationReader;
 
-enum EventElementType { Watermark, Timestamp, ItemId, FolderId, ParentFolderId, OldItemId, OldFolderId, OldParentFolderId, UnreadCount };
+enum EventElementType {
+    Watermark,
+    Timestamp,
+    ItemId,
+    FolderId,
+    ParentFolderId,
+    OldItemId,
+    OldFolderId,
+    OldParentFolderId,
+    UnreadCount,
+};
 typedef EwsXml<EventElementType> EventReader;
 
 EwsEventRequestBase::EwsEventRequestBase(EwsClient &client, const QString &reqName, QObject *parent)
@@ -103,17 +118,19 @@ EwsEventRequestBase::Response::Response(QXmlStreamReader &reader)
 
 EwsEventRequestBase::Notification::Notification(QXmlStreamReader &reader)
 {
-    static const QVector<NotificationReader::Item> items = {{SubscriptionId, QStringLiteral("SubscriptionId"), &ewsXmlTextReader},
-                                                            {PreviousWatermark, QStringLiteral("PreviousWatermark"), &ewsXmlTextReader},
-                                                            {MoreEvents, QStringLiteral("MoreEvents"), &ewsXmlBoolReader},
-                                                            {Events, QStringLiteral("CopiedEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("CreatedEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("DeletedEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("ModifiedEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("MovedEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("NewMailEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("FreeBusyChangeEvent"), &eventsReader},
-                                                            {Events, QStringLiteral("StatusEvent"), &eventsReader}};
+    static const QVector<NotificationReader::Item> items = {
+        {SubscriptionId, QStringLiteral("SubscriptionId"), &ewsXmlTextReader},
+        {PreviousWatermark, QStringLiteral("PreviousWatermark"), &ewsXmlTextReader},
+        {MoreEvents, QStringLiteral("MoreEvents"), &ewsXmlBoolReader},
+        {Events, QStringLiteral("CopiedEvent"), &eventsReader},
+        {Events, QStringLiteral("CreatedEvent"), &eventsReader},
+        {Events, QStringLiteral("DeletedEvent"), &eventsReader},
+        {Events, QStringLiteral("ModifiedEvent"), &eventsReader},
+        {Events, QStringLiteral("MovedEvent"), &eventsReader},
+        {Events, QStringLiteral("NewMailEvent"), &eventsReader},
+        {Events, QStringLiteral("FreeBusyChangeEvent"), &eventsReader},
+        {Events, QStringLiteral("StatusEvent"), &eventsReader},
+    };
     static const NotificationReader staticReader(items);
 
     NotificationReader ewsreader(staticReader);

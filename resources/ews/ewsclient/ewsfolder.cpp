@@ -17,11 +17,13 @@
 #define D_PTR EwsFolderPrivate *d = reinterpret_cast<EwsFolderPrivate *>(this->d.data());
 #define D_CPTR const EwsFolderPrivate *d = reinterpret_cast<const EwsFolderPrivate *>(this->d.data());
 
-static const QVector<QString> folderTypeNames = {QStringLiteral("Folder"),
-                                                 QStringLiteral("CalendarFolder"),
-                                                 QStringLiteral("ContactsFolder"),
-                                                 QStringLiteral("SearchFolder"),
-                                                 QStringLiteral("TasksFolder")};
+static const QVector<QString> folderTypeNames = {
+    QStringLiteral("Folder"),
+    QStringLiteral("CalendarFolder"),
+    QStringLiteral("ContactsFolder"),
+    QStringLiteral("SearchFolder"),
+    QStringLiteral("TasksFolder"),
+};
 
 class EwsFolderPrivate : public EwsItemBasePrivate
 {
@@ -97,7 +99,7 @@ EwsFolder::EwsFolder(QXmlStreamReader &reader)
     // Check what item type are we
     uint i = 0;
     d->mType = EwsFolderTypeUnknown;
-    for (const QString &name : qAsConst(folderTypeNames)) {
+    for (const QString &name : std::as_const(folderTypeNames)) {
         if (name == reader.name()) {
             d->mType = static_cast<EwsFolderType>(i);
             break;

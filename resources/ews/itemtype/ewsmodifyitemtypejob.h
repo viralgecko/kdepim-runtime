@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSMODIFYITEMTYPEJOB_H
-#define EWSMODIFYITEMTYPEJOB_H
+#pragma once
 
 #include "ewsmodifyitemjob.h"
 
@@ -17,5 +16,3 @@ public:
     ~EwsModifyItemTypeJob() override;
     void start() override;
 };
-
-#endif

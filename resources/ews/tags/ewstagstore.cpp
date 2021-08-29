@@ -17,8 +17,8 @@
 
 using namespace Akonadi;
 
-static Q_CONSTEXPR quint32 TagDataVer1 = 1;
-static Q_CONSTEXPR QDataStream::Version TagDataVer1StreamVer = QDataStream::Qt_5_4;
+static constexpr quint32 TagDataVer1 = 1;
+static constexpr QDataStream::Version TagDataVer1StreamVer = QDataStream::Qt_5_4;
 
 EwsTagStore::EwsTagStore(QObject *parent)
     : QObject(parent)
@@ -90,7 +90,7 @@ bool EwsTagStore::unserializeTag(const QByteArray &data, Akonadi::Tag &tag) cons
     tag.setName(name);
     tag.setGid(gid);
 
-    for (Attribute *attr : qAsConst(attributes)) {
+    for (Attribute *attr : std::as_const(attributes)) {
         tag.addAttribute(attr);
     }
 
@@ -220,7 +220,7 @@ bool EwsTagStore::syncTags(const Akonadi::Tag::List &tags)
         }
     }
 
-    for (const QByteArray &tagId : qAsConst(tagIds)) {
+    for (const QByteArray &tagId : std::as_const(tagIds)) {
         mTagData.remove(tagId);
     }
 

@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSFETCHCALENDARDETAILJOB_H
-#define EWSFETCHCALENDARDETAILJOB_H
+#pragma once
 
 #include "ewsfetchitemdetailjob.h"
 
@@ -17,9 +16,8 @@ public:
     ~EwsFetchCalendarDetailJob() override;
 
 protected:
-    void processItems(const QList<EwsGetItemRequest::Response> &responses) override;
+    void processItems(const EwsGetItemRequest::Response::List &responses) override;
 private Q_SLOTS:
     void exceptionItemsFetched(KJob *job);
 };
 
-#endif

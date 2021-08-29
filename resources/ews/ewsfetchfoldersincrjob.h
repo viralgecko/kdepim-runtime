@@ -1,11 +1,10 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSFETCHFOLDERSINCRJOB_H
-#define EWSFETCHFOLDERSINCRJOB_H
+#pragma once
 
 #include <QScopedPointer>
 
@@ -42,7 +41,9 @@ public:
     void start() override;
 Q_SIGNALS:
     void status(int status, const QString &message = QString());
+    void reportStatus(int status, const QString &message = QString());
     void percent(int progress);
+    void reportPercent(int progress);
 
 private:
     Akonadi::Collection::List mChangedFolders;
@@ -54,4 +55,3 @@ private:
     Q_DECLARE_PRIVATE(EwsFetchFoldersIncrJob)
 };
 
-#endif

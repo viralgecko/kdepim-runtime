@@ -53,7 +53,7 @@ void EwsSubscribedFoldersJob::verifySubFoldersRequestFinished(KJob *job)
         Q_ASSERT(req);
 
         mFolders.clear();
-        EwsId::List sourceIds = req->property("ids").value<EwsId::List>();
+        auto sourceIds = req->property("ids").value<EwsId::List>();
         QStringList idList;
 
         Q_ASSERT(req->responses().size() == sourceIds.size());
@@ -83,7 +83,12 @@ void EwsSubscribedFoldersJob::verifySubFoldersRequestFinished(KJob *job)
 
 const EwsId::List &EwsSubscribedFoldersJob::defaultSubscriptionFolders()
 {
-    static const EwsId::List list = {EwsId(EwsDIdInbox), EwsId(EwsDIdCalendar), EwsId(EwsDIdTasks), EwsId(EwsDIdContacts)};
+    static const EwsId::List list = {
+        EwsId(EwsDIdInbox),
+        EwsId(EwsDIdCalendar),
+        EwsId(EwsDIdTasks),
+        EwsId(EwsDIdContacts),
+    };
 
     return list;
 }

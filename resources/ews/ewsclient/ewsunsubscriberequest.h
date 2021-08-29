@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSUNSUBSCRIBEREQUEST_H
-#define EWSUNSUBSCRIBEREQUEST_H
+#pragma once
 
 #include <QSharedPointer>
 
@@ -17,7 +16,11 @@ class EwsUnsubscribeRequest : public EwsRequest
 {
     Q_OBJECT
 public:
-    enum Type { PullSubscription = 0, PushSubscription, StreamingSubscription };
+    enum Type {
+        PullSubscription = 0,
+        PushSubscription,
+        StreamingSubscription,
+    };
 
     class Response : public EwsRequest::Response
     {
@@ -52,4 +55,3 @@ private:
     QSharedPointer<Response> mResponse;
 };
 
-#endif

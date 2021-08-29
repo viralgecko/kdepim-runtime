@@ -1,11 +1,10 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSFETCHITEMSJOB_H
-#define EWSFETCHITEMSJOB_H
+#pragma once
 
 #include <AkonadiCore/ItemFetchJob>
 
@@ -30,7 +29,7 @@ public:
         EwsEventType type;
     };
 
-    typedef QList<QueuedUpdate> QueuedUpdateList;
+    using QueuedUpdateList = QList<QueuedUpdate>;
 
     EwsFetchItemsJob(const Akonadi::Collection &collection,
                      EwsClient &client,
@@ -39,6 +38,11 @@ public:
                      EwsTagStore *tagStore,
                      EwsResource *parent);
     ~EwsFetchItemsJob() override;
+
+    Akonadi::Item::List newItems() const
+    {
+        return mNewItems;
+    }
 
     Akonadi::Item::List changedItems() const
     {
@@ -72,6 +76,8 @@ private Q_SLOTS:
 Q_SIGNALS:
     void status(int status, const QString &message = QString());
     void percent(int progress);
+    void reportStatus(int status, const QString &message = QString());
+    void reportPercent(ulong progress);
 
 private:
     void compareItemLists();
@@ -84,7 +90,7 @@ private:
         QString changeKey;
         EwsEventType type;
     };*/
-    typedef QHash<EwsEventType, QHash<QString, QString>> QueuedUpdateHash;
+    using QueuedUpdateHash = QHash<EwsEventType, QHash<QString, QString>>;
 
     const Akonadi::Collection mCollection;
     EwsClient &mClient;
@@ -103,8 +109,8 @@ private:
     EwsTagStore *mTagStore = nullptr;
     bool mTagsSynced;
 
+    Akonadi::Item::List mNewItems;
     Akonadi::Item::List mChangedItems;
     Akonadi::Item::List mDeletedItems;
 };
 
-#endif

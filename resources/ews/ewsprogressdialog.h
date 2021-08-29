@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSPROGRESSDIALOG_H
-#define EWSPROGRESSDIALOG_H
+#pragma once
 
 #include <QDialog>
 
@@ -13,10 +12,12 @@ class EwsProgressDialog : public QDialog
 {
     Q_OBJECT
 public:
-    enum Type { AutoDiscovery, TryConnect };
+    enum Type {
+        AutoDiscovery,
+        TryConnect,
+    };
 
     explicit EwsProgressDialog(QWidget *parent, Type type);
     ~EwsProgressDialog() override;
 };
 
-#endif

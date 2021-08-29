@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSCLIENT_H
-#define EWSCLIENT_H
+#pragma once
 
 #include <QObject>
 #include <QPointer>
@@ -31,7 +30,11 @@ public:
     void setAuth(EwsAbstractAuth *auth);
     EwsAbstractAuth *auth() const;
 
-    enum RequestedConfiguration { MailTips = 0, UnifiedMessagingConfiguration, ProtectionRules };
+    enum RequestedConfiguration {
+        MailTips = 0,
+        UnifiedMessagingConfiguration,
+        ProtectionRules,
+    };
 
     QUrl url() const;
 
@@ -84,4 +87,3 @@ private:
     friend class EwsRequest;
 };
 
-#endif

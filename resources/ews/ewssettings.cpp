@@ -14,6 +14,8 @@
 #include "auth/ewspasswordauth.h"
 
 #include "ewsresource_debug.h"
+#include <KAuthorized>
+#include <kwidgetsaddons_version.h>
 
 static const QString ewsWalletFolder = QStringLiteral("akonadi-ews");
 
@@ -86,6 +88,7 @@ void EwsSettings::requestPassword(bool ask)
         } else {
             qCDebug(EWSRES_LOG) << "requestPassword: Requesting interactively";
             mPasswordDlg = new KPasswordDialog(nullptr);
+            mPasswordDlg->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
             mPasswordDlg->setModal(true);
             mPasswordDlg->setPrompt(i18n("Please enter password for user '%1' and Exchange account '%2'.", username(), email()));
             if (mPasswordDlg->exec() == QDialog::Accepted) {
@@ -249,7 +252,7 @@ void EwsSettings::setMap(const QMap<QString, QString> &map)
     }
 
     for (auto it = map.begin(); it != map.end(); ++it) {
-        qDebug() << "setMap:" << it.key();
+        qCDebug(EWSRES_LOG) << "setMap:" << it.key();
         if (!it.value().isNull()) {
             mMap[it.key()] = it.value();
         } else {

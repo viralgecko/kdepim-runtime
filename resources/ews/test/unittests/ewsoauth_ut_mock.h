@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSOAUTH_UT_MOCK_H
-#define EWSOAUTH_UT_MOCK_H
+#pragma once
 
 #include <functional>
 
@@ -21,7 +20,6 @@
 #include <QWidget>
 
 #include <KLocalizedString>
-#include <QtWebEngineWidgetsVersion>
 Q_DECLARE_LOGGING_CATEGORY(EWSCLI_LOG)
 
 namespace Mock
@@ -58,6 +56,8 @@ public:
 
     QUrl requestUrl() const;
     void block(bool shouldBlock);
+    void setHttpHeader(const QByteArray &name, const QByteArray &value);
+    void redirect(const QUrl &url);
 
     bool mBlocked;
     QUrl mUrl;
@@ -120,7 +120,7 @@ class QWebEngineView : public QWidget
 {
     Q_OBJECT
 public:
-    typedef std::function<void(const QUrl &, QVariantMap &)> AuthFunc;
+    using AuthFunc = std::function<void(const QUrl &, QVariantMap &)>;
 
     explicit QWebEngineView(QWidget *parent);
     ~QWebEngineView() override;
@@ -147,7 +147,9 @@ protected:
 class QNetworkRequest
 {
 public:
-    enum KnownHeaders { ContentTypeHeader };
+    enum KnownHeaders {
+        ContentTypeHeader,
+    };
 };
 
 class QNetworkReply : public QBuffer
@@ -192,10 +194,20 @@ class QAbstractOAuth : public QObject
     Q_OBJECT
 public:
     Q_ENUMS(Stage)
-    enum class Stage { RequestingTemporaryCredentials, RequestingAuthorization, RequestingAccessToken, RefreshingAccessToken };
+    enum class Stage {
+        RequestingTemporaryCredentials,
+        RequestingAuthorization,
+        RequestingAccessToken,
+        RefreshingAccessToken,
+    };
 
     Q_ENUMS(Status)
-    enum class Status { NotAuthenticated, TemporaryCredentialsReceived, Granted, RefreshingToken };
+    enum class Status {
+        NotAuthenticated,
+        TemporaryCredentialsReceived,
+        Granted,
+        RefreshingToken,
+    };
 
     explicit QAbstractOAuth(QObject *parent);
     ~QAbstractOAuth() override = default;
@@ -243,7 +255,7 @@ class QOAuth2AuthorizationCodeFlow : public QAbstractOAuth2
 {
     Q_OBJECT
 public:
-    typedef std::function<QNetworkReply::NetworkError(QString &, QMap<QNetworkRequest::KnownHeaders, QVariant> &)> TokenFunc;
+    using TokenFunc = std::function<QNetworkReply::NetworkError(QString &, QMap<QNetworkRequest::KnownHeaders, QVariant> &)>;
 
     explicit QOAuth2AuthorizationCodeFlow(QObject *parent = nullptr);
     ~QOAuth2AuthorizationCodeFlow() override;
@@ -301,6 +313,7 @@ public:
     }
 
     const QUrl &resultUri() const;
+    QString getAuthHeader();
 };
 
 QString browserDisplayRequestString();
@@ -325,4 +338,3 @@ QString tokenCallbackString(const QString &accessToken,
 QString requestWalletMapString();
 }
 
-#endif /* EWSOAUTH_UT_MOCK_H */

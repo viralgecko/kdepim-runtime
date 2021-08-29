@@ -37,7 +37,7 @@ EwsFetchItemTypeDetailsJob::~EwsFetchItemTypeDetailsJob()
 {
 }
 
-void EwsFetchItemTypeDetailsJob::processItems(const QList<EwsGetItemRequest::Response> &responses)
+void EwsFetchItemTypeDetailsJob::processItems(const EwsGetItemRequest::Response::List &responses)
 {
     Item::List::iterator it = mChangedItems.begin();
 

@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSITEMTYPEHANDLER_H
-#define EWSITEMTYPEHANDLER_H
+#pragma once
 
 #include "ewsitemhandler.h"
 
@@ -24,5 +23,3 @@ public:
     createItemJob(EwsClient &client, const Akonadi::Item &item, const Akonadi::Collection &collection, EwsTagStore *tagStore, EwsResource *parent) override;
     static EwsItemHandler *factory();
 };
-
-#endif

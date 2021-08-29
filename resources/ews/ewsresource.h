@@ -1,12 +1,12 @@
 /*
-    SPDX-FileCopyrightText: 2015-2018 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSRESOURCE_H
-#define EWSRESOURCE_H
+#pragma once
 
+#include <QQueue>
 #include <QScopedPointer>
 
 #include <AkonadiAgentBase/ResourceBase>
@@ -73,14 +73,17 @@ protected:
     void doSetOnline(bool online) override;
 public Q_SLOTS:
     void configure(WId windowId) override;
+    Q_SCRIPTABLE void clearCollectionSyncState(int collectionId);
     Q_SCRIPTABLE void clearFolderSyncState(const QString &folderId);
     Q_SCRIPTABLE void clearFolderSyncState();
     Q_SCRIPTABLE void clearFolderTreeSyncState();
+    Q_SCRIPTABLE void setInitialReconnectTimeout(int timeout);
 protected Q_SLOTS:
     void retrieveCollections() override;
     void retrieveItems(const Akonadi::Collection &collection) override;
     bool retrieveItems(const Akonadi::Item::List &items, const QSet<QByteArray> &parts) override;
     void retrieveTags() override;
+    QString dumpResourceToString() const override;
 private Q_SLOTS:
     void fetchFoldersJobFinished(KJob *job);
     void fetchFoldersIncrJobFinished(KJob *job);
@@ -125,6 +128,10 @@ private Q_SLOTS:
 #endif
 
 private:
+    enum AuthStage { AuthIdle, AuthRefreshToken, AuthAccessToken, AuthFailure };
+
+    enum QueuedFetchItemsJobType { RetrieveItems, SubscriptionSync };
+
     void finishItemsFetch(FetchItemState *state);
     void fetchSpecialFolders();
     void specialFoldersCollectionsRetrieved(const Akonadi::Collection::List &folders);
@@ -139,22 +146,37 @@ private:
     void reauthNotificationDismissed(bool accepted);
     void reauthenticate();
 
+    static QString getCollectionSyncState(const Akonadi::Collection &col);
+    static void saveCollectionSyncState(Akonadi::Collection &col, const QString &state);
+
+    void queueFetchItemsJob(const Akonadi::Collection &col, QueuedFetchItemsJobType type, std::function<void(EwsFetchItemsJob *)> startFn);
+    void startFetchItemsJob(const Akonadi::Collection &col, std::function<void(EwsFetchItemsJob *)> startFn);
+    void dequeueFetchItemsJob();
+
+    template<class Job>
+    void connectStatusSignals(Job *job);
+
     EwsClient mEwsClient;
     Akonadi::Collection mRootCollection;
     QScopedPointer<EwsSubscriptionManager> mSubManager;
-    QHash<QString, QString> mSyncState;
     QString mFolderSyncState;
     QHash<QString, EwsId::List> mItemsToCheck;
-    QHash<QString, EwsFetchItemsJob::QueuedUpdateList> mQueuedUpdates;
     QString mPassword;
     QScopedPointer<EwsAbstractAuth> mAuth;
-    int mAuthStage = 0;
+    AuthStage mAuthStage;
     QPointer<KNotification> mReauthNotification;
 
     bool mTagsRetrieved = false;
     int mReconnectTimeout;
+    int mInitialReconnectTimeout;
     EwsTagStore *mTagStore = nullptr;
     QScopedPointer<EwsSettings> mSettings;
+
+    struct QueuedFetchItemsJob {
+        Akonadi::Collection col;
+        QueuedFetchItemsJobType type;
+        std::function<void(EwsFetchItemsJob *)> startFn;
+    };
+    QQueue<QueuedFetchItemsJob> mFetchItemsJobQueue;
 };
 
-#endif

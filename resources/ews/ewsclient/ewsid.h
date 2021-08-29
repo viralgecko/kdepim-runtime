@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSID_H
-#define EWSID_H
+#pragma once
 
 #include <QList>
 #include <QMetaType>
@@ -34,9 +33,13 @@ class QXmlStreamReader;
 class EwsId
 {
 public:
-    enum Type { Distinguished, Real, Unspecified };
+    enum Type {
+        Distinguished,
+        Real,
+        Unspecified,
+    };
 
-    typedef QList<EwsId> List;
+    typedef QVector<EwsId> List;
 
     explicit EwsId(EwsDistinguishedId did)
         : mType(Distinguished)
@@ -108,4 +111,3 @@ QDebug operator<<(QDebug debug, const EwsId &id);
 Q_DECLARE_METATYPE(EwsId)
 Q_DECLARE_METATYPE(EwsId::List)
 
-#endif

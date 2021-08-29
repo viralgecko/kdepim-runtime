@@ -7,17 +7,31 @@
 #include "ewsupdateitemrequest.h"
 #include "ewsclient_debug.h"
 
-static const QVector<QString> conflictResolutionNames = {QStringLiteral("NeverOverwrite"), QStringLiteral("AutoResolve"), QStringLiteral("AlwaysOverwrite")};
+static const QVector<QString> conflictResolutionNames = {
+    QStringLiteral("NeverOverwrite"),
+    QStringLiteral("AutoResolve"),
+    QStringLiteral("AlwaysOverwrite"),
+};
 
-static const QVector<QString> messageDispositionNames = {QStringLiteral("SaveOnly"), QStringLiteral("SendOnly"), QStringLiteral("SendAndSaveCopy")};
+static const QVector<QString> messageDispositionNames = {
+    QStringLiteral("SaveOnly"),
+    QStringLiteral("SendOnly"),
+    QStringLiteral("SendAndSaveCopy"),
+};
 
-static const QVector<QString> meetingDispositionNames = {QStringLiteral("SendToNone"),
-                                                         QStringLiteral("SendOnlyToAll"),
-                                                         QStringLiteral("SendOnlyToChanged"),
-                                                         QStringLiteral("SendToAllAndSaveCopy"),
-                                                         QStringLiteral("SendToChangedAndSaveCopy")};
+static const QVector<QString> meetingDispositionNames = {
+    QStringLiteral("SendToNone"),
+    QStringLiteral("SendOnlyToAll"),
+    QStringLiteral("SendOnlyToChanged"),
+    QStringLiteral("SendToAllAndSaveCopy"),
+    QStringLiteral("SendToChangedAndSaveCopy"),
+};
 
-static const QVector<QString> updateTypeElementNames = {QStringLiteral("AppendToItemField"), QStringLiteral("SetItemField"), QStringLiteral("DeleteItemField")};
+static const QVector<QString> updateTypeElementNames = {
+    QStringLiteral("AppendToItemField"),
+    QStringLiteral("SetItemField"),
+    QStringLiteral("DeleteItemField"),
+};
 
 EwsUpdateItemRequest::EwsUpdateItemRequest(EwsClient &client, QObject *parent)
     : EwsRequest(client, parent)
@@ -55,7 +69,7 @@ void EwsUpdateItemRequest::start()
     }
 
     writer.writeStartElement(ewsMsgNsUri, QStringLiteral("ItemChanges"));
-    for (const ItemChange &ch : qAsConst(mChanges)) {
+    for (const ItemChange &ch : std::as_const(mChanges)) {
         ch.write(writer);
     }
     writer.writeEndElement();
@@ -75,6 +89,7 @@ void EwsUpdateItemRequest::start()
 
 bool EwsUpdateItemRequest::parseResult(QXmlStreamReader &reader)
 {
+    mResponses.reserve(mChanges.size());
     return parseResponseMessage(reader, QStringLiteral("UpdateItem"), [this](QXmlStreamReader &reader) {
         return parseItemsResponse(reader);
     });

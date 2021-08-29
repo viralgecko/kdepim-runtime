@@ -1,5 +1,5 @@
 /*
-    SPDX-FileCopyrightText: 2015-2016 Krzysztof Nowicki <krissn@op.pl>
+    SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
@@ -23,8 +23,8 @@
 
 using namespace Akonadi;
 
-static Q_CONSTEXPR int listBatchSize = 100;
-static Q_CONSTEXPR int fetchBatchSize = 50;
+static constexpr int listBatchSize = 100;
+static constexpr int fetchBatchSize = 50;
 
 /**
  * The fetch items job is processed in two stages.
@@ -98,8 +98,8 @@ EwsFetchItemsJob::~EwsFetchItemsJob()
 
 void EwsFetchItemsJob::start()
 {
-    Q_EMIT status(AgentBase::Running, i18nc("@info:status", "Retrieving %1 item list", mCollection.name()));
-    Q_EMIT percent(0);
+    Q_EMIT reportStatus(AgentBase::Running, i18nc("@info:status", "Retrieving %1 item list", mCollection.name()));
+    Q_EMIT reportPercent(0);
 
     /* Begin stage 1 - query item list from local and remote side. */
     auto syncItemsReq = new EwsSyncFolderItemsRequest(mClient, this);
@@ -210,7 +210,13 @@ void EwsFetchItemsJob::remoteItemFetchDone(KJob *job)
             }
         }
         const auto totalItems = mRemoteAddedItems.size() + mRemoteChangedItems.size() + mRemoteDeletedIds.size() + mRemoteFlagChangedIds.size();
-        Q_EMIT status(AgentBase::Running, i18nc("@info:status", "Retrieving %1 item list (%2 items)", mCollection.name(), totalItems));
+        if (!mLocalItems.empty()) {
+            Q_EMIT reportPercent(qMin(totalItems * 50 / mLocalItems.size(), 50));
+        }
+        Q_EMIT reportStatus(AgentBase::Running, i18nc("@info:status", "Retrieving %1 item list (%2 items)", mCollection.name(), totalItems));
+    } else {
+        setEwsResponseCode(itemReq->ewsResponseCode());
+        qCWarningNC(EWSRES_LOG) << QStringLiteral("EwsFetchItemsJob: Failed remote item sync");
     }
 }
 
@@ -253,14 +259,23 @@ bool EwsFetchItemsJob::processIncrementalRemoteItemUpdates(const EwsItem::List &
                                                            QHash<EwsItemType, Item::List> &toFetchItems)
 {
     Q_FOREACH (const EwsItem &ewsItem, items) {
-        EwsId id(ewsItem[EwsItemFieldItemId].value<EwsId>());
+        auto id(ewsItem[EwsItemFieldItemId].value<EwsId>());
         auto it = itemHash.find(id.id());
         if (it == itemHash.end()) {
             setErrorMsg(QStringLiteral("Got update for item %1, but item not found in local store.").arg(ewsHash(id.id())));
             emitResult();
             return false;
         }
+        const auto qitup = mQueuedUpdates[EwsModifiedEvent].find(id.id());
+        if (qitup != mQueuedUpdates[EwsModifiedEvent].end() && *qitup == id.changeKey()) {
+            qCDebugNC(EWSRES_LOG) << QStringLiteral("Match for queued modification of item %1").arg(ewsHash(id.id()));
+            continue;
+        }
         Item &item = *it;
+        if (item.remoteRevision() == id.changeKey()) {
+            qCDebugNC(EWSRES_LOG) << QStringLiteral("Matching change key for item %1 - not syncing").arg(ewsHash(id.id()));
+            continue;
+        }
         item.clearPayload();
         item.setRemoteRevision(id.changeKey());
         if (!mTagStore->readEwsProperties(item, ewsItem, mTagsSynced)) {
@@ -283,31 +298,25 @@ void EwsFetchItemsJob::compareItemLists()
     QHash<EwsItemType, Item::List> toFetchItems;
 
     QHash<QString, Item> itemHash;
-    for (const Item &item : qAsConst(mLocalItems)) {
+    for (const Item &item : std::as_const(mLocalItems)) {
         itemHash.insert(item.remoteId(), item);
     }
 
     Q_FOREACH (const EwsItem &ewsItem, mRemoteAddedItems) {
         /* In case of a full sync all existing items appear as added on the remote side. Therefore
          * look for the item in the local list before creating a new copy. */
-        EwsId id(ewsItem[EwsItemFieldItemId].value<EwsId>());
+        auto id(ewsItem[EwsItemFieldItemId].value<EwsId>());
         QHash<QString, Item>::iterator it = itemHash.find(id.id());
         EwsItemType type = ewsItem.internalType();
         if (type == EwsItemTypeUnknown) {
             /* Ignore unknown items. */
             continue;
         }
-        EwsItemHandler *Handler = EwsItemHandler::itemHandler(type);
-        if( Handler == nullptr)
-        {
-            qCDebugNC(EWSRES_LOG) << QStringLiteral("Unhandled Item found");
-            continue;
-        }
-        QString mimeType = Handler->mimeType();
+        QString mimeType = EwsItemHandler::itemHandler(type)->mimeType();
         if (it == itemHash.end()) {
             Item item(mimeType);
             item.setParentCollection(mCollection);
-            EwsId id = ewsItem[EwsItemFieldItemId].value<EwsId>();
+            auto id = ewsItem[EwsItemFieldItemId].value<EwsId>();
             item.setRemoteId(id.id());
             item.setRemoteRevision(id.changeKey());
             if (!mTagStore->readEwsProperties(item, ewsItem, mTagsSynced)) {
@@ -319,15 +328,21 @@ void EwsFetchItemsJob::compareItemLists()
             ++mTotalItemsToFetch;
         } else {
             Item &item = *it;
-            item.clearPayload();
-            item.setRemoteRevision(id.changeKey());
-            if (!mTagStore->readEwsProperties(item, ewsItem, mTagsSynced)) {
-                qCDebugNC(EWSRES_LOG) << QStringLiteral("Missing tags encountered - forcing sync");
-                syncTags();
-                return;
+            /* In case of a full sync even unchanged items appear as new. Compare the change keys
+             * to determine if a fetch is needed. */
+            if (item.remoteRevision() != id.changeKey()) {
+                item.clearPayload();
+                item.setRemoteRevision(id.changeKey());
+                if (!mTagStore->readEwsProperties(item, ewsItem, mTagsSynced)) {
+                    qCDebugNC(EWSRES_LOG) << QStringLiteral("Missing tags encountered - forcing sync");
+                    syncTags();
+                    return;
+                }
+                toFetchItems[type].append(item);
+                ++mTotalItemsToFetch;
+            } else {
+                qCDebugNC(EWSRES_LOG) << QStringLiteral("Matching change key for item %1 - not syncing").arg(ewsHash(id.id()));
             }
-            toFetchItems[type].append(item);
-            ++mTotalItemsToFetch;
             itemHash.erase(it);
         }
     }
@@ -347,20 +362,12 @@ void EwsFetchItemsJob::compareItemLists()
         // In case of an incremental sync deleted items will be given explicitly. */
         Q_FOREACH (const EwsId &id, mRemoteDeletedIds) {
             QHash<QString, Item>::iterator it = itemHash.find(id.id());
-            /* If one or more items marked as deleted are not found it means that the folder is out
-             * of sync. The only way to fix this is to issue a full sync.
-             * The only exception is when an item is checked explicitly. In such case the absence
-             * of this item can be ignored. */
             if (it == itemHash.end()) {
-                QHash<QString, QString>::iterator qit = mQueuedUpdates[EwsDeletedEvent].find(id.id());
-                if (EWSRES_LOG().isDebugEnabled() && qit != mQueuedUpdates[EwsDeletedEvent].end()) {
-                    qCDebugNC(EWSRES_LOG) << QStringLiteral("Match for queued deletion of item %1").arg(ewsHash(id.id()));
-                }
-                if (!mItemsToCheck.contains(id) && qit == mQueuedUpdates[EwsDeletedEvent].end()) {
-                    setErrorMsg(QStringLiteral("Got delete for item %1, but item not found in local store.").arg(ewsHash(id.id())));
-                    emitResult();
-                    return;
-                }
+                /* If an item is not found locally, it can mean two things:
+                 *  1. The item got deleted earlier without the resource being told about it.
+                 *  2. The item was never known by Akonadi due to a sync problem.
+                 * Either way the item doesn't exist any more and there is no point crying about it. */
+                qCDebugNC(EWSRES_LOG) << QStringLiteral("Got delete for item %1, but item not found in local store.").arg(ewsHash(id.id()));
             } else {
                 mDeletedItems.append(*it);
             }
@@ -385,10 +392,10 @@ void EwsFetchItemsJob::compareItemLists()
     qCDebugNC(EWSRES_LOG)
         << QStringLiteral("Changed %2, deleted %3, new %4").arg(mRemoteChangedItems.size()).arg(mDeletedItems.size()).arg(mRemoteAddedItems.size());
 
-    Q_EMIT status(AgentBase::Running, i18nc("@info:status", "Retrieving %1 items", mCollection.name()));
+    Q_EMIT reportStatus(AgentBase::Running, i18nc("@info:status", "Retrieving %1 items", mCollection.name()));
 
     bool fetch = false;
-    for (const auto iType : toFetchItems.keys()) {
+    for (const auto &iType : toFetchItems.keys()) {
         for (int i = 0; i < toFetchItems[iType].size(); i += fetchBatchSize) {
             EwsItemHandler *handler = EwsItemHandler::itemHandler(static_cast<EwsItemType>(iType));
             if (!handler) {
@@ -417,21 +424,31 @@ void EwsFetchItemsJob::compareItemLists()
 
 void EwsFetchItemsJob::itemDetailFetchDone(KJob *job)
 {
-    removeSubjob(job);
+    const auto detailJob = qobject_cast<EwsFetchItemDetailJob *>(job);
+    if (detailJob) {
+        qCWarningNC(EWSRES_LOG) << QStringLiteral("itemDetailFetchDone: ") << detailJob->error();
+        if (!detailJob->error()) {
+            removeSubjob(job);
 
-    if (!job->error()) {
-        auto detailJob = qobject_cast<EwsFetchItemDetailJob *>(job);
-        if (detailJob) {
-            mChangedItems += detailJob->changedItems();
-        }
+            const auto changedItems = detailJob->changedItems();
+            for (const auto &item : changedItems) {
+                if (item.isValid()) {
+                    mChangedItems.append(item);
+                } else {
+                    mNewItems.append(item);
+                }
+            }
 
-        mTotalItemsFetched = mChangedItems.size();
-        Q_EMIT percent((mTotalItemsFetched * 100) / mTotalItemsToFetch);
+            mTotalItemsFetched = mChangedItems.size();
+            Q_EMIT reportPercent(50 + (mTotalItemsFetched * 50) / mTotalItemsToFetch);
 
-        if (subjobs().isEmpty()) {
-            emitResult();
+            if (subjobs().isEmpty()) {
+                emitResult();
+            } else {
+                subjobs().first()->start();
+            }
         } else {
-            subjobs().first()->start();
+            setEwsResponseCode(detailJob->ewsResponseCode());
         }
     }
 }

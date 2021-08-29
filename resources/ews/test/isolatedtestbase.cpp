@@ -12,6 +12,7 @@
 #include <AkonadiCore/AgentManager>
 #include <AkonadiCore/Control>
 
+#include "ewsresourceinterface.h"
 #include "ewssettings.h"
 #include "ewswallet.h"
 #include "fakeewsserverthread.h"
@@ -103,6 +104,13 @@ TestAgentInstance::TestAgentInstance(const QString &url)
                                             this));
     QVERIFY(mEwsWalletInterface->isValid());
 
+    mEwsResourceInterface.reset(
+        new OrgKdeAkonadiEwsResourceInterface(QStringLiteral("org.freedesktop.Akonadi.Resource.") + mIdentifier + QLatin1Char('.') + akonadiInstanceIdentifier,
+                                              QStringLiteral("/"),
+                                              QDBusConnection::sessionBus(),
+                                              this));
+    QVERIFY(mEwsResourceInterface->isValid());
+
     /* The EWS resource initializes its DBus adapters asynchronously. Therefore it can happen that
      * due to a race access is attempted prior to their initialization. To fix this retry the DBus
      * communication a few times before declaring failure. */
@@ -178,20 +186,42 @@ bool TestAgentInstance::setOnline(bool online, bool wait)
     }
 }
 
+OrgKdeAkonadiEwsSettingsInterface &TestAgentInstance::settingsInterface() const
+{
+    return *mEwsSettingsInterface;
+}
+
+OrgKdeAkonadiEwsWalletInterface &TestAgentInstance::walletInterface() const
+{
+    return *mEwsWalletInterface;
+}
+
+OrgKdeAkonadiEwsResourceInterface &TestAgentInstance::resourceInterface() const
+{
+    return *mEwsResourceInterface;
+}
+
+Akonadi::AgentInstance &TestAgentInstance::instance() const
+{
+    return *mEwsInstance;
+}
+
 MsgRootInboxDialogEntry::MsgRootInboxDialogEntry(const QString &rootId, const QString &inboxId, const QString &descr, const ReplyCallback &callback)
     : DialogEntryBase(descr, callback)
 {
-    xQuery = IsolatedTestBase::loadResourceAsString(QStringLiteral(":/xquery/getfolder-inbox-msgroot")).arg(rootId).arg(inboxId);
+    xQuery = IsolatedTestBase::loadResourceAsString(QStringLiteral(":/xquery/getfolder-inbox-msgroot")).arg(rootId, inboxId);
     description = QStringLiteral("GetFolder request for inbox and msgroot");
 }
 
 SubscribedFoldersDialogEntry::SubscribedFoldersDialogEntry(const IsolatedTestBase::FolderList &list, const QString &descr, const ReplyCallback &callback)
     : DialogEntryBase(descr, callback)
 {
-    static const QVector<IsolatedTestBase::Folder::DistinguishedType> specialFolders = {IsolatedTestBase::Folder::Inbox,
-                                                                                        IsolatedTestBase::Folder::Calendar,
-                                                                                        IsolatedTestBase::Folder::Tasks,
-                                                                                        IsolatedTestBase::Folder::Contacts};
+    static const QVector<IsolatedTestBase::Folder::DistinguishedType> specialFolders = {
+        IsolatedTestBase::Folder::Inbox,
+        IsolatedTestBase::Folder::Calendar,
+        IsolatedTestBase::Folder::Tasks,
+        IsolatedTestBase::Folder::Contacts,
+    };
     QHash<IsolatedTestBase::Folder::DistinguishedType, const IsolatedTestBase::Folder *> folderHash;
     for (const auto &folder : list) {
         if (specialFolders.contains(folder.type)) {
@@ -330,6 +360,5 @@ ValidateFolderIdsDialogEntry::ValidateFolderIdsDialogEntry(const QStringList &id
 
     xQuery = IsolatedTestBase::loadResourceAsString(QStringLiteral(":/xquery/getfolder-validateids"))
                  .arg(folderIndex)
-                 .arg(xQueryFolderIds.join(QStringLiteral(" and ")))
-                 .arg(responseXml);
+                 .arg(xQueryFolderIds.join(QStringLiteral(" and ")), responseXml);
 }

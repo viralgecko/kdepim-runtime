@@ -1,5 +1,5 @@
 #
-#  SPDX-FileCopyrightText: 2015-2018 Krzysztof Nowicki <krissn@op.pl>
+#  SPDX-FileCopyrightText: 2015-2020 Krzysztof Nowicki <krissn@op.pl>
 #
 #  SPDX-License-Identifier: LGPL-2.0-or-later
 
@@ -19,6 +19,12 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}/ewsclient)
 add_definitions(-DTRANSLATION_DOMAIN=\"akonadi_ews_resource\")
 
 set(ewsresource_SRCS
+    ewsfolderclassattribute.cpp
+    ewsitemclassattribute.cpp
+    itemtype/ewsitemtypehandler.cpp
+    itemtype/ewscreateitemtypejob.cpp
+    itemtype/ewsfetchitemtypedetailjob.cpp
+    itemtype/ewsmodifyitemtypejob.cpp
     abchperson/ewsabchpersonhandler.cpp
     abchperson/ewscreateabchpersonjob.cpp
     abchperson/ewsfetchabchpersondetailjob.cpp
@@ -31,10 +37,6 @@ set(ewsresource_SRCS
     contact/ewscreatecontactjob.cpp
     contact/ewsfetchcontactdetailjob.cpp
     contact/ewsmodifycontactjob.cpp
-    itemtype/ewsitemtypehandler.cpp
-    itemtype/ewscreateitemtypejob.cpp
-    itemtype/ewsfetchitemtypedetailjob.cpp
-    itemtype/ewsmodifyitemtypejob.cpp
     mail/ewscreatemailjob.cpp
     mail/ewsfetchmaildetailjob.cpp
     mail/ewsmailhandler.cpp
@@ -51,21 +53,21 @@ set(ewsresource_SRCS
     ewsautodiscoveryjob.cpp
     ewsconfigdialog.cpp
     ewscreateitemjob.cpp
-    ewsfolderclassattribute.cpp
-    ewsitemclassattribute.cpp
-    ewsfetchfoldersjob.cpp
     ewsfetchfoldersincrjob.cpp
-    ewsfetchitemsjob.cpp
+    ewsfetchfoldersjob.cpp
     ewsfetchitemdetailjob.cpp
+    ewsfetchitempayloadjob.cpp
+    ewsfetchitemsjob.cpp
     ewsitemhandler.cpp
-    ewsmodifyitemjob.cpp
     ewsmodifyitemflagsjob.cpp
+    ewsmodifyitemjob.cpp
     ewsprogressdialog.cpp
     ewsresource.cpp
     ewssettings.cpp
     ewssubscribedfoldersjob.cpp
     ewssubscriptionmanager.cpp
-    ewssubscriptionwidget.cpp)
+    ewssubscriptionwidget.cpp
+    ewssyncstateattribute.cpp)
 
 ecm_qt_declare_logging_category(ewsresource_SRCS
     HEADER ewsres_debug.h
@@ -89,16 +91,16 @@ ki18n_wrap_ui(ewsresource_SRCS ewsconfigdialog.ui)
 
 kconfig_add_kcfg_files(ewsresource_SRCS ewssettingsbase.kcfgc)
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/ewsresource.kcfg org.kde.Akonadi.Ews.Settings)
-qt5_add_dbus_adaptor(ewsresource_SRCS
+qt_add_dbus_adaptor(ewsresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Ews.Settings.xml ewssettings.h EwsSettings ewssettingsadaptor EwsSettingsAdaptor
     )
 
-qt5_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/ewsresource.h org.kde.Akonadi.Ews.Resource.xml OPTIONS -a )
-qt5_add_dbus_adaptor(ewsresource_SRCS
+qt_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/ewsresource.h org.kde.Akonadi.Ews.Resource.xml OPTIONS -a )
+qt_add_dbus_adaptor(ewsresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Ews.Resource.xml ewsresource.h EwsResource ewsresourceadaptor EwsResourceAdaptor
     )
-qt5_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/ewssettings.h org.kde.Akonadi.Ews.Wallet.xml OPTIONS -a )
-qt5_add_dbus_adaptor(ewsresource_SRCS
+qt_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/ewssettings.h org.kde.Akonadi.Ews.Wallet.xml OPTIONS -a )
+qt_add_dbus_adaptor(ewsresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Ews.Wallet.xml ewssettings.h EwsSettings ewswalletadaptor EwsWalletAdaptor
     )
 
@@ -138,10 +140,10 @@ if (HAVE_SEPARATE_MTA_RESOURCE)
 
     kconfig_add_kcfg_files(ewsmtaresource_SRCS ewsmtasettings.kcfgc)
     kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/ewsmtaresource.kcfg org.kde.Akonadi.EwsMta.Settings)
-    qt5_add_dbus_adaptor(ewsmtaresource_SRCS
+    qt_add_dbus_adaptor(ewsmtaresource_SRCS
         ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.EwsMta.Settings.xml ewsmtasettings.h EwsMtaSettings ewsmtasettingsadaptor
         )
-    qt5_add_dbus_interface(ewsmtaresource_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Ews.Resource.xml ewsresourceinterface)
+    qt_add_dbus_interface(ewsmtaresource_SRCS ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Ews.Resource.xml ewsresourceinterface)
 
     add_executable(akonadi_ewsmta_resource ${ewsmtaresource_SRCS})
     target_link_libraries(akonadi_ewsmta_resource

@@ -4,10 +4,9 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSOAUTH_H
-#define EWSOAUTH_H
+#pragma once
 
-#include <QObject>
+class QObject;
 #include <QScopedPointer>
 
 #include "ewsabstractauth.h"
@@ -36,4 +35,3 @@ private:
     Q_DECLARE_PRIVATE(EwsOAuth)
 };
 
-#endif /* EWSOAUTH_H */

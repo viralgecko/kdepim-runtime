@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSSYNCFOLDERITEMSREQUEST_H
-#define EWSSYNCFOLDERITEMSREQUEST_H
+#pragma once
 
 #include "ewsitem.h"
 #include "ewsitemshape.h"
@@ -16,7 +15,13 @@ class EwsSyncFolderItemsRequest : public EwsRequest
 {
     Q_OBJECT
 public:
-    enum ChangeType { Create, Update, Delete, ReadFlagChange, Unknown };
+    enum ChangeType {
+        Create,
+        Update,
+        Delete,
+        ReadFlagChange,
+        Unknown,
+    };
 
     class Response;
 
@@ -100,4 +105,3 @@ private:
 
 Q_DECLARE_METATYPE(EwsSyncFolderItemsRequest::Change::List)
 
-#endif

@@ -6,6 +6,7 @@
 
 #include "ewsconfigdialog.h"
 
+#include <KAuthorized>
 #include <KConfigDialogManager>
 #include <KMessageBox>
 #include <KWindowSystem>
@@ -24,7 +25,7 @@
 #include "ewssubscriptionwidget.h"
 #include "ui_ewsconfigdialog.h"
 
-typedef QPair<QString, QString> StringPair;
+using StringPair = QPair<QString, QString>;
 
 static const QVector<StringPair> userAgents = {
     {QStringLiteral("Microsoft Outlook 2016"), QStringLiteral("Microsoft Office/16.0 (Windows NT 10.0; Microsoft Outlook 16.0.6326; Pro)")},
@@ -61,7 +62,7 @@ EwsConfigDialog::EwsConfigDialog(EwsResource *parentResource, EwsClient &client,
     }
 
     auto mainLayout = new QVBoxLayout(this);
-    QWidget *mainWidget = new QWidget(this);
+    auto mainWidget = new QWidget(this);
     mainLayout->addWidget(mainWidget);
 
     mButtonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
@@ -77,6 +78,7 @@ EwsConfigDialog::EwsConfigDialog(EwsResource *parentResource, EwsClient &client,
     mUi = new Ui::SetupServerView;
     mUi->setupUi(mainWidget);
     mUi->accountName->setText(parentResource->name());
+    mUi->passwordEdit->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
 
     mSubWidget = new EwsSubscriptionWidget(client, mSettings.data(), this);
     mUi->subscriptionTabLayout->addWidget(mSubWidget);
@@ -126,7 +128,7 @@ EwsConfigDialog::EwsConfigDialog(EwsResource *parentResource, EwsClient &client,
 
     int selectedIndex = -1;
     int i = 0;
-    for (const StringPair &item : qAsConst(userAgents)) {
+    for (const StringPair &item : std::as_const(userAgents)) {
         mUi->userAgentCombo->addItem(item.first, item.second);
         if (mSettings->userAgent() == item.second) {
             selectedIndex = i;
@@ -169,7 +171,6 @@ EwsConfigDialog::EwsConfigDialog(EwsResource *parentResource, EwsClient &client,
     connect(mUi->tryConnectButton, &QPushButton::clicked, this, &EwsConfigDialog::tryConnect);
     connect(mUi->userAgentCombo, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &EwsConfigDialog::userAgentChanged);
     connect(mUi->clearFolderTreeSyncStateButton, &QPushButton::clicked, mParentResource, &EwsResource::clearFolderTreeSyncState);
-    connect(mUi->clearFolderItemSyncStateButton, &QPushButton::clicked, mParentResource, QOverload<>::of(&EwsResource::clearFolderSyncState));
 }
 
 EwsConfigDialog::~EwsConfigDialog()

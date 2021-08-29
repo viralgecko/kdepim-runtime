@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSITEMHANDLER_H
-#define EWSITEMHANDLER_H
+#pragma once
 
 #include <functional>
 
@@ -40,7 +39,7 @@ public:
     virtual EwsCreateItemJob *
     createItemJob(EwsClient &client, const Akonadi::Item &item, const Akonadi::Collection &collection, EwsTagStore *tagStore, EwsResource *parent) = 0;
 
-    typedef std::function<EwsItemHandler *()> ItemHandlerFactory;
+    using ItemHandlerFactory = std::function<EwsItemHandler *()>;
     static void registerItemHandler(EwsItemType type, const ItemHandlerFactory &factory);
     static EwsItemHandler *itemHandler(EwsItemType type);
     static EwsItemType mimeToItemType(const QString &mimeType);
@@ -67,4 +66,3 @@ private:
     };                                                                                                                                                         \
     const type##_itemhandler_registrar type##_itemhandler_registrar_object;
 
-#endif

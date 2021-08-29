@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSDELETEFOLDERREQUEST_H
-#define EWSDELETEFOLDERREQUEST_H
+#pragma once
 
 #include <QList>
 
@@ -19,7 +18,11 @@ class EwsDeleteFolderRequest : public EwsRequest
 {
     Q_OBJECT
 public:
-    enum Type { HardDelete = 0, SoftDelete, MoveToDeletedItems };
+    enum Type {
+        HardDelete = 0,
+        SoftDelete,
+        MoveToDeletedItems,
+    };
 
     class Response : public EwsRequest::Response
     {
@@ -60,4 +63,3 @@ private:
     QList<Response> mResponses;
 };
 
-#endif

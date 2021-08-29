@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef EWSXMLREADER_H
-#define EWSXMLREADER_H
+#pragma once
 
 #include <functional>
 
@@ -23,7 +22,7 @@ public:
 
     typedef QHash<T, QVariant> ValueHash;
 
-    static Q_CONSTEXPR T Ignore = static_cast<T>(-1);
+    static constexpr T Ignore = static_cast<T>(-1);
 
     struct Item {
         Item()
@@ -184,4 +183,3 @@ extern bool ewsXmlLegacyFreeBusyStatusWriter(QXmlStreamWriter &writer, const QVa
 extern bool ewsXmlResponseTypeReader(QXmlStreamReader &reader, QVariant &val);
 extern bool ewsXmlMyResponseTypeWriter(QXmlStreamWriter &writer, const QVariant &val);
 
-#endif
