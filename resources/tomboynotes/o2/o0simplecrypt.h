@@ -4,8 +4,7 @@
     SPDX-License-Identifier: BSD-3-Clause
 */
 
-#ifndef SIMPLECRYPT_H
-#define SIMPLECRYPT_H
+#pragma once
 #include <QString>
 #include <QVector>
 
@@ -202,7 +201,12 @@ public:
 
     // enum to describe options that have been used for the encryption. Currently only one, but
     // that only leaves room for future extensions like adding a cryptographic hash...
-    enum CryptoFlag { CryptoFlagNone = 0, CryptoFlagCompression = 0x01, CryptoFlagChecksum = 0x02, CryptoFlagHash = 0x04 };
+    enum CryptoFlag {
+        CryptoFlagNone = 0,
+        CryptoFlagCompression = 0x01,
+        CryptoFlagChecksum = 0x02,
+        CryptoFlagHash = 0x04,
+    };
     Q_DECLARE_FLAGS(CryptoFlags, CryptoFlag)
 private:
     void splitKey();
@@ -215,4 +219,3 @@ private:
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(O0SimpleCrypt::CryptoFlags)
 
-#endif // SimpleCrypt_H

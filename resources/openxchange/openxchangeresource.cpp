@@ -257,7 +257,7 @@ OpenXchangeResource::OpenXchangeResource(const QString &id)
     // Create the standard collections.
     //
     // There exists special OX folders (e.g. private, public, shared) that are not
-    // returned by a normal webdav listing, therefor we create them manually here.
+    // returned by a normal webdav listing, therefore we create them manually here.
     // This is possible because the remote ids of these folders are fixed values from 1
     // till 4.
     mResourceCollection.setParentCollection(Collection::root());
@@ -266,7 +266,7 @@ OpenXchangeResource::OpenXchangeResource(const QString &id)
     mResourceCollection.setName(name());
     mResourceCollection.setContentMimeTypes(QStringList() << Collection::mimeType());
     mResourceCollection.setRights(Collection::ReadOnly);
-    auto *attribute = mResourceCollection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attribute = mResourceCollection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     attribute->setIconName(QStringLiteral("ox"));
 
     Collection privateFolder;
@@ -683,7 +683,7 @@ void OpenXchangeResource::onObjectsRequestDeltaJobFinished(KJob *job)
     auto requestJob = qobject_cast<OXA::ObjectsRequestDeltaJob *>(job);
     Q_ASSERT(requestJob);
 
-    const Akonadi::Collection collection = requestJob->property("collection").value<Collection>();
+    const auto collection = requestJob->property("collection").value<Collection>();
 
     ObjectsLastSync lastSyncInfo;
 
@@ -909,7 +909,7 @@ static Collection folderToCollection(const OXA::Folder &folder, const Collection
     // set a unique name to make Akonadi happy
     collection.setName(folder.title() + QLatin1Char('_') + QUuid::createUuid().toString());
 
-    auto *attribute = collection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attribute = collection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     attribute->setDisplayName(folder.title());
 
     QStringList mimeTypes;
@@ -1050,13 +1050,13 @@ void OpenXchangeResource::onFolderCreateJobFinished(KJob *job)
 
     const OXA::Folder folder = createJob->folder();
 
-    Collection collection = job->property("collection").value<Collection>();
+    auto collection = job->property("collection").value<Collection>();
 
     const RemoteInformation remoteInformation(folder.objectId(), folder.module(), folder.lastModified());
     remoteInformation.store(collection);
 
     // set matching icon
-    auto *attribute = collection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attribute = collection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     switch (folder.module()) {
     case OXA::Folder::Calendar:
         attribute->setIconName(QStringLiteral("view-calendar"));
@@ -1086,7 +1086,7 @@ void OpenXchangeResource::onFolderModifyJobFinished(KJob *job)
 
     const OXA::Folder folder = modifyJob->folder();
 
-    Collection collection = job->property("collection").value<Collection>();
+    auto collection = job->property("collection").value<Collection>();
 
     // update last_modified property
     RemoteInformation remoteInformation = RemoteInformation::load(collection);
@@ -1108,7 +1108,7 @@ void OpenXchangeResource::onFolderMoveJobFinished(KJob *job)
 
     const OXA::Folder folder = moveJob->folder();
 
-    Collection collection = job->property("collection").value<Collection>();
+    auto collection = job->property("collection").value<Collection>();
 
     // update last_modified property
     RemoteInformation remoteInformation = RemoteInformation::load(collection);
@@ -1134,7 +1134,7 @@ void OpenXchangeResource::onFolderDeleteJobFinished(KJob *job)
  * so that we can find out the right parent collection in
  * onFoldersRequestDeltaJob().
  *
- * Therefor we trigger this method when the resource is started and
+ * Therefore we trigger this method when the resource is started and
  * configured to use incremental sync.
  */
 void OpenXchangeResource::syncCollectionsRemoteIdCache()

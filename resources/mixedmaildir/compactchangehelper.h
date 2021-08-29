@@ -5,8 +5,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef COMPACTCHANGEHELPER_H
-#define COMPACTCHANGEHELPER_H
+#pragma once
 
 #include <QObject>
 
@@ -17,7 +16,7 @@ namespace Akonadi
 class Collection;
 class Item;
 
-typedef QVector<Item> ItemList;
+using ItemList = QVector<Item>;
 }
 
 class CompactChangeHelper : public QObject
@@ -43,4 +42,3 @@ private:
     Q_PRIVATE_SLOT(d, void processNextItem())
 };
 
-#endif

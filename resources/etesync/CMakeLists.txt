@@ -37,7 +37,7 @@ kcfg_generate_dbus_interface(
     org.kde.Akonadi.etesync.Settings
 )
 
-qt5_add_dbus_adaptor(etesyncresource_SRCS
+qt_add_dbus_adaptor(etesyncresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.etesync.Settings.xml
     ${CMAKE_CURRENT_BINARY_DIR}/settings.h
     Settings
@@ -51,7 +51,7 @@ if (COMPILE_WITH_UNITY_CMAKE_SUPPORT)
 endif()
 target_link_libraries(akonadi_etesync_resource
     ${ETEBASE_LIBRARIES}
-    Qt5::DBus
+    Qt::DBus
     KF5::AkonadiAgentBase
     KF5::ConfigCore
     KF5::Contacts

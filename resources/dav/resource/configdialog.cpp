@@ -27,12 +27,13 @@ ConfigDialog::ConfigDialog(QWidget *parent)
     : QDialog(parent)
 {
     setWindowIcon(QIcon::fromTheme(QStringLiteral("folder-remote")));
+    setWindowTitle(i18nc("@title:window", "DAV Resource Configuration"));
     auto mainLayout = new QVBoxLayout(this);
-    QWidget *mainWidget = new QWidget(this);
+    auto mainWidget = new QWidget(this);
     mainLayout->addWidget(mainWidget);
     mUi.setupUi(mainWidget);
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     mOkButton = buttonBox->button(QDialogButtonBox::Ok);
     mOkButton->setDefault(true);
     mOkButton->setShortcut(Qt::CTRL | Qt::Key_Return);
@@ -86,7 +87,7 @@ ConfigDialog::~ConfigDialog()
 
 void ConfigDialog::readConfig()
 {
-    KConfigGroup grp(KSharedConfig::openConfig(), "ConfigDialog");
+    KConfigGroup grp(KSharedConfig::openStateConfig(), "ConfigDialog");
     const QSize size = grp.readEntry("Size", QSize(300, 200));
     if (size.isValid()) {
         resize(size);
@@ -95,7 +96,7 @@ void ConfigDialog::readConfig()
 
 void ConfigDialog::writeConfig()
 {
-    KConfigGroup grp(KSharedConfig::openConfig(), "ConfigDialog");
+    KConfigGroup grp(KSharedConfig::openStateConfig(), "ConfigDialog");
     grp.writeEntry("Size", size());
     grp.sync();
 }
@@ -263,8 +264,8 @@ void ConfigDialog::onEditButtonClicked()
 
 void ConfigDialog::onOkClicked()
 {
-    typedef QPair<QString, KDAV::Protocol> UrlPair;
-    for (const UrlPair &url : qAsConst(mRemovedUrls)) {
+    using UrlPair = QPair<QString, KDAV::Protocol>;
+    for (const UrlPair &url : std::as_const(mRemovedUrls)) {
         Settings::self()->removeUrlConfiguration(url.second, url.first);
     }
 
@@ -277,8 +278,8 @@ void ConfigDialog::onCancelClicked()
 {
     mRemovedUrls.clear();
 
-    typedef QPair<QString, KDAV::Protocol> UrlPair;
-    for (const UrlPair &url : qAsConst(mAddedUrls)) {
+    using UrlPair = QPair<QString, KDAV::Protocol>;
+    for (const UrlPair &url : std::as_const(mAddedUrls)) {
         Settings::self()->removeUrlConfiguration(url.second, url.first);
     }
     reject();

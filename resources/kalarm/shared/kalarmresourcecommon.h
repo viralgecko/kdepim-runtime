@@ -6,13 +6,12 @@
  *  SPDX-License-Identifier: LGPL-2.0-or-later
  */
 
-#ifndef KALARMRESOURCECOMMON_H
-#define KALARMRESOURCECOMMON_H
+#pragma once
 
 #include <kalarmcal/kacalendar.h>
 #include <kalarmcal/kaevent.h>
 
-#include <QObject>
+class QObject;
 
 namespace KCalendarCore
 {
@@ -34,8 +33,14 @@ Akonadi::Item retrieveItem(const Akonadi::Item &, KAEvent &);
 KAEvent checkItemChanged(const Akonadi::Item &, QString &errorMsg);
 void setCollectionCompatibility(const Akonadi::Collection &, KACalendar::Compat, int version);
 
-enum ErrorCode { UidNotFound, NotCurrentFormat, EventNotCurrentFormat, EventNoAlarms, EventReadOnly, CalendarAdd };
+enum ErrorCode {
+    UidNotFound,
+    NotCurrentFormat,
+    EventNotCurrentFormat,
+    EventNoAlarms,
+    EventReadOnly,
+    CalendarAdd,
+};
 QString errorMessage(ErrorCode, const QString &param = QString());
 }
 
-#endif // KALARMRESOURCECOMMON_H

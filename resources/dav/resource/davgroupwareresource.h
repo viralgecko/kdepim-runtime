@@ -4,8 +4,7 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#ifndef DAVGROUPWARERESOURCE_H
-#define DAVGROUPWARERESOURCE_H
+#pragma once
 
 #include <KDAV/Enums>
 #include <KDAV/EtagCache>
@@ -63,7 +62,11 @@ protected:
     void doSetOnline(bool online) override;
 
 private:
-    enum ItemFetchUpdateType { ItemUpdateNone, ItemUpdateAdd, ItemUpdateChange };
+    enum ItemFetchUpdateType {
+        ItemUpdateNone,
+        ItemUpdateAdd,
+        ItemUpdateChange,
+    };
 
     KJob *createRetrieveCollectionsJob();
     void onReloadConfig();
@@ -120,4 +123,3 @@ private:
     bool mSyncErrorNotified = false;
 };
 
-#endif

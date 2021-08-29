@@ -4,8 +4,7 @@
    SPDX-License-Identifier: LGPL-2.0-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 #include "settingsbase.h"
 
@@ -20,7 +19,10 @@ class Settings : public SettingsBase
     Q_OBJECT
     Q_CLASSINFO("D-Bus Interface", "org.kde.Akonadi.POP3.Wallet")
 public:
-    enum class Option { NoOption = 0, ExportToDBus = 1 };
+    enum class Option {
+        NoOption = 0,
+        ExportToDBus = 1,
+    };
     Q_DECLARE_FLAGS(Options, Option)
 
     explicit Settings(const KSharedConfigPtr &config, Options options = Option::ExportToDBus);
@@ -38,4 +40,3 @@ private:
 
 Q_DECLARE_OPERATORS_FOR_FLAGS(Settings::Options)
 
-#endif

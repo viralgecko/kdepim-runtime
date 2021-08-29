@@ -4,8 +4,7 @@
    SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef FOLDERARCHIVEACCOUNTINFO_H
-#define FOLDERARCHIVEACCOUNTINFO_H
+#pragma once
 
 #include <AkonadiCore/Collection>
 #include <KConfigGroup>
@@ -17,7 +16,11 @@ public:
     explicit FolderArchiveAccountInfo(const KConfigGroup &config);
     ~FolderArchiveAccountInfo();
 
-    enum FolderArchiveType { UniqueFolder, FolderByMonths, FolderByYears };
+    enum FolderArchiveType {
+        UniqueFolder,
+        FolderByMonths,
+        FolderByYears,
+    };
 
     bool isValid() const;
 
@@ -49,4 +52,3 @@ private:
     bool mKeepExistingStructure = false;
 };
 
-#endif // FOLDERARCHIVEACCOUNTINFO_H

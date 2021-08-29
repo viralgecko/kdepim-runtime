@@ -13,6 +13,7 @@
 #include "settingsadaptor.h"
 #include "utils.h"
 
+#include <KAuthorized>
 #include <KLocalizedString>
 
 #include <KWallet>
@@ -159,7 +160,7 @@ KDAV::DavUrl::List Settings::configuredDavUrls()
     QMap<QString, UrlConfiguration *>::const_iterator it = mUrls.cbegin();
     const QMap<QString, UrlConfiguration *>::const_iterator itEnd = mUrls.cend();
     for (; it != itEnd; ++it) {
-        QStringList split = it.key().split(QLatin1Char(','));
+        const QStringList split = it.key().split(QLatin1Char(','));
         davUrls << configuredDavUrl(KDAV::ProtocolInfo::protocolByName(split.at(1)), split.at(0));
     }
 
@@ -469,7 +470,7 @@ QString Settings::promptForPassword(const QString &user)
     QPointer<QDialog> dlg = new QDialog();
     QString password;
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, dlg);
+    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, dlg);
     auto mainLayout = new QVBoxLayout(dlg);
     QPushButton *okButton = buttonBox->button(QDialogButtonBox::Ok);
     okButton->setDefault(true);
@@ -477,17 +478,18 @@ QString Settings::promptForPassword(const QString &user)
     connect(buttonBox, &QDialogButtonBox::accepted, dlg.data(), &QDialog::accept);
     connect(buttonBox, &QDialogButtonBox::rejected, dlg.data(), &QDialog::reject);
 
-    QWidget *mainWidget = new QWidget(dlg);
+    auto mainWidget = new QWidget(dlg);
     mainLayout->addWidget(mainWidget);
     mainLayout->addWidget(buttonBox);
     auto vLayout = new QVBoxLayout();
     mainWidget->setLayout(vLayout);
-    QLabel *label = new QLabel(i18n("A password is required for user %1", (user == QLatin1String("$default$") ? defaultUsername() : user)), mainWidget);
+    auto label = new QLabel(i18n("A password is required for user %1", (user == QLatin1String("$default$") ? defaultUsername() : user)), mainWidget);
     vLayout->addWidget(label);
     auto hLayout = new QHBoxLayout();
     label = new QLabel(i18n("Password: "), mainWidget);
     hLayout->addWidget(label);
     auto lineEdit = new KPasswordLineEdit();
+    lineEdit->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
     hLayout->addWidget(lineEdit);
     vLayout->addLayout(hLayout);
     lineEdit->setFocus();

@@ -17,6 +17,7 @@
 #include <QPushButton>
 
 #include <QCheckBox>
+#include <QComboBox>
 #include <QGroupBox>
 #include <QLabel>
 #include <QTabWidget>
@@ -43,10 +44,10 @@ NewMailNotifierSettingsWidget::NewMailNotifierSettingsWidget(const KSharedConfig
     auto tab = new QTabWidget(parent);
     parent->layout()->addWidget(tab);
 
-    QWidget *settings = new QWidget;
+    auto settings = new QWidget;
     auto vbox = new QVBoxLayout(settings);
 
-    QGroupBox *grp = new QGroupBox(i18n("Choose which fields to show:"), parent);
+    auto grp = new QGroupBox(i18n("Choose which fields to show:"), parent);
     vbox->addWidget(grp);
     auto groupboxLayout = new QVBoxLayout;
     grp->setLayout(groupboxLayout);
@@ -71,25 +72,45 @@ NewMailNotifierSettingsWidget::NewMailNotifierSettingsWidget(const KSharedConfig
     mExcludeMySelf->setObjectName(QStringLiteral("mExcludeMySelf"));
     vbox->addWidget(mExcludeMySelf);
 
-    mAllowToShowMail = new QCheckBox(i18n("Show Action Buttons"), parent);
-    mAllowToShowMail->setObjectName(QStringLiteral("mAllowToShowMail"));
-    vbox->addWidget(mAllowToShowMail);
-
     mKeepPersistentNotification = new QCheckBox(i18n("Keep Persistent Notification"), parent);
     mKeepPersistentNotification->setObjectName(QStringLiteral("mKeepPersistentNotification"));
     vbox->addWidget(mKeepPersistentNotification);
 
+    mAllowToShowMail = new QCheckBox(i18n("Show Action Buttons"), parent);
+    mAllowToShowMail->setObjectName(QStringLiteral("mAllowToShowMail"));
+    vbox->addWidget(mAllowToShowMail);
+
+    auto hboxLayout = new QHBoxLayout;
+    hboxLayout->setObjectName(QStringLiteral("hboxLayout"));
+    vbox->addLayout(hboxLayout);
+
+    mReplyMail = new QCheckBox(i18n("Reply Mail"), parent);
+    mReplyMail->setObjectName(QStringLiteral("mReplyMail"));
+    hboxLayout->addWidget(mReplyMail);
+    mReplyMail->setEnabled(false);
+
+    mReplyMailTypeComboBox = new QComboBox(parent);
+    mReplyMailTypeComboBox->setObjectName(QStringLiteral("mReplyMailTypeComboBox"));
+    mReplyMailTypeComboBox->setEnabled(false);
+    mReplyMailTypeComboBox->addItems({i18n("Reply to Author"), i18n("Reply to All")});
+    hboxLayout->addWidget(mReplyMailTypeComboBox);
+    hboxLayout->addStretch(1);
+
+    connect(mAllowToShowMail, &QCheckBox::clicked, this, [this](bool enabled) {
+        updateReplyMail(enabled);
+    });
+
     vbox->addStretch();
     tab->addTab(settings, i18n("Display"));
 
-    QWidget *textSpeakWidget = new QWidget;
+    auto textSpeakWidget = new QWidget;
     vbox = new QVBoxLayout;
     textSpeakWidget->setLayout(vbox);
     mTextToSpeak = new QCheckBox(i18n("Enabled"), parent);
     mTextToSpeak->setObjectName(QStringLiteral("mTextToSpeak"));
     vbox->addWidget(mTextToSpeak);
 
-    QLabel *howIsItWork = new QLabel(i18n("<a href=\"whatsthis\">How does this work?</a>"), parent);
+    auto howIsItWork = new QLabel(i18n("<a href=\"whatsthis\">How does this work?</a>"), parent);
     howIsItWork->setObjectName(QStringLiteral("howIsItWork"));
     howIsItWork->setTextInteractionFlags(Qt::LinksAccessibleByMouse);
     howIsItWork->setContextMenuPolicy(Qt::NoContextMenu);
@@ -98,7 +119,7 @@ NewMailNotifierSettingsWidget::NewMailNotifierSettingsWidget(const KSharedConfig
 
     auto textToSpeakLayout = new QHBoxLayout;
     textToSpeakLayout->setContentsMargins(0, 0, 0, 0);
-    QLabel *lab = new QLabel(i18n("Message:"), parent);
+    auto lab = new QLabel(i18n("Message:"), parent);
     lab->setObjectName(QStringLiteral("labmessage"));
     textToSpeakLayout->addWidget(lab);
     mTextToSpeakSetting = new QLineEdit;
@@ -125,7 +146,7 @@ NewMailNotifierSettingsWidget::NewMailNotifierSettingsWidget(const KSharedConfig
                                       QStringLiteral(KDEPIM_RUNTIME_VERSION),
                                       i18n("Notify about new mails."),
                                       KAboutLicense::GPL_V2,
-                                      i18n("Copyright (C) 2013-2020 Laurent Montel"));
+                                      i18n("Copyright (C) 2013-2021 Laurent Montel"));
 
     aboutData.setProductName(QByteArrayLiteral("Akonadi/New Mail Notifier"));
     aboutData.addAuthor(i18n("Laurent Montel"), i18n("Maintainer"), QStringLiteral("montel@kde.org"));
@@ -136,6 +157,12 @@ NewMailNotifierSettingsWidget::NewMailNotifierSettingsWidget(const KSharedConfig
 NewMailNotifierSettingsWidget::~NewMailNotifierSettingsWidget()
 {
     delete NewMailNotifierAgentSettings::self();
+}
+
+void NewMailNotifierSettingsWidget::updateReplyMail(bool enabled)
+{
+    mReplyMail->setEnabled(enabled);
+    mReplyMailTypeComboBox->setEnabled(enabled);
 }
 
 void NewMailNotifierSettingsWidget::load()
@@ -155,6 +182,10 @@ void NewMailNotifierSettingsWidget::load()
     mTextToSpeak->setChecked(settings->textToSpeakEnabled());
     mTextToSpeakSetting->setEnabled(mTextToSpeak->isChecked());
     mTextToSpeakSetting->setText(settings->textToSpeak());
+    mReplyMail->setChecked(settings->replyMail());
+    mReplyMailTypeComboBox->setCurrentIndex(settings->replyMailType());
+
+    updateReplyMail(mAllowToShowMail->isChecked());
 }
 
 bool NewMailNotifierSettingsWidget::save() const
@@ -170,6 +201,8 @@ bool NewMailNotifierSettingsWidget::save() const
     settings->setKeepPersistentNotification(mKeepPersistentNotification->isChecked());
     settings->setTextToSpeakEnabled(mTextToSpeak->isChecked());
     settings->setTextToSpeak(mTextToSpeakSetting->text());
+    settings->setReplyMail(mReplyMail->isChecked());
+    settings->setReplyMailType(mReplyMailTypeComboBox->currentIndex());
     settings->save();
     mNotify->save();
 

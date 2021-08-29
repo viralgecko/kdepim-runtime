@@ -5,15 +5,18 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef TESTDATAUTIL_H
-#define TESTDATAUTIL_H
+#pragma once
 
 class QString;
 #include <QStringList>
 
 namespace TestDataUtil
 {
-enum FolderType { InvalidFolder, MaildirFolder, MBoxFolder };
+enum FolderType {
+    InvalidFolder,
+    MaildirFolder,
+    MBoxFolder,
+};
 
 FolderType folderType(const QString &testDataName);
 
@@ -22,4 +25,3 @@ QStringList testDataNames();
 bool installFolder(const QString &testDataName, const QString &installPath, const QString &folderName);
 }
 
-#endif

@@ -5,8 +5,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef PASSWORDREQUESTERINTERFACE_H
-#define PASSWORDREQUESTERINTERFACE_H
+#pragma once
 
 #include <QObject>
 
@@ -16,9 +15,17 @@ class PasswordRequesterInterface : public QObject
     Q_ENUMS(ResultType RequestType)
 
 public:
-    enum ResultType { PasswordRetrieved, ReconnectNeeded, UserRejected, EmptyPasswordEntered };
+    enum ResultType {
+        PasswordRetrieved,
+        ReconnectNeeded,
+        UserRejected,
+        EmptyPasswordEntered,
+    };
 
-    enum RequestType { StandardRequest, WrongPasswordRequest };
+    enum RequestType {
+        StandardRequest,
+        WrongPasswordRequest,
+    };
 
 protected:
     explicit PasswordRequesterInterface(QObject *parent = nullptr);
@@ -31,4 +38,3 @@ Q_SIGNALS:
     void done(int resultType, const QString &password = QString());
 };
 
-#endif

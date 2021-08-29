@@ -1,7 +1,5 @@
 include(ECMAddTests)
 
-find_package(Qt5Test CONFIG REQUIRED)
-
 if(${EXECUTABLE_OUTPUT_PATH})
     set( PREVIOUS_EXEC_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH} )
 else()
@@ -32,7 +30,7 @@ ecm_mark_as_test(mixedmaildir-testdatatest)
 
 target_link_libraries(
   testdatatest
-  Qt5::Test
+  Qt::Test
 )
 
 # put the libraries all tests link against into a variable and use it
@@ -45,7 +43,7 @@ set( common_link_libraries
   KF5::AkonadiCore
   KF5::Mbox
   KF5::Mime
-  Qt5::Test
+  Qt::Test
   KF5::I18n
 )
 

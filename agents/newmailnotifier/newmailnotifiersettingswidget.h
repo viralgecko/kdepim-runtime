@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef NEWMAILNOTIFIERSETTINGSWIDGET_H
-#define NEWMAILNOTIFIERSETTINGSWIDGET_H
+#pragma once
 
 #include <AkonadiCore/AgentConfigurationBase>
 #include <AkonadiCore/Collection>
@@ -13,6 +12,7 @@
 class KNotifyConfigWidget;
 class QCheckBox;
 class QLineEdit;
+class QComboBox;
 class NewMailNotifierSelectCollectionWidget;
 class NewMailNotifierSettingsWidget : public Akonadi::AgentConfigurationBase
 {
@@ -26,6 +26,7 @@ public:
 
 private:
     void slotHelpLinkClicked(const QString &);
+    void updateReplyMail(bool enabled);
     QCheckBox *mShowPhoto = nullptr;
     QCheckBox *mShowFrom = nullptr;
     QCheckBox *mShowSubject = nullptr;
@@ -36,9 +37,10 @@ private:
     KNotifyConfigWidget *mNotify = nullptr;
     QCheckBox *mTextToSpeak = nullptr;
     QLineEdit *mTextToSpeakSetting = nullptr;
+    QCheckBox *mReplyMail = nullptr;
+    QComboBox *mReplyMailTypeComboBox = nullptr;
     NewMailNotifierSelectCollectionWidget *mSelectCollection = nullptr;
 };
 
 AKONADI_AGENTCONFIG_FACTORY(NewMailNotifierSettingsFactory, "newmailnotifierconfig.json", NewMailNotifierSettingsWidget)
 
-#endif // NEWMAILNOTIFIERSETTINGSWIDGET_H

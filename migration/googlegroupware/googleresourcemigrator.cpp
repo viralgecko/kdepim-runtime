@@ -64,9 +64,9 @@ std::unique_ptr<QSettings> settingsForResource(const Akonadi::AgentInstance &ins
         return {};
     }
 
-    const auto configFile = Akonadi::ServerManager::self()->addNamespace(instance.identifier()) + QStringLiteral("rc");
+    const QString configFile = Akonadi::ServerManager::self()->addNamespace(instance.identifier()) + QStringLiteral("rc");
     const auto configPath = QStandardPaths::locate(QStandardPaths::ConfigLocation, configFile);
-    return std::unique_ptr<QSettings>{new QSettings{configPath, QSettings::IniFormat}};
+    return std::make_unique<QSettings>(configPath, QSettings::IniFormat);
 }
 
 QString getAccountNameFromResourceSettings(const Akonadi::AgentInstance &instance)
@@ -174,7 +174,7 @@ void GoogleResourceMigrator::startWork()
         if (isLegacyGoogleResource(instance)) {
             const auto account = getAccountNameFromResourceSettings(instance);
             if (account.isEmpty()) {
-                qCInfo(MIGRATION_LOG) << "GoogleResourceMigrator: resource" << instance.identifier() << "is not configued, removing";
+                qCInfo(MIGRATION_LOG) << "GoogleResourceMigrator: resource" << instance.identifier() << "is not configured, removing";
                 Akonadi::AgentManager::self()->removeInstance(instance);
                 continue;
             }

@@ -7,8 +7,7 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#ifndef SETTINGS_H
-#define SETTINGS_H
+#pragma once
 
 #include "settingsbase.h"
 
@@ -75,7 +74,7 @@ public:
     void addCollectionUrlMapping(KDAV::Protocol protocol, const QString &collectionUrl, const QString &configuredUrl);
 
     /**
-     * Returns the collections URLs mapped behing @p configuredUrl and @p protocol.
+     * Returns the collections URLs mapped behind @p configuredUrl and @p protocol.
      */
     QStringList mappedCollections(KDAV::Protocol protocol, const QString &configuredUrl);
 
@@ -117,4 +116,3 @@ private:
     QList<UrlConfiguration *> mToDeleteUrlConfigs;
 };
 
-#endif

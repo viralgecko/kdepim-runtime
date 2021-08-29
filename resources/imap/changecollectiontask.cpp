@@ -47,7 +47,7 @@ void ChangeCollectionTask::doStart(KIMAP::Session *session)
     m_pendingJobs = 0;
 
     if (parts().contains("AccessRights")) {
-        auto *aclAttribute = m_collection.attribute<Akonadi::ImapAclAttribute>();
+        auto aclAttribute = m_collection.attribute<Akonadi::ImapAclAttribute>();
 
         if (aclAttribute == nullptr) {
             emitWarning(i18n("ACLs for '%1' need to be retrieved from the IMAP server first. Skipping ACL change", collection().name()));
@@ -110,9 +110,9 @@ void ChangeCollectionTask::doStart(KIMAP::Session *session)
 
     if (parts().contains("collectionannotations") && serverSupportsAnnotations()) {
         Akonadi::Collection c = collection();
-        auto *annotationsAttribute = c.attribute<Akonadi::CollectionAnnotationsAttribute>();
+        auto annotationsAttribute = c.attribute<Akonadi::CollectionAnnotationsAttribute>();
 
-        if (annotationsAttribute) { // No annotations it seems... server is lieing to us?
+        if (annotationsAttribute) { // No annotations it seems... server is lying to us?
             QMap<QByteArray, QByteArray> annotations = annotationsAttribute->annotations();
             qCDebug(IMAPRESOURCE_LOG) << "All annotations: " << annotations;
 
@@ -145,7 +145,7 @@ void ChangeCollectionTask::doStart(KIMAP::Session *session)
 
     if (parts().contains("imapacl")) {
         Akonadi::Collection c = collection();
-        auto *aclAttribute = c.attribute<Akonadi::ImapAclAttribute>();
+        auto aclAttribute = c.attribute<Akonadi::ImapAclAttribute>();
 
         if (aclAttribute) {
             const QMap<QByteArray, KIMAP::Acl::Rights> rights = aclAttribute->rights();

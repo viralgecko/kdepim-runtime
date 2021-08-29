@@ -8,8 +8,7 @@
  *
  */
 
-#ifndef ACCOUNT_WIDGET_H
-#define ACCOUNT_WIDGET_H
+#pragma once
 
 #include "ui_popsettings.h"
 #include <qt5keychain/keychain.h>
@@ -42,14 +41,12 @@ private Q_SLOTS:
     void slotEnableLeaveOnServerDays(bool state);
     void slotEnableLeaveOnServerCount(bool state);
     void slotEnableLeaveOnServerSize(bool state);
-    void slotFilterOnServerClicked();
     void slotPipeliningClicked();
     void slotPopEncryptionChanged(QAbstractButton *button);
     void slotCheckPopCapabilities();
     void slotPopCapabilities(const QVector<int> &);
     void slotLeaveOnServerDaysChanged(int value);
     void slotLeaveOnServerCountChanged(int value);
-    void slotFilterOnServerSizeChanged(int value);
 
     void targetCollectionReceived(Akonadi::Collection::List collections);
     void localFolderRequestJobFinished(KJob *job);
@@ -73,4 +70,3 @@ private:
     Settings &mSettings;
 };
 
-#endif

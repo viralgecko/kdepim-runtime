@@ -4,10 +4,10 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#ifndef SETUPWIZARD_H
-#define SETUPWIZARD_H
+#pragma once
 
-#include <QLabel>
+class QLabel;
+class QProgressBar;
 #include <QProgressBar>
 #include <QWizard>
 #include <QWizardPage>
@@ -16,7 +16,6 @@
 
 class QLineEdit;
 class QCheckBox;
-class QLabel;
 class KPasswordLineEdit;
 
 class SetupWizard : public QWizard
@@ -26,7 +25,9 @@ class SetupWizard : public QWizard
 public:
     explicit SetupWizard(EteSyncClientState *clientState, QWidget *parent = nullptr);
 
-    enum { W_LoginPage };
+    enum {
+        W_LoginPage,
+    };
 
     EteSyncClientState *mClientState = nullptr;
 
@@ -87,4 +88,3 @@ private:
     QString mErrorMessage;
 };
 
-#endif

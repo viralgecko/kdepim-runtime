@@ -38,6 +38,7 @@
 #include <KGAPI/AuthJob>
 
 #include <algorithm>
+#include <memory>
 
 #define CALENDARS_PROPERTY "_KGAPI2CalendarPtr"
 #define ROOT_COLLECTION_REMOTEID QStringLiteral("RootCollection")
@@ -100,7 +101,7 @@ GoogleResource::GoogleResource(const QString &id)
     Q_EMIT status(NotConfigured, i18n("Waiting for KWallet..."));
     updateResourceName();
 
-    m_freeBusyHandler.reset(new FreeBusyHandler(m_iface, m_settings));
+    m_freeBusyHandler = std::make_unique<FreeBusyHandler>(m_iface, m_settings);
     m_handlers.clear();
     m_handlers.push_back(GenericHandler::Ptr(new CalendarHandler(m_iface, m_settings)));
     m_handlers.push_back(GenericHandler::Ptr(new ContactHandler(m_iface, m_settings)));
@@ -162,7 +163,12 @@ void GoogleResource::configure(WId windowId)
 QList<QUrl> GoogleResource::scopes() const
 {
     // TODO: determine it based on what user wants?
-    const QList<QUrl> scopes = {Account::accountInfoScopeUrl(), Account::calendarScopeUrl(), Account::contactsScopeUrl(), Account::tasksScopeUrl()};
+    const QList<QUrl> scopes = {
+        Account::accountInfoScopeUrl(),
+        Account::calendarScopeUrl(),
+        Account::contactsScopeUrl(),
+        Account::tasksScopeUrl(),
+    };
     return scopes;
 }
 
@@ -215,7 +221,7 @@ bool GoogleResource::handleError(KGAPI2::Job *job, bool _cancelTask)
 
 void GoogleResource::runAuthJob(const KGAPI2::AccountPtr &account, const QVariant &args)
 {
-    AuthJob *authJob = new AuthJob(account, m_settings->clientId(), m_settings->clientSecret(), this);
+    auto authJob = new AuthJob(account, m_settings->clientId(), m_settings->clientSecret(), this);
     authJob->setProperty(JOB_PROPERTY, args);
     connect(authJob, &AuthJob::finished, this, &GoogleResource::slotAuthJobFinished);
 }
@@ -229,12 +235,12 @@ void GoogleResource::requestAuthenticationFromUser(const KGAPI2::AccountPtr &acc
         : i18n("Google Groupware has been logged out from account %1. Please log in to enable Google Contacts and Calendar sync again.",
                account->accountName());
 
-    auto *ntf = KNotification::event(QStringLiteral("authNeeded"),
-                                     i18nc("@title", "%1 needs your attention.", agentName()),
-                                     msg,
-                                     QStringLiteral("im-google"),
-                                     /*widget=*/nullptr,
-                                     KNotification::Persistent | KNotification::SkipGrouping);
+    auto ntf = KNotification::event(QStringLiteral("authNeeded"),
+                                    i18nc("@title", "%1 needs your attention.", agentName()),
+                                    msg,
+                                    QStringLiteral("im-google"),
+                                    /*widget=*/nullptr,
+                                    KNotification::Persistent | KNotification::SkipGrouping);
     ntf->setActions({i18nc("@action", "Log in")});
     ntf->setComponentName(QStringLiteral("akonadi_google_resource"));
     connect(ntf, &KNotification::action1Activated, this, [this, ntf, account, args]() {
@@ -277,7 +283,7 @@ void GoogleResource::slotAuthJobFinished(KGAPI2::Job *job)
         qCWarning(GOOGLE_LOG) << "Failed to store account in KWallet";
     }
 
-    auto *otherJob = job->property(JOB_PROPERTY).value<KGAPI2::Job *>();
+    auto otherJob = job->property(JOB_PROPERTY).value<KGAPI2::Job *>();
     if (otherJob) {
         otherJob->setAccount(account);
         otherJob->restart();
@@ -370,7 +376,7 @@ void GoogleResource::retrieveCollections()
     m_rootCollection.setRights(Collection::CanCreateCollection);
     m_rootCollection.setCachePolicy(cachePolicy);
 
-    auto *attr = m_rootCollection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attr = m_rootCollection.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     attr->setDisplayName(m_settings->accountPtr()->accountName());
     attr->setIconName(QStringLiteral("im-google"));
 

@@ -5,8 +5,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef RESOURCESTATEINTERFACE_H
-#define RESOURCESTATEINTERFACE_H
+#pragma once
 
 #include <QSharedPointer>
 #include <QStringList>
@@ -22,7 +21,7 @@
 class ResourceStateInterface
 {
 public:
-    typedef QSharedPointer<ResourceStateInterface> Ptr;
+    using Ptr = QSharedPointer<ResourceStateInterface>;
 
     virtual ~ResourceStateInterface();
 
@@ -115,4 +114,3 @@ public:
     virtual void setItemMergingMode(Akonadi::ItemSync::MergeMode mergeMode) = 0;
 };
 
-#endif

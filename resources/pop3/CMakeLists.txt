@@ -12,7 +12,7 @@ ecm_qt_declare_logging_category(pop3_common_SRCS HEADER pop3resource_debug.h IDE
     )
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/settings.kcfg org.kde.Akonadi.POP3.Settings)
-qt5_add_dbus_adaptor(pop3_common_SRCS
+qt_add_dbus_adaptor(pop3_common_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.POP3.Settings.xml settings.h Settings
     )
 
@@ -47,7 +47,7 @@ target_link_libraries( akonadi_pop3_resource
     KF5::AkonadiAgentBase
     KF5::I18n
     KF5::Notifications
-    Qt5::DBus
+    Qt::DBus
     KF5::PimCommon
     qt5keychain
     )
@@ -66,19 +66,17 @@ install(FILES akonadi_pop3_resource.notifyrc DESTINATION ${KDE_INSTALL_KNOTIFY5R
 
 
 ################################## Config plugin ##############################
+kcoreaddons_add_plugin(pop3config
+    INSTALL_NAMESPACE "akonadi/config"
+    )
 
-set(pop3config_SRCS
+target_sources(pop3config PRIVATE
     pop3config.cpp
     accountwidget.cpp
     ${pop3_common_SRCS}
     )
-ki18n_wrap_ui(pop3config_SRCS popsettings.ui)
+ki18n_wrap_ui(pop3config popsettings.ui)
 
-kcoreaddons_add_plugin(pop3config
-    SOURCES ${pop3config_SRCS}
-    JSON "pop3config.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
 target_link_libraries(pop3config
     KF5::AkonadiCore
     KF5::TextWidgets

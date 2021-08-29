@@ -1,7 +1,5 @@
 include(ECMAddTests)
 
-find_package(Qt5Test CONFIG REQUIRED)
-
 if(${EXECUTABLE_OUTPUT_PATH})
     set( PREVIOUS_EXEC_OUTPUT_PATH ${EXECUTABLE_OUTPUT_PATH} )
 else()
@@ -25,5 +23,5 @@ target_link_libraries(
   abstractlocalstoretest
   akonadi-filestore
   KF5::AkonadiCore
-  Qt5::Test
+  Qt::Test
 )

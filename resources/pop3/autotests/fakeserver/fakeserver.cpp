@@ -10,6 +10,8 @@
 
 // Qt
 #include <QDebug>
+#include <QTcpServer>
+#include <QTcpSocket>
 
 FakeServerThread::FakeServerThread(QObject *parent)
     : QThread(parent)
@@ -220,7 +222,10 @@ void FakeServer::setNextConversation(const QString &conversation, const QList<in
     QStringList lines = conversation.split(QStringLiteral("\r\n"), Qt::SkipEmptyParts);
     Q_ASSERT(lines.first().startsWith(QLatin1String("C:")));
 
-    enum Mode { Client, Server };
+    enum Mode {
+        Client,
+        Server,
+    };
     Mode mode = Client;
 
     const QByteArray mailSizeMarker = QStringLiteral("%MAILSIZE%").toLatin1();

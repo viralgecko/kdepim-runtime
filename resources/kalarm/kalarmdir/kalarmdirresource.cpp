@@ -79,7 +79,7 @@ KAlarmDirResource::KAlarmDirResource(const QString &id)
     connect(KDirWatch::self(), &KDirWatch::deleted, this, &KAlarmDirResource::fileDeleted);
 
     // Find the collection which this resource manages
-    CollectionFetchJob *job = new CollectionFetchJob(Collection::root(), CollectionFetchJob::FirstLevel);
+    auto job = new CollectionFetchJob(Collection::root(), CollectionFetchJob::FirstLevel);
     job->fetchScope().setResource(identifier());
     connect(job, &CollectionFetchJob::result, this, &KAlarmDirResource::collectionFetchResult);
 
@@ -730,7 +730,7 @@ void KAlarmDirResource::setNameRights(Collection &c)
     qCDebug(KALARMDIRRESOURCE_LOG) << "setNameRights";
     const QString display = mSettings->displayName();
     c.setName(display.isEmpty() ? name() : display);
-    auto *attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     attr->setDisplayName(name());
     attr->setIconName(QStringLiteral("kalarm"));
     if (mSettings->readOnly()) {
@@ -769,7 +769,7 @@ void KAlarmDirResource::retrieveItems(const Akonadi::Collection &collection)
 
     // Retrieve events
     Item::List items;
-    for (const EventFile &data : qAsConst(mEvents)) {
+    for (const EventFile &data : std::as_const(mEvents)) {
         const KAEvent &event = data.event;
         const QString mime = CalEvent::mimeType(event.category());
         if (mime.isEmpty()) {
@@ -820,7 +820,7 @@ void KAlarmDirResource::fileCreated(const QString &path)
         // The directory has been created. Load all files in it, and
         // tell the Akonadi server to create an Item for each event.
         loadFiles(true);
-        for (const EventFile &data : qAsConst(mEvents)) {
+        for (const EventFile &data : std::as_const(mEvents)) {
             createItem(data.event);
         }
     } else {
@@ -1090,7 +1090,7 @@ void KAlarmDirResource::setCompatibility(bool writeAttr)
         mCompatibility = KACalendar::Current;
     } else {
         mCompatibility = KACalendar::Unknown;
-        for (const EventFile &data : qAsConst(mEvents)) {
+        for (const EventFile &data : std::as_const(mEvents)) {
             const KAEvent &event = data.event;
             mCompatibility |= event.compatibility();
             if ((mCompatibility & AllCompat) == AllCompat) {

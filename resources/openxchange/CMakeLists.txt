@@ -45,7 +45,7 @@ set( openxchangeresource_SRCS
 install( FILES openxchangeresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTDIR}/akonadi/agents" )
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/openxchangeresource.kcfg org.kde.Akonadi.OpenXchange.Settings)
-qt5_add_dbus_adaptor(openxchangeresource_SRCS
+qt_add_dbus_adaptor(openxchangeresource_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.OpenXchange.Settings.xml settings.h Settings
 )
 
@@ -69,7 +69,7 @@ target_link_libraries(akonadi_openxchange_resource
     KF5::CalendarCore
     KF5::AkonadiContact
     KF5::I18n
-    Qt5::Xml
+    Qt::Xml
 )
 
 install(TARGETS akonadi_openxchange_resource ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
@@ -77,21 +77,19 @@ install(TARGETS akonadi_openxchange_resource ${KDE_INSTALL_TARGETS_DEFAULT_ARGS}
 add_subdirectory(icons)
 
 ################################### Config plugin ############################
+kcoreaddons_add_plugin(openxchangeconfig
+    INSTALL_NAMESPACE "akonadi/config"
+)
 
-set(openxchangeconfig_SRCS
+target_sources(openxchangeconfig PRIVATE
   configwidget.cpp
   openxchangeconfig.cpp
   oxa/connectiontestjob.cpp
   ${openxchange_common_SRCS}
 )
 
-ki18n_wrap_ui(openxchangeconfig_SRCS configwidget.ui)
+ki18n_wrap_ui(openxchangeconfig configwidget.ui)
 
-kcoreaddons_add_plugin(openxchangeconfig
-    SOURCES ${openxchangeconfig_SRCS}
-    JSON "openxchangeconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-)
 
 target_link_libraries(openxchangeconfig
     KF5::AkonadiCore

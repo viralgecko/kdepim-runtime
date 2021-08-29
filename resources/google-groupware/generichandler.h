@@ -4,8 +4,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#ifndef GENERICHANDLER_H
-#define GENERICHANDLER_H
+#pragma once
 
 #include <KGAPI/Types>
 
@@ -34,7 +33,7 @@ class GenericHandler : public QObject
 {
     Q_OBJECT
 public:
-    typedef std::unique_ptr<GenericHandler> Ptr;
+    using Ptr = std::unique_ptr<GenericHandler>;
 
     GenericHandler(GoogleResourceStateInterface *iface, GoogleSettings *settings);
     ~GenericHandler() override;
@@ -91,4 +90,3 @@ protected:
     GoogleSettings *const m_settings;
 };
 
-#endif // GENERICHANDLER_H

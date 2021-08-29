@@ -1,15 +1,9 @@
 
 add_definitions(-DTRANSLATION_DOMAIN=\"akonadi_maildispatcher_agent\")
+add_executable(akonadi_maildispatcher_agent)
 
-set( maildispatcheragent_SRCS
-  maildispatcheragent.cpp
-  outboxqueue.cpp
-  sendjob.cpp
-  sentactionhandler.cpp
-  storeresultjob.cpp
-)
 
-ecm_qt_declare_logging_category(maildispatcheragent_SRCS HEADER maildispatcher_debug.h IDENTIFIER MAILDISPATCHER_LOG CATEGORY_NAME org.kde.pim.maildispatcher
+ecm_qt_declare_logging_category(akonadi_maildispatcher_agent HEADER maildispatcher_debug.h IDENTIFIER MAILDISPATCHER_LOG CATEGORY_NAME org.kde.pim.maildispatcher
         DESCRIPTION "maildispacher agent (kdepim-runtime)"
         OLD_CATEGORY_NAMES log_maildispatcher
         EXPORT KDEPIMRUNTIME
@@ -17,14 +11,21 @@ ecm_qt_declare_logging_category(maildispatcheragent_SRCS HEADER maildispatcher_d
 
 kconfig_add_kcfg_files(maildispatcheragent_SRCS settings.kcfgc)
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/maildispatcheragent.kcfg org.kde.Akonadi.MailDispatcher.Settings)
-qt5_add_dbus_adaptor(maildispatcheragent_SRCS
+qt_add_dbus_adaptor(maildispatcheragent_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.MailDispatcher.Settings.xml settings.h Settings
 )
-qt5_add_dbus_adaptor( maildispatcheragent_SRCS
+qt_add_dbus_adaptor( maildispatcheragent_SRCS
   org.freedesktop.Akonadi.MailDispatcherAgent.xml maildispatcheragent.h MailDispatcherAgent
 )
+target_sources( akonadi_maildispatcher_agent PRIVATE
+  maildispatcheragent.cpp
+  outboxqueue.cpp
+  sendjob.cpp
+  sentactionhandler.cpp
+  storeresultjob.cpp
+  ${maildispatcheragent_SRCS}
+)
 
-add_executable(akonadi_maildispatcher_agent ${maildispatcheragent_SRCS})
 if (COMPILE_WITH_UNITY_CMAKE_SUPPORT)
     set_target_properties(akonadi_maildispatcher_agent PROPERTIES UNITY_BUILD ON)
 endif()
@@ -53,7 +54,6 @@ install( FILES akonadi_maildispatcher_agent.notifyrc DESTINATION ${KDE_INSTALL_K
 
 kcoreaddons_add_plugin(maildispatcherconfig
     SOURCES maildispatcherconfig.cpp
-    JSON "maildispatcherconfig.json"
     INSTALL_NAMESPACE "akonadi/config")
 target_link_libraries(maildispatcherconfig
     KF5::AkonadiCore

@@ -115,7 +115,7 @@ Akonadi::Item KolabHelpers::translateFromImap(Kolab::FolderType folderType, cons
         return imapItem;
     }
 
-    const KMime::Message::Ptr payload = imapItem.payload<KMime::Message::Ptr>();
+    const auto payload = imapItem.payload<KMime::Message::Ptr>();
     const Kolab::KolabObjectReader reader(payload);
     if (checkForErrors(imapItem)) {
         ok = true;
@@ -173,7 +173,7 @@ Akonadi::Item KolabHelpers::translateFromImap(Kolab::FolderType folderType, cons
             toAdd << ref;
         }
         contactGroup.removeAllContactReferences();
-        for (const KContacts::ContactGroup::ContactReference &ref : qAsConst(toAdd)) {
+        for (const KContacts::ContactGroup::ContactReference &ref : std::as_const(toAdd)) {
             contactGroup.append(ref);
         }
 
@@ -235,7 +235,7 @@ static KContacts::ContactGroup convertToGidOnly(const KContacts::ContactGroup &c
             if (items.count() != 1) {
                 continue;
             }
-            const KContacts::Addressee addressee = job->items().at(0).payload<KContacts::Addressee>();
+            const auto addressee = job->items().at(0).payload<KContacts::Addressee>();
             gid = addressee.uid();
         }
         KContacts::ContactGroup::ContactReference ref;
@@ -244,7 +244,7 @@ static KContacts::ContactGroup convertToGidOnly(const KContacts::ContactGroup &c
     }
     KContacts::ContactGroup gidOnlyContactGroup = contactGroup;
     gidOnlyContactGroup.removeAllContactReferences();
-    for (const KContacts::ContactGroup::ContactReference &ref : qAsConst(toAdd)) {
+    for (const KContacts::ContactGroup::ContactReference &ref : std::as_const(toAdd)) {
         gidOnlyContactGroup.append(ref);
     }
     return gidOnlyContactGroup;
@@ -259,7 +259,7 @@ Akonadi::Item KolabHelpers::translateToImap(const Akonadi::Item &item, bool &ok)
         return item;
     }
     const QLatin1String productId("Akonadi-Kolab-Resource");
-    // Everthing stays the same, except mime type and payload
+    // Everything stays the same, except mime type and payload
     Akonadi::Item imapItem = item;
     imapItem.setMimeType(QStringLiteral("message/rfc822"));
     try {
@@ -490,7 +490,7 @@ QString KolabHelpers::createMemberUrl(const Akonadi::Item &item, const QString &
             qCWarning(KOLABRESOURCE_LOG) << "Email without payload, failed to add to tag: " << item.id() << item.remoteId();
             return QString();
         }
-        KMime::Message::Ptr msg = item.payload<KMime::Message::Ptr>();
+        auto msg = item.payload<KMime::Message::Ptr>();
         member.uid = item.remoteId().toLong();
         member.user = user;
         member.subject = msg->subject()->asUnicodeString();

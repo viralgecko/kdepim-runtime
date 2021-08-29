@@ -5,8 +5,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef ICALRESOURCEBASE_H
-#define ICALRESOURCEBASE_H
+#pragma once
 
 #include "settings.h"
 #include "singlefileresource.h"
@@ -30,7 +29,10 @@ protected Q_SLOTS:
     void retrieveItems(const Akonadi::Collection &col) override;
 
 protected:
-    enum CheckType { CheckForAdded, CheckForChanged };
+    enum CheckType {
+        CheckForAdded,
+        CheckForChanged,
+    };
 
     void initialise(const QStringList &mimeTypes, const QString &icon);
     bool readFromFile(const QString &fileName) override;
@@ -89,4 +91,3 @@ template<typename PayloadPtr> bool ICalResourceBase::checkItemAddedChanged(const
     return true;
 }
 
-#endif

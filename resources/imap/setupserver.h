@@ -7,10 +7,9 @@
    SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#ifndef SETUPSERVER_H
-#define SETUPSERVER_H
+#pragma once
 
-#include <KJob>
+class KJob;
 #include <QDialog>
 #include <collection.h>
 
@@ -62,7 +61,6 @@ private Q_SLOTS:
      * Call this if you want the settings saved from this page.
      */
     void applySettings();
-    void slotIdentityCheckboxChanged();
     void slotMailCheckboxChanged();
     void slotEncryptionRadioChanged();
     void slotSubcriptionCheckboxChanged();
@@ -101,4 +99,3 @@ private Q_SLOTS:
     void populateDefaultAuthenticationOptions(QComboBox *combo);
 };
 
-#endif

@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef MIXEDMAILDIR_RESOURCE_H
-#define MIXEDMAILDIR_RESOURCE_H
+#pragma once
 
 #include <resourcebase.h>
 
@@ -83,7 +82,7 @@ private:
         QStringList mTagList;
     };
 
-    typedef QVector<TagContext> TagContextList;
+    using TagContextList = QVector<TagContext>;
     QHash<Akonadi::Collection::Id, TagContextList> mTagContextByColId;
     TagContextList mPendingTagContexts;
 
@@ -93,4 +92,3 @@ private:
     CompactChangeHelper *mCompactHelper = nullptr;
 };
 
-#endif

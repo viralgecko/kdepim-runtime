@@ -6,8 +6,7 @@
  *
  */
 
-#ifndef KMINDEXREADER_H
-#define KMINDEXREADER_H
+#pragma once
 
 #include "kmindexreader_export.h"
 
@@ -41,7 +40,7 @@ private:
     friend class TestIdxReader;
 };
 
-typedef QSharedPointer<KMIndexData> KMIndexDataPtr;
+using KMIndexDataPtr = QSharedPointer<KMIndexData>;
 
 /**
  * @short A class to read legacy kmail (< 4.5) index files
@@ -130,4 +129,3 @@ private:
     friend class TestIdxReader;
 };
 
-#endif // KMINDEXREADER_H

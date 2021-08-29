@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef AKONADI_SINGLEFILERESOURCEBASE_H
-#define AKONADI_SINGLEFILERESOURCEBASE_H
+#pragma once
 
 #include "akonadi-singlefileresource_export.h"
 #include <resourcebase.h>
@@ -81,7 +80,7 @@ protected:
      * and notifies implementing resources to handle a hash change if the
      * previous known hash was not empty. Finally this method clears the cache
      * and calls synchronize.
-     * Returns true on succes, false otherwise.
+     * Returns true on success, false otherwise.
      */
     bool readLocalFile(const QString &fileName);
 
@@ -174,4 +173,3 @@ protected Q_SLOTS:
 };
 }
 
-#endif

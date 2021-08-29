@@ -23,7 +23,14 @@
 #include <KLocalizedString>
 #include <KMime/Message>
 #include <KNotification>
+#include <chrono>
+
+using namespace std::chrono_literals;
+
+#include <kcoreaddons_version.h>
+#if KCOREADDONS_VERSION < QT_VERSION_CHECK(6, 0, 0)
 #include <Kdelibs4ConfigMigrator>
+#endif
 
 #include <QDBusConnection>
 #include <QTimer>
@@ -86,7 +93,7 @@ void MailDispatcherAgent::dispatch()
             mAborting = false;
             mSentAnything = false;
             Q_EMIT status(AgentBase::Idle, i18n("Sending canceled."));
-            QTimer::singleShot(3000, this, &MailDispatcherAgent::emitStatusReady);
+            QTimer::singleShot(3s, this, &MailDispatcherAgent::emitStatusReady);
         } else {
             if (mSentAnything) {
                 // Finished sending messages in queue.
@@ -95,7 +102,7 @@ void MailDispatcherAgent::dispatch()
                 Q_EMIT status(AgentBase::Idle, i18n("Finished sending messages."));
 
                 if (!mErrorOccurred && mShowSentNotification) {
-                    KNotification *notify = new KNotification(QStringLiteral("emailsent"));
+                    auto notify = new KNotification(QStringLiteral("emailsent"));
                     notify->setIconName(QStringLiteral("kmail"));
                     notify->setComponentName(QStringLiteral("akonadi_maildispatcher_agent"));
                     notify->setTitle(i18nc("Notification title when email was sent", "E-Mail Successfully Sent"));
@@ -107,7 +114,7 @@ void MailDispatcherAgent::dispatch()
                 // Empty queue.
                 Q_EMIT status(AgentBase::Idle, i18n("No items in queue."));
             }
-            QTimer::singleShot(3000, this, &MailDispatcherAgent::emitStatusReady);
+            QTimer::singleShot(3s, this, &MailDispatcherAgent::emitStatusReady);
         }
 
         mErrorOccurred = false;
@@ -117,10 +124,11 @@ void MailDispatcherAgent::dispatch()
 MailDispatcherAgent::MailDispatcherAgent(const QString &id)
     : AgentBase(id)
 {
+#if KCOREADDONS_VERSION < QT_VERSION_CHECK(6, 0, 0)
     Kdelibs4ConfigMigrator migrate(QStringLiteral("maildispatcheragent"));
     migrate.setConfigFiles(QStringList() << QStringLiteral("maildispatcheragentrc") << QStringLiteral("akonadi_maildispatcher_agent.notifyrc"));
     migrate.migrate();
-
+#endif
     qCDebug(MAILDISPATCHER_LOG) << "maildispatcheragent: At your service, sir!";
 
     new SettingsAdaptor(Settings::self());
@@ -249,7 +257,7 @@ void MailDispatcherAgent::sendResult(KJob *job)
         // do anything.
         qCDebug(MAILDISPATCHER_LOG) << "Sending failed. error:" << job->errorString();
 
-        KNotification *notify = new KNotification(QStringLiteral("sendingfailed"));
+        auto notify = new KNotification(QStringLiteral("sendingfailed"));
         notify->setComponentName(QStringLiteral("akonadi_maildispatcher_agent"));
         notify->setIconName(QStringLiteral("kmail"));
         notify->setTitle(i18nc("Notification title when email sending failed", "E-Mail Sending Failed"));
@@ -261,7 +269,7 @@ void MailDispatcherAgent::sendResult(KJob *job)
         qCDebug(MAILDISPATCHER_LOG) << "Sending succeeded.";
 
         // handle possible sent actions
-        const auto *attribute = sentItem.attribute<MailTransport::SentActionAttribute>();
+        const auto attribute = sentItem.attribute<MailTransport::SentActionAttribute>();
         if (attribute) {
             const MailTransport::SentActionAttribute::Action::List lstAct = attribute->actions();
             for (const MailTransport::SentActionAttribute::Action &action : lstAct) {

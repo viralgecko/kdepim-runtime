@@ -20,7 +20,7 @@ ecm_qt_declare_logging_category(vcarddirresource_SRCS HEADER vcarddirresource_de
 
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/vcarddirresource.kcfg org.kde.Akonadi.VCardDirectory.Settings)
-qt5_add_dbus_adaptor(vcarddirresource_SRCS
+qt_add_dbus_adaptor(vcarddirresource_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.VCardDirectory.Settings.xml settings.h VcardDirResourceSettings
 )
 
@@ -44,7 +44,7 @@ target_link_libraries(akonadi_vcarddir_resource
   KF5::KIOWidgets
   KF5::ConfigWidgets
   KF5::WindowSystem
-  Qt5::DBus
+  Qt::DBus
 )
 
 add_dependencies(akonadi_vcarddir_resource akonadi-singlefileresource)
@@ -54,21 +54,18 @@ add_subdirectory(wizard)
 install(TARGETS akonadi_vcarddir_resource ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 
 ############################## Config plugin ################################
-set(vcarddirconfig_ui_SRCS)
-ki18n_wrap_ui(vcarddirconfig_ui_SRCS vcarddiragentsettingswidget.ui)
+kcoreaddons_add_plugin(vcarddirconfig
+    INSTALL_NAMESPACE "akonadi/config"
+    )
+ki18n_wrap_ui(vcarddirconfig vcarddiragentsettingswidget.ui)
 
-set(vcarddirconfig_SRCS
+target_sources(vcarddirconfig PRIVATE
     vcarddirsettingswidget.cpp
     ${vcarddirconfig_ui_SRCS}
     ${vcarddirresource_common_SRCS}
     )
 
 
-kcoreaddons_add_plugin(vcarddirconfig
-    SOURCES ${vcarddirconfig_SRCS}
-    JSON "vcarddirconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
 target_link_libraries(vcarddirconfig
     KF5::AkonadiCore
     KF5::CalendarCore

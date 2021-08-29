@@ -6,8 +6,7 @@
  *
  */
 
-#ifndef _POP3_H
-#define _POP3_H
+#pragma once
 
 #include <QUrl>
 #include <kio/tcpslavebase.h>
@@ -48,7 +47,12 @@ protected:
      */
     bool sendCommand(const QByteArray &cmd);
 
-    enum Resp { Err, Ok, Cont, Invalid };
+    enum Resp {
+        Err,
+        Ok,
+        Cont,
+        Invalid,
+    };
     /**
      *  Send a command to the server, and wait for the  one-line-status
      *  reply via getResponse.  Similar rules apply.  If no buffer is
@@ -106,4 +110,3 @@ protected:
     ssize_t readBufferLen;
 };
 
-#endif

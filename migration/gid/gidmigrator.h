@@ -4,10 +4,9 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef GIDMIGRATOR_H
-#define GIDMIGRATOR_H
+#pragma once
 
-#include <KJob>
+class KJob;
 #include <migratorbase.h>
 
 class GidMigrator : public MigratorBase
@@ -33,4 +32,3 @@ private:
     const QString mMimeType;
 };
 
-#endif // GIDMIGRATOR_H

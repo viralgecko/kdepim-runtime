@@ -204,7 +204,7 @@ void VCardDirResource::retrieveCollections()
         c.setRights(rights);
     }
 
-    auto *attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+    auto attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
     attr->setDisplayName(i18n("Contacts Folder"));
     attr->setIconName(QStringLiteral("x-office-address-book"));
 
@@ -218,7 +218,7 @@ void VCardDirResource::retrieveItems(const Akonadi::Collection &)
     Item::List items;
     items.reserve(mAddressees.count());
 
-    for (const KContacts::Addressee &addressee : qAsConst(mAddressees)) {
+    for (const KContacts::Addressee &addressee : std::as_const(mAddressees)) {
         Item item;
         item.setRemoteId(addressee.uid());
         item.setMimeType(KContacts::Addressee::mimeType());

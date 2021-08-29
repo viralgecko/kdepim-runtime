@@ -4,8 +4,7 @@
  *    SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-#ifndef GRAPH_H_
-#define GRAPH_H_
+#pragma once
 
 #include <kio/storedtransferjob.h>
 
@@ -19,10 +18,15 @@ QUrl url(const QString &endpoint, const QString &accessToken, const QStringList 
 KJob *job(const QString &endpoint, const QString &accessToken, const QStringList &fields = {}, const QMap<QString, QString> &queries = {});
 KJob *job(const QUrl &url);
 
-enum RSVP { Attending, MaybeAttending, Declined, NotResponded, Birthday };
+enum RSVP {
+    Attending,
+    MaybeAttending,
+    Declined,
+    NotResponded,
+    Birthday,
+};
 
 RSVP rsvpFromString(const QString &rsvp);
 QString rsvpToString(RSVP rsvp);
 }
 
-#endif // GRAPH_H_

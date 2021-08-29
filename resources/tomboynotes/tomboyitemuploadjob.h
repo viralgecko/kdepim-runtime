@@ -4,14 +4,17 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef TOMBOYITEMUPLOADJOB_H
-#define TOMBOYITEMUPLOADJOB_H
+#pragma once
 
 #include "tomboyjobbase.h"
 #include <AkonadiCore/Item>
 #include <KMime/Message>
 
-enum class JobType { AddItem, ModifyItem, DeleteItem };
+enum class JobType {
+    AddItem,
+    ModifyItem,
+    DeleteItem,
+};
 
 class TomboyItemUploadJob : public TomboyJobBase
 {
@@ -41,4 +44,3 @@ private:
     int mRemoteRevision;
 };
 
-#endif // TOMBOYITEMUPLOADJOB_H

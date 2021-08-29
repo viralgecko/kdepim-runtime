@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef OXA_OXUTILS_H
-#define OXA_OXUTILS_H
+#pragma once
 
 #include <QDateTime>
 #include <QString>
@@ -21,7 +20,7 @@ QString writeNumber(qlonglong value);
 QString writeString(const QString &value);
 QString writeName(const QString &value);
 QString writeDateTime(const QDateTime &value);
-QString writeDate(const QDate &value);
+QString writeDate(QDate value);
 
 bool readBoolean(const QString &text);
 qlonglong readNumber(const QString &text);
@@ -32,4 +31,3 @@ QDate readDate(const QString &text);
 }
 }
 
-#endif

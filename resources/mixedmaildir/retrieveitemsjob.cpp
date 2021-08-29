@@ -33,7 +33,10 @@
 
 using namespace Akonadi;
 
-enum { MaxItemCreateJobs = 100, MaxItemModifyJobs = 100 };
+enum {
+    MaxItemCreateJobs = 100,
+    MaxItemModifyJobs = 100,
+};
 
 class RetrieveItemsJob::Private
 {
@@ -202,7 +205,7 @@ void RetrieveItemsJob::Private::storeListResult(KJob *job)
     // all items remaining in mServerItemsByRemoteId are no longer in the store
 
     if (!mServerItemsByRemoteId.isEmpty()) {
-        ItemDeleteJob *deleteJob = new ItemDeleteJob(Akonadi::valuesToVector(mServerItemsByRemoteId), transaction());
+        auto deleteJob = new ItemDeleteJob(Akonadi::valuesToVector(mServerItemsByRemoteId), transaction());
         transaction()->setIgnoreJobFailure(deleteJob);
     }
 

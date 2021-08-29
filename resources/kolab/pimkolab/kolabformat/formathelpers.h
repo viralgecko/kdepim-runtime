@@ -4,15 +4,25 @@
  * SPDX-License-Identifier: LGPL-3.0-or-later
  */
 
-#ifndef FORMATHELPERS_H
-#define FORMATHELPERS_H
+#pragma once
 
 #include <kolab_export.h>
 #include <string>
 
 namespace Kolab
 {
-enum FolderType { MailType = 0, ContactType, EventType, TaskType, JournalType, NoteType, ConfigurationType, FreebusyType, FileType, LastType };
+enum FolderType {
+    MailType = 0,
+    ContactType,
+    EventType,
+    TaskType,
+    JournalType,
+    NoteType,
+    ConfigurationType,
+    FreebusyType,
+    FileType,
+    LastType,
+};
 
 /**
  * Returns the FolderType from a KOLAB_FOLDER_TYPE_* folder type string
@@ -33,4 +43,3 @@ KOLAB_EXPORT FolderType guessFolderTypeFromName(const std::string &name);
 KOLAB_EXPORT std::string nameForFolderType(FolderType type);
 }
 
-#endif

@@ -5,14 +5,13 @@
    SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#ifndef FAKESERVER_H
-#define FAKESERVER_H
+#pragma once
 
 #include <QMutex>
-#include <QTcpServer>
-#include <QTcpSocket>
 #include <QThread>
 
+class QTcpServer;
+class QTcpSocket;
 class FakeServer : public QObject
 {
     Q_OBJECT
@@ -86,4 +85,3 @@ private:
     FakeServer *mServer = nullptr;
 };
 
-#endif

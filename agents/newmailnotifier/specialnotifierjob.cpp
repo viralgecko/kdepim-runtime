@@ -6,6 +6,7 @@
 
 #include "specialnotifierjob.h"
 #include "newmailnotifieragentsettings.h"
+#include "newmailnotifierreplymessagejob.h"
 #include "newmailnotifiershowmessagejob.h"
 
 #include <Akonadi/Contact/ContactSearchJob>
@@ -60,7 +61,7 @@ void SpecialNotifierJob::slotItemFetchJobDone(KJob *job)
             return;
         }
 
-        const KMime::Message::Ptr mb = mItem.payload<KMime::Message::Ptr>();
+        const auto mb = mItem.payload<KMime::Message::Ptr>();
         mFrom = mb->from()->asUnicodeString();
         mSubject = mb->subject()->asUnicodeString();
         if (NewMailNotifierAgentSettings::showPhoto()) {
@@ -103,7 +104,7 @@ void SpecialNotifierJob::slotSearchJobFinished(KJob *job)
 void SpecialNotifierJob::emitNotification(const QPixmap &pixmap)
 {
     if (NewMailNotifierAgentSettings::excludeEmailsFromMe()) {
-        for (const QString &email : qAsConst(mListEmails)) {
+        for (const QString &email : std::as_const(mListEmails)) {
             if (mFrom.contains(email)) {
                 // Exclude this notification
                 deleteLater();
@@ -138,7 +139,7 @@ void SpecialNotifierJob::emitNotification(const QPixmap &pixmap)
     }
 
     if (NewMailNotifierAgentSettings::showButtonToDisplayMail()) {
-        KNotification *notification =
+        auto notification =
             new KNotification(QStringLiteral("new-email"),
                               NewMailNotifierAgentSettings::keepPersistentNotification() ? KNotification::Persistent | KNotification::SkipGrouping
                                                                                          : KNotification::CloseOnTimeout);
@@ -148,7 +149,22 @@ void SpecialNotifierJob::emitNotification(const QPixmap &pixmap)
         } else {
             notification->setPixmap(pixmap);
         }
-        notification->setActions(QStringList() << i18n("Show mail...") << i18n("Mark As Read") << i18n("Delete"));
+        QStringList lstActions{i18n("Show mail..."), i18n("Mark As Read"), i18n("Delete")};
+        if (NewMailNotifierAgentSettings::replyMail()) {
+            switch (NewMailNotifierAgentSettings::replyMailType()) {
+            case 0:
+                lstActions << i18n("Reply to Author");
+                break;
+            case 1:
+                lstActions << i18n("Reply to All");
+                break;
+            default:
+                qCWarning(NEWMAILNOTIFIER_LOG) << " Problem with NewMailNotifierAgentSettings::replyMailType() value: "
+                                               << NewMailNotifierAgentSettings::replyMailType();
+                break;
+            }
+        }
+        notification->setActions(lstActions);
 
         connect(notification, QOverload<unsigned int>::of(&KNotification::activated), this, &SpecialNotifierJob::slotActivateNotificationAction);
         connect(notification, &KNotification::closed, this, &SpecialNotifierJob::deleteLater);
@@ -173,8 +189,19 @@ void SpecialNotifierJob::slotActivateNotificationAction(unsigned int index)
     case 3:
         slotDeleteMessage();
         return;
+    case 4:
+        slotReplyMessage();
+        return;
     }
     qCWarning(NEWMAILNOTIFIER_LOG) << " SpecialNotifierJob::slotActivateNotificationAction unknown index " << index;
+}
+
+void SpecialNotifierJob::slotReplyMessage()
+{
+    auto job = new NewMailNotifierReplyMessageJob(mItem.id());
+    job->setReplyToAll(NewMailNotifierAgentSettings::replyMailType() == 0 ? false : true);
+    job->start();
+    deleteLater();
 }
 
 void SpecialNotifierJob::slotDeleteMessage()
@@ -195,7 +222,7 @@ void SpecialNotifierJob::slotMarkAsRead()
 {
     Akonadi::MessageStatus messageStatus;
     messageStatus.setRead(true);
-    Akonadi::MarkAsCommand *markAsReadAllJob = new Akonadi::MarkAsCommand(messageStatus, Akonadi::Item::List() << mItem);
+    auto markAsReadAllJob = new Akonadi::MarkAsCommand(messageStatus, Akonadi::Item::List() << mItem);
     connect(markAsReadAllJob, &Akonadi::MarkAsCommand::result, this, &SpecialNotifierJob::slotMarkAsResult);
     markAsReadAllJob->execute();
 }

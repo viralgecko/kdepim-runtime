@@ -19,11 +19,13 @@
 #include <kmime/kmime_util.h>
 
 #include "pop3resource_debug.h"
+#include <KAuthorized>
 #include <KMessageBox>
 #include <KNotification>
 #include <KPasswordDialog>
 #include <kio/global.h>
 #include <kio/job.h>
+#include <kwidgetsaddons_version.h>
 
 #include <QTimer>
 #include <qt5keychain/keychain.h>
@@ -144,6 +146,7 @@ void POP3Resource::walletOpenedForLoading(QKeychain::Job *baseJob)
 void POP3Resource::showPasswordDialog(const QString &queryText)
 {
     QPointer<KPasswordDialog> dlg = new KPasswordDialog(nullptr, KPasswordDialog::ShowUsernameLine);
+    dlg->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
     dlg->setModal(true);
     dlg->setUsername(mSettings.login());
     dlg->setPassword(mPassword);
@@ -203,7 +206,7 @@ void POP3Resource::doStateStep()
     case Precommand:
         qCDebug(POP3RESOURCE_LOG) << "================ Starting state Precommand =====================";
         if (!mSettings.precommand().isEmpty()) {
-            PrecommandJob *precommandJob = new PrecommandJob(mSettings.precommand(), this);
+            auto precommandJob = new PrecommandJob(mSettings.precommand(), this);
             connect(precommandJob, &PrecommandJob::result, this, &POP3Resource::precommandResult);
             precommandJob->start();
             Q_EMIT status(Running, i18n("Executing precommand."));
@@ -278,11 +281,11 @@ void POP3Resource::doStateStep()
         qCDebug(POP3RESOURCE_LOG) << "================ Starting state Download =======================";
 
         // Determine which mails we want to download. Those are all mails which are
-        // currently on ther server, minus the ones we have already downloaded (we
+        // currently on their server, minus the ones we have already downloaded (we
         // remember which UIDs we have downloaded in the settings)
         QList<int> idsToDownload = mIdsToSizeMap.keys();
         const QStringList alreadyDownloadedUIDs = mSettings.seenUidList();
-        for (const QString &uidOnServer : qAsConst(mIdsToUidsMap)) {
+        for (const QString &uidOnServer : std::as_const(mIdsToUidsMap)) {
             if (alreadyDownloadedUIDs.contains(uidOnServer)) {
                 const int idOfUIDOnServer = mUidsToIdsMap.value(uidOnServer, -1);
                 Q_ASSERT(idOfUIDOnServer != -1);
@@ -296,7 +299,7 @@ void POP3Resource::doStateStep()
         // put them into a list here
         QList<int> sizesOfMessagesToDownload;
         sizesOfMessagesToDownload.reserve(idsToDownload.count());
-        for (int id : qAsConst(idsToDownload)) {
+        for (int id : std::as_const(idsToDownload)) {
             sizesOfMessagesToDownload.append(mIdsToSizeMap.value(id));
         }
 
@@ -525,7 +528,7 @@ void POP3Resource::messageFinished(int messageId, KMime::Message::Ptr message)
     item.setMimeType(QStringLiteral("message/rfc822"));
     item.setPayload<KMime::Message::Ptr>(message);
 
-    auto *attr = item.attribute<Akonadi::Pop3ResourceAttribute>(Akonadi::Item::AddIfMissing);
+    auto attr = item.attribute<Akonadi::Pop3ResourceAttribute>(Akonadi::Item::AddIfMissing);
     attr->setPop3AccountName(identifier());
     Akonadi::MessageFlags::copyMessageFlags(*message, item);
     auto itemCreateJob = new ItemCreateJob(item, mTargetCollection);
@@ -703,7 +706,7 @@ QList<int> POP3Resource::shouldDeleteId(int downloadedId) const
             if (mSettings.leaveOnServerSize() > 0) {
                 const qint64 limitInBytes = mSettings.leaveOnServerSize() * (1024 * 1024);
                 qint64 sizeOnServerAfterDeletion = 0;
-                for (int id : qAsConst(mIdsToSave)) {
+                for (int id : std::as_const(mIdsToSave)) {
                     sizeOnServerAfterDeletion += mIdsToSizeMap.value(id);
                 }
                 while (sizeOnServerAfterDeletion > limitInBytes) {
@@ -715,7 +718,7 @@ QList<int> POP3Resource::shouldDeleteId(int downloadedId) const
         }
         // Now save the messages from deletion
         //
-        for (int idToSave : qAsConst(mIdsToSave)) {
+        for (int idToSave : std::as_const(mIdsToSave)) {
             idsToDeleteFromServer.removeAll(idToSave);
         }
         if (downloadedId != -1 && !mIdsToSave.contains(downloadedId)) {
@@ -841,7 +844,7 @@ void POP3Resource::saveSeenUIDList()
         }
     }
     Q_ASSERT(seenUIDs.size() == timeOfSeenUIDs.size());
-    for (const QString &uid : qAsConst(uidsOfMessagesDownloadedButNotDeleted)) {
+    for (const QString &uid : std::as_const(uidsOfMessagesDownloadedButNotDeleted)) {
         if (!seenUIDs.contains(uid)) {
             seenUIDs.append(uid);
             timeOfSeenUIDs.append(time(nullptr));

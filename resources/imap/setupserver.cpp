@@ -33,6 +33,7 @@
 #include <Akonadi/KMime/SpecialMailCollections>
 #include <Akonadi/KMime/SpecialMailCollectionsRequestJob>
 #include <CollectionModifyJob>
+#include <KAuthorized>
 #include <KEMailSettings>
 #include <KLocalizedString>
 #include <KMessageBox>
@@ -43,6 +44,7 @@
 #include <entitydisplayattribute.h>
 #include <resourcesettings.h>
 
+#include <QFontDatabase>
 #include <QPointer>
 #include <QVBoxLayout>
 #include <kidentitymanagement/identitycombo.h>
@@ -120,10 +122,10 @@ SetupServer::SetupServer(ImapResourceBase *parentResource, WId parent)
     auto networkConfigMgr = new QNetworkConfigurationManager(QCoreApplication::instance());
 
     m_parentResource->settings()->setWinId(parent);
-    QWidget *mainWidget = new QWidget(this);
+    auto mainWidget = new QWidget(this);
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(mainWidget);
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     mOkButton = buttonBox->button(QDialogButtonBox::Ok);
     mOkButton->setDefault(true);
     mOkButton->setShortcut(Qt::CTRL | Qt::Key_Return);
@@ -132,6 +134,8 @@ SetupServer::SetupServer(ImapResourceBase *parentResource, WId parent)
     mainLayout->addWidget(buttonBox);
 
     m_ui->setupUi(mainWidget);
+    m_ui->password->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
+    m_ui->customPassword->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
     new KPIM::LineEditCatchReturnKey(m_ui->accountName, this);
     new KPIM::LineEditCatchReturnKey(m_ui->imapServer, this);
     new KPIM::LineEditCatchReturnKey(m_ui->userName, this);
@@ -155,6 +159,7 @@ SetupServer::SetupServer(ImapResourceBase *parentResource, WId parent)
     m_ui->checkInterval->setMinimum(Akonadi::ResourceSettings::self()->minimumCheckInterval());
     m_ui->checkInterval->setMaximum(10000);
     m_ui->checkInterval->setSingleStep(1);
+    m_ui->imapInfo->setFont(QFontDatabase::systemFont(QFontDatabase::SmallestReadableFont));
 
     // regex for evaluating a valid server name/ip
     mValidator.setRegularExpression(QRegularExpression(QStringLiteral("[A-Za-z0-9_:.-]*")));
@@ -164,9 +169,8 @@ SetupServer::SetupServer(ImapResourceBase *parentResource, WId parent)
     m_ui->folderRequester->setAccessRightsFilter(Akonadi::Collection::CanChangeItem | Akonadi::Collection::CanCreateItem | Akonadi::Collection::CanDeleteItem);
     m_ui->folderRequester->changeCollectionDialogOptions(Akonadi::CollectionDialog::AllowToCreateNewChildCollection);
     m_identityCombobox = new KIdentityManagement::IdentityCombo(KIdentityManagement::IdentityManager::self(), this);
-    m_ui->identityLabel->setBuddy(m_identityCombobox);
-    m_ui->identityLayout->addWidget(m_identityCombobox, 1);
-    m_ui->identityLabel->setBuddy(m_identityCombobox);
+    m_identityCombobox->setShowDefault(true);
+    m_ui->formLayoutAdvanced->insertRow(3, i18n("Identity:"), m_identityCombobox);
 
     connect(m_ui->testButton, &QPushButton::pressed, this, &SetupServer::slotTest);
 
@@ -180,7 +184,6 @@ SetupServer::SetupServer(ImapResourceBase *parentResource, WId parent)
     connect(m_ui->managesieveCheck, &QCheckBox::toggled, this, &SetupServer::slotEnableWidgets);
     connect(m_ui->sameConfigCheck, &QCheckBox::toggled, this, &SetupServer::slotEnableWidgets);
 
-    connect(m_ui->useDefaultIdentityCheck, &QCheckBox::toggled, this, &SetupServer::slotIdentityCheckboxChanged);
     connect(m_ui->enableMailCheckBox, &QCheckBox::toggled, this, &SetupServer::slotMailCheckboxChanged);
     connect(m_ui->safeImapGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &SetupServer::slotEncryptionRadioChanged);
     connect(m_ui->customSieveGroup, QOverload<QAbstractButton *>::of(&QButtonGroup::buttonClicked), this, &SetupServer::slotCustomSieveChanged);
@@ -206,11 +209,6 @@ bool SetupServer::shouldClearCache() const
 void SetupServer::slotSubcriptionCheckboxChanged()
 {
     m_ui->subscriptionButton->setEnabled(m_ui->subscriptionEnabled->isChecked());
-}
-
-void SetupServer::slotIdentityCheckboxChanged()
-{
-    m_identityCombobox->setEnabled(!m_ui->useDefaultIdentityCheck->isChecked());
 }
 
 void SetupServer::slotMailCheckboxChanged()
@@ -324,7 +322,7 @@ void SetupServer::applySettings()
     m_parentResource->settings()->setTrashCollection(m_ui->folderRequester->collection().id());
     Akonadi::Collection trash = m_ui->folderRequester->collection();
     Akonadi::SpecialMailCollections::self()->registerCollection(Akonadi::SpecialMailCollections::Trash, trash);
-    auto *attribute = trash.attribute<Akonadi::EntityDisplayAttribute>(Akonadi::Collection::AddIfMissing);
+    auto attribute = trash.attribute<Akonadi::EntityDisplayAttribute>(Akonadi::Collection::AddIfMissing);
     attribute->setIconName(QStringLiteral("user-trash"));
     new Akonadi::CollectionModifyJob(trash);
     if (mOldTrash != trash) {
@@ -332,9 +330,9 @@ void SetupServer::applySettings()
     }
 
     m_parentResource->settings()->setAutomaticExpungeEnabled(m_ui->autoExpungeCheck->isChecked());
-    m_parentResource->settings()->setUseDefaultIdentity(m_ui->useDefaultIdentityCheck->isChecked());
+    m_parentResource->settings()->setUseDefaultIdentity(m_identityCombobox->isDefaultIdentity());
 
-    if (!m_ui->useDefaultIdentityCheck->isChecked()) {
+    if (!m_identityCombobox->isDefaultIdentity()) {
         m_parentResource->settings()->setAccountIdentity(m_identityCombobox->currentIdentity());
     }
 
@@ -445,10 +443,7 @@ void SetupServer::readSettings()
         requestJob->start();
     }
 
-    m_ui->useDefaultIdentityCheck->setChecked(m_parentResource->settings()->useDefaultIdentity());
-    if (!m_ui->useDefaultIdentityCheck->isChecked()) {
-        m_identityCombobox->setCurrentIdentity(m_parentResource->settings()->accountIdentity());
-    }
+    m_identityCombobox->setCurrentIdentity(m_parentResource->settings()->accountIdentity());
 
     m_ui->enableMailCheckBox->setChecked(m_parentResource->settings()->intervalCheckEnabled());
     if (m_ui->enableMailCheckBox->isChecked()) {
@@ -498,7 +493,7 @@ void SetupServer::slotTest()
     qCDebug(IMAPRESOURCE_LOG) << m_ui->imapServer->text();
 
     m_ui->testButton->setEnabled(false);
-    m_ui->safeImap->setEnabled(false);
+    m_ui->advancedTab->setEnabled(false);
     m_ui->authenticationCombo->setEnabled(false);
 
     m_ui->testInfo->clear();
@@ -567,7 +562,7 @@ void SetupServer::slotFinished(const QVector<int> &testResult)
     m_ui->testInfo->setText(text);
 
     m_ui->testButton->setEnabled(true);
-    m_ui->safeImap->setEnabled(true);
+    m_ui->advancedTab->setEnabled(true);
     m_ui->authenticationCombo->setEnabled(true);
     slotEncryptionRadioChanged();
     slotSafetyChanged();
@@ -627,7 +622,7 @@ void SetupServer::slotSafetyChanged()
 
     m_ui->authenticationCombo->clear();
     addAuthenticationItem(m_ui->authenticationCombo, MailTransport::Transport::EnumAuthenticationType::CLEAR);
-    for (int prot : qAsConst(protocols)) {
+    for (int prot : std::as_const(protocols)) {
         addAuthenticationItem(m_ui->authenticationCombo, (MailTransport::Transport::EnumAuthenticationType::type)prot);
     }
     if (protocols.isEmpty()) {

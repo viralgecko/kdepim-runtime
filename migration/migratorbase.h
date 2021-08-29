@@ -5,15 +5,13 @@
  *
  */
 
-#ifndef MIGRATORBASE_H
-#define MIGRATORBASE_H
+#pragma once
 
 #include <KConfig>
 #include <KConfigGroup>
 #include <QFile>
 #include <QObject>
 
-class QFile;
 
 class NullableConfigGroup
 {
@@ -103,9 +101,23 @@ public:
      */
     QString logfile() const;
 
-    enum MigrationState { None, InProgress, Paused, Complete, NeedsUpdate, Aborted, Failed };
+    enum MigrationState {
+        None,
+        InProgress,
+        Paused,
+        Complete,
+        NeedsUpdate,
+        Aborted,
+        Failed,
+    };
 
-    enum MessageType { Success, Skip, Info, Warning, Error };
+    enum MessageType {
+        Success,
+        Skip,
+        Info,
+        Warning,
+        Error,
+    };
 
     /**
      * Read migration state.
@@ -204,4 +216,3 @@ private:
 
 Q_DECLARE_METATYPE(MigratorBase::MigrationState)
 
-#endif // MIGRATORBASE_H

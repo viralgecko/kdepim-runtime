@@ -24,8 +24,7 @@ extern "C" {
 
 #include <QSslSocket>
 
-#include <KTcpSocket>
-
+#include "kio_version.h"
 #include <kio/slaveinterface.h>
 
 #include <string.h>
@@ -45,20 +44,29 @@ extern "C" {
 #define MAX_RESPONSE_LEN 512
 #define MAX_COMMANDS 10
 
+// Pseudo plugin class to embed meta data
+class KIOPluginForMetaData : public QObject
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.kde.kio.slave.pop3" FILE "pop3.json")
+};
+
 extern "C" {
 int Q_DECL_EXPORT kdemain(int argc, char **argv);
 }
 
 using namespace KIO;
 
-static const sasl_callback_t callbacks[] = {{SASL_CB_ECHOPROMPT, nullptr, nullptr},
-                                            {SASL_CB_NOECHOPROMPT, nullptr, nullptr},
-                                            {SASL_CB_GETREALM, nullptr, nullptr},
-                                            {SASL_CB_USER, nullptr, nullptr},
-                                            {SASL_CB_AUTHNAME, nullptr, nullptr},
-                                            {SASL_CB_PASS, nullptr, nullptr},
-                                            {SASL_CB_CANON_USER, nullptr, nullptr},
-                                            {SASL_CB_LIST_END, nullptr, nullptr}};
+static const sasl_callback_t callbacks[] = {
+    {SASL_CB_ECHOPROMPT, nullptr, nullptr},
+    {SASL_CB_NOECHOPROMPT, nullptr, nullptr},
+    {SASL_CB_GETREALM, nullptr, nullptr},
+    {SASL_CB_USER, nullptr, nullptr},
+    {SASL_CB_AUTHNAME, nullptr, nullptr},
+    {SASL_CB_PASS, nullptr, nullptr},
+    {SASL_CB_CANON_USER, nullptr, nullptr},
+    {SASL_CB_LIST_END, nullptr, nullptr},
+};
 
 int kdemain(int argc, char **argv)
 {
@@ -365,7 +373,7 @@ int POP3Protocol::loginAPOP(const char *challenge, KIO::AuthInfo &ai)
 bool POP3Protocol::saslInteract(void *in, AuthInfo &ai)
 {
     qCDebug(POP3_LOG);
-    auto *interact = (sasl_interact_t *)in;
+    auto interact = (sasl_interact_t *)in;
 
     // some mechanisms do not require username && pass, so don't need a popup
     // window for getting this info
@@ -601,11 +609,9 @@ bool POP3Protocol::pop3_open()
     if (!hasMetaData(QStringLiteral("useProxy")) || metaData(QStringLiteral("useProxy")) != QLatin1String("on")) {
         qCDebug(POP3_LOG) << "requested to use no proxy";
 
-        // the KTcpSocket branch can be removed once we can require KF >= 5.65 as TCPSlaveBase will
-        // use QSslSocket internally
         QNetworkProxy proxy;
         proxy.setType(QNetworkProxy::NoProxy);
-        if (auto sock = qobject_cast<QSslSocket *>(socket())) {
+        if (auto sock = tcpSocket()) {
             sock->setProxy(proxy);
         } else {
             qCWarning(POP3_LOG) << "no socket, cannot set no proxy";
@@ -1151,3 +1157,5 @@ void POP3Protocol::del(const QUrl &url, bool /*isfile */)
     qCDebug(POP3_LOG) << "Path:" << _path;
     finished();
 }
+
+#include "pop3.moc"

@@ -49,7 +49,7 @@ file( GLOB providersFiles "../services/*.desktop" )
 install( FILES ${providersFiles} DESTINATION "${KDE_INSTALL_KSERVICES5DIR}/akonadi/davgroupware-providers" )
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/davgroupwareresource.kcfg org.kde.Akonadi.davGroupware.Settings)
-qt5_add_dbus_adaptor(davgroupwareresource_SRCS
+qt_add_dbus_adaptor(davgroupwareresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.davGroupware.Settings.xml settings.h Settings
     )
 
@@ -77,7 +77,8 @@ target_link_libraries(akonadi_davgroupware_resource
     KF5::ConfigWidgets
     KF5::WindowSystem
     KF5::DAV
-    Qt5::Xml
+    KF5::Service
+    Qt::Xml
     )
 
 install(TARGETS akonadi_davgroupware_resource ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})

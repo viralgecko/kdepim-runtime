@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef RESOURCESTATEINTERFACE_H
-#define RESOURCESTATEINTERFACE_H
+#pragma once
 
 #include <Collection>
 #include <Item>
@@ -19,7 +18,7 @@
 class ResourceStateInterface
 {
 public:
-    typedef QSharedPointer<ResourceStateInterface> Ptr;
+    using Ptr = QSharedPointer<ResourceStateInterface>;
 
     virtual ~ResourceStateInterface() = default;
 
@@ -58,4 +57,3 @@ public:
     virtual void emitPercent(int percent) = 0;
 };
 
-#endif // RESOURCESTATEINTERFACE_H

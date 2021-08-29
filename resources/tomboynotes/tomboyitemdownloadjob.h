@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef TOMBOYITEMDOWNLOADJOB_H
-#define TOMBOYITEMDOWNLOADJOB_H
+#pragma once
 
 #include "tomboyjobbase.h"
 #include <AkonadiCore/Item>
@@ -15,7 +14,7 @@ class TomboyItemDownloadJob : public TomboyJobBase
     Q_OBJECT
 public:
     explicit TomboyItemDownloadJob(const Akonadi::Item &item, KIO::AccessManager *manager, QObject *parent = nullptr);
-    // returns the parsed results wrapped in Akonadi::Item, see bellow
+    // returns the parsed results wrapped in Akonadi::Item, see below
     Akonadi::Item item() const;
 
     // automatically called by KJob
@@ -27,4 +26,3 @@ private:
     Akonadi::Item mResultItem;
 };
 
-#endif // TOMBOYITEMDOWNLOADJOB_H

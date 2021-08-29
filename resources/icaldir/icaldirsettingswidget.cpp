@@ -13,6 +13,7 @@
 #include <KLocalizedString>
 #include <QUrl>
 
+#include <QFontDatabase>
 #include <QPushButton>
 #include <QTimer>
 
@@ -21,7 +22,7 @@ IcalDirSettingsWidget::IcalDirSettingsWidget(const KSharedConfigPtr &config, QWi
 {
     IcalDirResourceSettings::instance(config);
 
-    QWidget *mainWidget = new QWidget(parent);
+    auto mainWidget = new QWidget(parent);
 
     ui.setupUi(mainWidget);
     parent->layout()->addWidget(mainWidget);
@@ -34,6 +35,9 @@ IcalDirSettingsWidget::IcalDirSettingsWidget(const KSharedConfigPtr &config, QWi
     ui.kcfg_Path->setUrl(QUrl::fromLocalFile(IcalDirResourceSettings::self()->path()));
     ui.kcfg_AutosaveInterval->setSuffix(ki18np(" minute", " minutes"));
     mManager = new KConfigDialogManager(mainWidget, IcalDirResourceSettings::self());
+    ui.readOnlyLabel->setFont(QFontDatabase::systemFont(QFontDatabase::SmallestReadableFont));
+    ui.runingLabel->setFont(QFontDatabase::systemFont(QFontDatabase::SmallestReadableFont));
+    ui.pathLabel->setFont(QFontDatabase::systemFont(QFontDatabase::SmallestReadableFont));
 }
 
 void IcalDirSettingsWidget::validate()

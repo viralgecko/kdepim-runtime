@@ -4,12 +4,10 @@
     SPDX-License-Identifier: GPL-2.0-or-later
 */
 
-#ifndef SETUPWIZARD_H
-#define SETUPWIZARD_H
+#pragma once
 
 #include <KDAV/Enums>
 
-#include <QLabel>
 #include <QWizard>
 #include <QWizardPage>
 
@@ -17,11 +15,11 @@ class KJob;
 class QLineEdit;
 class QTextBrowser;
 
+class QLabel;
 class QButtonGroup;
 class QCheckBox;
 class QComboBox;
 class QFormLayout;
-class QLabel;
 class QRadioButton;
 class KPasswordLineEdit;
 
@@ -32,12 +30,18 @@ class SetupWizard : public QWizard
 public:
     explicit SetupWizard(QWidget *parent = nullptr);
 
-    enum { W_CredentialsPage, W_PredefinedProviderPage, W_ServerTypePage, W_ConnectionPage, W_CheckPage };
+    enum {
+        W_CredentialsPage,
+        W_PredefinedProviderPage,
+        W_ServerTypePage,
+        W_ConnectionPage,
+        W_CheckPage,
+    };
 
     class Url
     {
     public:
-        typedef QVector<Url> List;
+        using List = QVector<Url>;
 
         KDAV::Protocol protocol;
         QString url;
@@ -128,4 +132,3 @@ private:
     QTextBrowser *mStatusLabel = nullptr;
 };
 
-#endif

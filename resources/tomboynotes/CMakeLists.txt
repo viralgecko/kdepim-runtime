@@ -53,7 +53,7 @@ kcfg_generate_dbus_interface(
     org.kde.Akonadi.TomboyNotes.Settings
     )
 
-qt5_add_dbus_adaptor(tomboynotesresource_SRCS
+qt_add_dbus_adaptor(tomboynotesresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.TomboyNotes.Settings.xml
     ${CMAKE_CURRENT_BINARY_DIR}/settings.h
     Settings
@@ -65,10 +65,10 @@ if (COMPILE_WITH_UNITY_CMAKE_SUPPORT)
     set_target_properties(akonadi_tomboynotes_resource PROPERTIES UNITY_BUILD ON)
 endif()
 target_link_libraries(akonadi_tomboynotes_resource
-    Qt5::DBus
-    Qt5::Gui
-    Qt5::Network
-    Qt5::WebEngineWidgets
+    Qt::DBus
+    Qt::Gui
+    Qt::Network
+    Qt::WebEngineWidgets
     KF5::AkonadiAgentBase
     KF5::AkonadiNotes
     KF5::ConfigCore
@@ -88,20 +88,16 @@ install(FILES tomboynotesresource.desktop
     )
 
 ############################# Config plugin ################################
-set(tomboynotesconfig_ui_SRCS)
-ki18n_wrap_ui(tomboynotesconfig_ui_SRCS tomboynotesagentconfigwidget.ui)
-set(tomboynotesconfig_SRCS
+kcoreaddons_add_plugin(tomboynotesconfig
+    INSTALL_NAMESPACE "akonadi/config"
+    )
+ki18n_wrap_ui(tomboynotesconfig tomboynotesagentconfigwidget.ui)
+target_sources(tomboynotesconfig PRIVATE
     tomboynotesconfigwidget.cpp
-    ${tomboynotesconfig_ui_SRCS}
     ${tomboynotesresource_common_SRCS}
     )
 
 
-kcoreaddons_add_plugin(tomboynotesconfig
-    SOURCES ${tomboynotesconfig_SRCS}
-    JSON "tomboynotesconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
 target_link_libraries(tomboynotesconfig
     KF5::AkonadiCore
     KF5::CalendarCore

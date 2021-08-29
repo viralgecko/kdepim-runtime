@@ -39,7 +39,7 @@ install( FILES mixedmaildirresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTD
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/mixedmaildirresource.kcfg org.kde.Akonadi.MixedMaildir.Settings)
 
-qt5_add_dbus_adaptor(mixedmaildirresource_SRCS
+qt_add_dbus_adaptor(mixedmaildirresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.MixedMaildir.Settings.xml settings.h Settings
     )
 
@@ -81,18 +81,17 @@ endif ()
 
 ###################################### Config Plugin #########################
 
-set(mixedmaildirconfig_SRCS
+kcoreaddons_add_plugin(mixedmaildirconfig
+    INSTALL_NAMESPACE "akonadi/config"
+    )
+target_sources(mixedmaildirconfig PRIVATE
     mixedmaildirconfig.cpp
     configwidget.cpp
     ${mixedmaildir_common_SRCS}
     )
-ki18n_wrap_ui(mixedmaildirconfig_SRCS settings.ui)
+ki18n_wrap_ui(mixedmaildirconfig settings.ui)
 
-kcoreaddons_add_plugin(mixedmaildirconfig
-    SOURCES ${mixedmaildirconfig_SRCS}
-    JSON "mixedmaildirconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
+
 target_link_libraries(mixedmaildirconfig
     KF5::AkonadiCore
     KF5::I18n

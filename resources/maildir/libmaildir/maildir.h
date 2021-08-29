@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef MAILDIR_H
-#define MAILDIR_H
+#pragma once
 
 #include "maildir_export.h"
 
@@ -230,7 +229,7 @@ public:
     void refreshKeyCache();
 
     /** Return the last error message string. The error might not come from the last performed operation,
-     if that was sucessful. The caller should always check the return value of the methods before
+     if that was successful. The caller should always check the return value of the methods before
      querying the last error string. */
     QString lastError() const;
 
@@ -240,4 +239,3 @@ private:
     Private *d;
 };
 }
-#endif // __MAILDIR_H__

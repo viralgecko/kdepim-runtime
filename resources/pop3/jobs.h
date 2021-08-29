@@ -4,8 +4,7 @@
    SPDX-License-Identifier: LGPL-2.0-only OR LGPL-3.0-only OR LicenseRef-KDE-Accepted-LGPL
 */
 
-#ifndef JOBS_H
-#define JOBS_H
+#pragma once
 
 #include <KIO/MetaData>
 #include <KJob>
@@ -41,7 +40,7 @@ public:
     QUrl getUrl() const;
 
     // Sets the current SlaveBaseJob that is using the POPSession.
-    // If there is a job, all slave errors will be forwared to that job
+    // If there is a job, all slave errors will be forwarded to that job
     void setCurrentJob(SlaveBaseJob *job);
 
 private Q_SLOTS:
@@ -184,4 +183,3 @@ private:
     uint mDataCounter;
 };
 
-#endif // JOBS_H

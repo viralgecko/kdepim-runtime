@@ -198,7 +198,7 @@ QByteArray O1::buildAuthorizationHeader(const QList<O0RequestParameter> &oauthPa
     QByteArray ret("OAuth ");
     QList<O0RequestParameter> headers(oauthParams);
     std::sort(headers.begin(), headers.end());
-    for (const O0RequestParameter &h : qAsConst(headers)) {
+    for (const O0RequestParameter &h : std::as_const(headers)) {
         if (first) {
             first = false;
         } else {
@@ -275,11 +275,7 @@ void O1::link()
     request.setRawHeader(O2_HTTP_AUTHORIZATION_HEADER, buildAuthorizationHeader(headers));
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String(O2_MIME_TYPE_XFORM));
     QNetworkReply *reply = manager_->post(request, QByteArray());
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &O1::onTokenRequestError);
-#else
     connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), this, &O1::onTokenRequestError);
-#endif
     connect(reply, &QNetworkReply::finished, this, &O1::onTokenRequestFinished);
 }
 
@@ -366,11 +362,7 @@ void O1::exchangeToken()
     request.setRawHeader(O2_HTTP_AUTHORIZATION_HEADER, buildAuthorizationHeader(oauthParams));
     request.setHeader(QNetworkRequest::ContentTypeHeader, QLatin1String(O2_MIME_TYPE_XFORM));
     QNetworkReply *reply = manager_->post(request, QByteArray());
-#if QT_VERSION < QT_VERSION_CHECK(5, 15, 0)
-    connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::error), this, &O1::onTokenExchangeError);
-#else
     connect(reply, QOverload<QNetworkReply::NetworkError>::of(&QNetworkReply::errorOccurred), this, &O1::onTokenExchangeError);
-#endif
     connect(reply, &QNetworkReply::finished, this, &O1::onTokenExchangeFinished);
 }
 
@@ -401,7 +393,7 @@ void O1::onTokenExchangeFinished()
         // Set extra tokens if any
         if (!response.isEmpty()) {
             QVariantMap extraTokens;
-            for (const QString &key : qAsConst(response)) {
+            for (const QString &key : std::as_const(response)) {
                 extraTokens.insert(key, response.value(key));
             }
             setExtraTokens(extraTokens);

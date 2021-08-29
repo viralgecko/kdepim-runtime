@@ -5,10 +5,9 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef SETTINGSPASSWORDREQUESTER_H
-#define SETTINGSPASSWORDREQUESTER_H
+#pragma once
 
-#include <QDialog>
+class QDialog;
 #include <passwordrequesterinterface.h>
 
 class ImapResourceBase;
@@ -41,4 +40,3 @@ private:
     QDialog *m_settingsDialog = nullptr;
 };
 
-#endif

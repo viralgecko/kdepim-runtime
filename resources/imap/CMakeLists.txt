@@ -60,12 +60,12 @@ ecm_qt_declare_logging_category(imapresource_LIB_SRCS HEADER imapresource_trace.
 kcfg_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/imapresource.kcfg org.kde.Akonadi.Imap.Settings )
 kconfig_add_kcfg_files(imapresource_LIB_SRCS settingsbase.kcfgc)
 
-qt5_add_dbus_adaptor( imapresource_LIB_SRCS
+qt_add_dbus_adaptor( imapresource_LIB_SRCS
      ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Imap.Settings.xml settings.h Settings
      )
 
-qt5_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/imapresourcebase.h org.kde.Akonadi.Imap.Resource.xml OPTIONS -a )
-qt5_add_dbus_adaptor( imapresource_LIB_SRCS
+qt_generate_dbus_interface( ${CMAKE_CURRENT_SOURCE_DIR}/imapresourcebase.h org.kde.Akonadi.Imap.Resource.xml OPTIONS -a )
+qt_add_dbus_adaptor( imapresource_LIB_SRCS
      ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Imap.Resource.xml
         imapresourcebase.h ImapResourceBase
      )
@@ -73,8 +73,8 @@ qt5_add_dbus_adaptor( imapresource_LIB_SRCS
 add_library(imapresource STATIC ${imapresource_LIB_SRCS})
 
 target_link_libraries(imapresource
-    Qt5::DBus
-    Qt5::Network
+    Qt::DBus
+    Qt::Network
     KF5::AkonadiCore
     KF5::IMAP
     KF5::MailTransport
@@ -93,7 +93,9 @@ target_link_libraries(imapresource
 
 ########### next target ###############
 
-set( akonadi_imap_resource_SRCS
+add_executable(akonadi_imap_resource)
+ki18n_wrap_ui(akonadi_imap_resource setupserverview_desktop.ui)
+target_sources( akonadi_imap_resource PRIVATE
   main.cpp
   imapresource.cpp
   resourcestate.cpp
@@ -106,10 +108,8 @@ set( akonadi_imap_resource_SRCS
 
 install( FILES imapresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTDIR}/akonadi/agents" )
 
-ki18n_wrap_ui(akonadi_imap_resource_SRCS setupserverview_desktop.ui)
 
 
-add_executable(akonadi_imap_resource ${akonadi_imap_resource_SRCS})
 if (COMPILE_WITH_UNITY_CMAKE_SUPPORT)
     set_target_properties(akonadi_imap_resource PROPERTIES UNITY_BUILD ON)
 endif()
@@ -120,7 +120,7 @@ if( APPLE )
 endif ()
 
 target_link_libraries(akonadi_imap_resource
-    Qt5::DBus
+    Qt::DBus
     KF5::AkonadiCore
     KF5::IMAP
     akonadi-singlefileresource

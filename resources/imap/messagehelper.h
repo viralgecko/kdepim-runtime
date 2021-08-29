@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef MESSAGEHELPER_H
-#define MESSAGEHELPER_H
+#pragma once
 
 #include <AkonadiCore/Item>
 #include <KMime/Message>
@@ -14,7 +13,7 @@
 class MessageHelper
 {
 public:
-    typedef QSharedPointer<MessageHelper> Ptr;
+    using Ptr = QSharedPointer<MessageHelper>;
 
     virtual ~MessageHelper();
     virtual Akonadi::Item createItemFromMessage(const KMime::Message::Ptr &message,
@@ -26,4 +25,3 @@ public:
                                                 bool &ok) const;
 };
 
-#endif

@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef KOLABRETRIEVETAGSTASK_H
-#define KOLABRETRIEVETAGSTASK_H
+#pragma once
 
 #include "kolabrelationresourcetask.h"
 #include <tag.h>
@@ -20,7 +19,10 @@ class KolabRetrieveTagTask : public KolabRelationResourceTask
 {
     Q_OBJECT
 public:
-    enum RetrieveType { RetrieveTags, RetrieveRelations };
+    enum RetrieveType {
+        RetrieveTags,
+        RetrieveRelations,
+    };
 
     explicit KolabRetrieveTagTask(const ResourceStateInterface::Ptr &resource, RetrieveType type, QObject *parent = nullptr);
 
@@ -46,4 +48,3 @@ private:
     void taskComplete();
 };
 
-#endif // KOLABCHANGETAGTASK_H

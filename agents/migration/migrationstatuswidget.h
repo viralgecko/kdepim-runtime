@@ -5,11 +5,10 @@
  *
  */
 
-#ifndef MIGRATIONSTATUSWIDGET_H
-#define MIGRATIONSTATUSWIDGET_H
+#pragma once
 
 #include "migrationscheduler.h"
-#include <QItemSelectionModel>
+class QItemSelectionModel;
 #include <QWidget>
 
 class MigrationStatusWidget : public QWidget
@@ -31,4 +30,3 @@ private:
     QItemSelectionModel *mSelectionModel = nullptr;
 };
 
-#endif // MIGRATIONCONFIGDIALOG_H

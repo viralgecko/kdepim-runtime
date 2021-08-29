@@ -29,6 +29,13 @@
 #define S_IROTH 0004
 #endif
 
+// Pseudo plugin class to embed meta data
+class KIOPluginForMetaData : public QObject
+{
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.kde.kio.slave.akonadi" FILE "akonadi.json")
+};
+
 extern "C" {
 int Q_DECL_EXPORT kdemain(int argc, char **argv);
 }
@@ -117,7 +124,7 @@ void AkonadiSlave::stat(const QUrl &url)
     }
     // Stats for an item
     else if (Item::fromUrl(url).isValid()) {
-        ItemFetchJob *job = new ItemFetchJob(Item::fromUrl(url));
+        auto job = new ItemFetchJob(Item::fromUrl(url));
 
         if (!job->exec()) {
             error(KIO::ERR_INTERNAL, job->errorString());
@@ -148,7 +155,7 @@ void AkonadiSlave::del(const QUrl &url, bool isFile)
         }
         finished();
     } else { // It's a file
-        ItemDeleteJob *job = new ItemDeleteJob(Item::fromUrl(url));
+        auto job = new ItemDeleteJob(Item::fromUrl(url));
         if (!job->exec()) {
             error(KIO::ERR_INTERNAL, job->errorString());
             return;
@@ -221,7 +228,7 @@ KIO::UDSEntry AkonadiSlave::entryForCollection(const Akonadi::Collection &collec
     entry.fastInsert(KIO::UDSEntry::UDS_FILE_TYPE, S_IFDIR);
     entry.fastInsert(KIO::UDSEntry::UDS_URL, collection.url().url());
     entry.fastInsert(KIO::UDSEntry::UDS_ACCESS, S_IRUSR | S_IRGRP | S_IROTH);
-    if (const auto *attr = collection.attribute<EntityDisplayAttribute>()) {
+    if (const auto attr = collection.attribute<EntityDisplayAttribute>()) {
         if (!attr->iconName().isEmpty()) {
             entry.fastInsert(KIO::UDSEntry::UDS_ICON_NAME, attr->iconName());
         }
@@ -231,3 +238,5 @@ KIO::UDSEntry AkonadiSlave::entryForCollection(const Akonadi::Collection &collec
     }
     return entry;
 }
+
+#include "akonadislave.moc"

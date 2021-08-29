@@ -2,8 +2,7 @@
     SPDX-License-Identifier: BSD-2-Clause
 */
 
-#ifndef O2REQUESTOR_H
-#define O2REQUESTOR_H
+#pragma once
 
 #include <QByteArray>
 #include <QNetworkAccessManager>
@@ -67,7 +66,11 @@ protected Q_SLOTS:
 protected:
     int setup(const QNetworkRequest &request, QNetworkAccessManager::Operation operation);
 
-    enum Status { Idle, Requesting, ReRequesting };
+    enum Status {
+        Idle,
+        Requesting,
+        ReRequesting,
+    };
 
     QNetworkAccessManager *manager_ = nullptr;
     O2 *authenticator_ = nullptr;
@@ -82,4 +85,3 @@ protected:
     QNetworkReply::NetworkError error_;
 };
 
-#endif // O2REQUESTOR_H

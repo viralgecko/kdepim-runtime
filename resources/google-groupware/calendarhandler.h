@@ -5,8 +5,7 @@
     SPDX-License-Identifier: GPL-3.0-or-later
 */
 
-#ifndef CALENDARHANDLER_H
-#define CALENDARHANDLER_H
+#pragma once
 
 #include "generichandler.h"
 #include <QObject>
@@ -44,7 +43,7 @@ class FreeBusyHandler : public QObject
 {
     Q_OBJECT
 public:
-    typedef std::unique_ptr<FreeBusyHandler> Ptr;
+    using Ptr = std::unique_ptr<FreeBusyHandler>;
 
     FreeBusyHandler(GoogleResourceStateInterface *iface, GoogleSettings *settings);
 
@@ -57,4 +56,3 @@ private:
     GoogleSettings *m_settings = nullptr;
 };
 
-#endif // CALENDARHANDLER_H

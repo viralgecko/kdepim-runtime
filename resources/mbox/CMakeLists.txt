@@ -37,7 +37,7 @@ ecm_qt_declare_logging_category(mboxresource_SRCS HEADER mboxresource_debug.h ID
 install( FILES mboxresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTDIR}/akonadi/agents" )
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/mboxresource.kcfg org.kde.Akonadi.Mbox.Settings)
-qt5_add_dbus_adaptor(mboxresource_SRCS
+qt_add_dbus_adaptor(mboxresource_SRCS
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Mbox.Settings.xml settings.h Settings
     )
 
@@ -71,24 +71,22 @@ if (BUILD_TESTING)
 endif()
 
 ############################# Config plugin ################################
+kcoreaddons_add_plugin(mboxconfig
+    INSTALL_NAMESPACE "akonadi/config"
+    )
 
-set(mboxconfig_SRCS
+target_sources(mboxconfig PRIVATE
     mboxconfig.cpp
     lockmethodpage.cpp
     compactpage.cpp
     ${mboxresource_common_SRCS}
     )
 
-ki18n_wrap_ui(mboxconfig_SRCS
+ki18n_wrap_ui(mboxconfig
     compactpage.ui
     lockfilepage.ui
     )
 
-kcoreaddons_add_plugin(mboxconfig
-    SOURCES ${mboxconfig_SRCS}
-    JSON "mboxconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
 target_link_libraries(mboxconfig
     KF5::AkonadiCore
     KF5::ConfigWidgets

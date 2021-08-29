@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef OXA_FOLDER_H
-#define OXA_FOLDER_H
+#pragma once
 
 #include <QMap>
 #include <QString>
@@ -26,7 +25,7 @@ public:
     /**
      * Describes a list of folders.
      */
-    typedef QVector<Folder> List;
+    using List = QVector<Folder>;
 
     /**
      * Describes the status of the folder.
@@ -127,8 +126,8 @@ public:
         bool mAdminFlag = false;
     };
 
-    typedef QMap<qlonglong, Permissions> UserPermissions;
-    typedef QMap<qlonglong, Permissions> GroupPermissions;
+    using UserPermissions = QMap<qlonglong, Permissions>;
+    using GroupPermissions = QMap<qlonglong, Permissions>;
 
     Folder();
 
@@ -181,4 +180,3 @@ private:
 }
 Q_DECLARE_TYPEINFO(OXA::Folder, Q_MOVABLE_TYPE);
 
-#endif

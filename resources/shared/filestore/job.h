@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef AKONADI_FILESTORE_JOB_H
-#define AKONADI_FILESTORE_JOB_H
+#pragma once
 
 #include "akonadi-filestore_export.h"
 
@@ -71,7 +70,10 @@ public:
         virtual bool visit(StoreCompactJob *job) = 0;
     };
 
-    enum ErrorCodes { InvalidStoreState = KJob::UserDefinedError + 1, InvalidJobContext };
+    enum ErrorCodes {
+        InvalidStoreState = KJob::UserDefinedError + 1,
+        InvalidJobContext,
+    };
 
     explicit Job(AbstractJobSession *session = nullptr);
 
@@ -88,4 +90,3 @@ private:
 }
 }
 
-#endif

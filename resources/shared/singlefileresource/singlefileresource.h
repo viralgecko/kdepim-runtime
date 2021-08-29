@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef AKONADI_SINGLEFILERESOURCE_H
-#define AKONADI_SINGLEFILERESOURCE_H
+#pragma once
 
 #include "akonadi-singlefileresource_export.h"
 #include "singlefileresourcebase.h"
@@ -259,7 +258,7 @@ public:
     {
         QString newName;
         if (collection.hasAttribute<EntityDisplayAttribute>()) {
-            const auto *attr = collection.attribute<EntityDisplayAttribute>();
+            const auto attr = collection.attribute<EntityDisplayAttribute>();
             newName = attr->displayName();
         }
         const QString oldName = mSettings->displayName();
@@ -288,7 +287,7 @@ public:
             rights |= Collection::CanChangeCollection;
             c.setRights(rights);
         }
-        auto *attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
+        auto attr = c.attribute<EntityDisplayAttribute>(Collection::AddIfMissing);
         if (name() != attr->displayName()) {
             attr->setDisplayName(name());
             new CollectionModifyJob(c);
@@ -315,4 +314,3 @@ protected:
 };
 }
 
-#endif

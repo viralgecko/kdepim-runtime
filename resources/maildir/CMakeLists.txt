@@ -35,7 +35,7 @@ ecm_qt_declare_logging_category(maildirresource_SRCS HEADER maildirresource_debu
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/maildirresource.kcfg org.kde.Akonadi.Maildir.Settings)
 
-qt5_add_dbus_adaptor(maildirresource_SRCS
+qt_add_dbus_adaptor(maildirresource_SRCS
   ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Maildir.Settings.xml settings.h Akonadi_Maildir_Resource::MaildirSettings maildirsettingsadaptor MaildirSettingsAdaptor
 )
 
@@ -60,22 +60,20 @@ install(FILES ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Maildir.Settings.xml
 install( FILES maildirresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTDIR}/akonadi/agents" )
 
 ############################# Config plugin ###############################
+kcoreaddons_add_plugin(maildirconfig
+    INSTALL_NAMESPACE "akonadi/config"
+)
 
-set(maildirconfig_SRCS
+target_sources(maildirconfig PRIVATE
     maildirconfigmain.cpp
     maildirconfig.cpp
     configwidget.cpp
     ${maildir_common_SRCS}
 )
 
-ki18n_wrap_ui(maildirconfig_SRCS settings.ui)
+ki18n_wrap_ui(maildirconfig settings.ui)
 
 
-kcoreaddons_add_plugin(maildirconfig
-    SOURCES ${maildirconfig_SRCS}
-    JSON "maildirconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-)
 target_link_libraries(maildirconfig
     KF5::AkonadiCore
     KF5::ConfigWidgets

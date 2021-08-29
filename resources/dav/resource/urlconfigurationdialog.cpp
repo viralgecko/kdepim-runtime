@@ -10,6 +10,7 @@
 #include <KDAV/DavCollectionModifyJob>
 #include <KDAV/DavCollectionsFetchJob>
 
+#include <KAuthorized>
 #include <KLocalizedString>
 #include <KMessageBox>
 
@@ -22,13 +23,14 @@ UrlConfigurationDialog::UrlConfigurationDialog(QWidget *parent)
     : QDialog(parent)
     , mRemoteProtocolGroup(new QButtonGroup(this))
 {
-    QWidget *mainWidget = new QWidget(this);
+    auto mainWidget = new QWidget(this);
     auto mainLayout = new QVBoxLayout(this);
     mainLayout->addWidget(mainWidget);
     mUi.setupUi(mainWidget);
     mUi.credentialsGroup->setVisible(false);
+    mUi.password->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
 
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
+    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel, this);
     mOkButton = buttonBox->button(QDialogButtonBox::Ok);
     mOkButton->setDefault(true);
     mOkButton->setShortcut(Qt::CTRL | Qt::Key_Return);
@@ -47,7 +49,7 @@ UrlConfigurationDialog::UrlConfigurationDialog(QWidget *parent)
     mRemoteProtocolGroup->addButton(mUi.caldav, KDAV::CalDav);
     mRemoteProtocolGroup->addButton(mUi.carddav, KDAV::CardDav);
     mRemoteProtocolGroup->addButton(mUi.groupdav, KDAV::GroupDav);
-    connect(mRemoteProtocolGroup, QOverload<QAbstractButton *, bool>::of(&QButtonGroup::buttonToggled), this, &UrlConfigurationDialog::onConfigChanged);
+    connect(mRemoteProtocolGroup, &QButtonGroup::idToggled, this, &UrlConfigurationDialog::onConfigChanged);
     connect(mUi.remoteUrl, &QLineEdit::textChanged, this, &UrlConfigurationDialog::onConfigChanged);
     connect(mUi.useDefaultCreds, &QRadioButton::toggled, this, &UrlConfigurationDialog::onConfigChanged);
     connect(mUi.username, &QLineEdit::textChanged, this, &UrlConfigurationDialog::onConfigChanged);
@@ -67,7 +69,7 @@ UrlConfigurationDialog::~UrlConfigurationDialog()
 
 void UrlConfigurationDialog::readConfig()
 {
-    KConfigGroup grp(KSharedConfig::openConfig(), "UrlConfigurationDialog");
+    KConfigGroup grp(KSharedConfig::openStateConfig(), "UrlConfigurationDialog");
     const QSize size = grp.readEntry("Size", QSize(300, 200));
     if (size.isValid()) {
         resize(size);
@@ -76,7 +78,7 @@ void UrlConfigurationDialog::readConfig()
 
 void UrlConfigurationDialog::writeConfig()
 {
-    KConfigGroup grp(KSharedConfig::openConfig(), "UrlConfigurationDialog");
+    KConfigGroup grp(KSharedConfig::openStateConfig(), "UrlConfigurationDialog");
     grp.writeEntry("Size", size());
     grp.sync();
 }

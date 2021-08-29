@@ -7,8 +7,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef KOLABV2_KOLABBASE_H
-#define KOLABV2_KOLABBASE_H
+#pragma once
 
 #include <KCalendarCore/Incidence>
 
@@ -40,7 +39,11 @@ public:
         QString smtpAddress;
     };
 
-    enum Sensitivity { Public = 0, Private = 1, Confidential = 2 };
+    enum Sensitivity {
+        Public = 0,
+        Private = 1,
+        Confidential = 2,
+    };
 
     explicit KolabBase(const QString &time_zone = QString());
     virtual ~KolabBase();
@@ -114,7 +117,7 @@ protected:
     /// Read all known fields from this contact group
     void setFields(const KContacts::ContactGroup *);
 
-    /// Save all known fields into this contact groupd
+    /// Save all known fields into this contact group
     void saveTo(KContacts::ContactGroup *) const;
 
     // This just makes the initial dom tree with version and doctype
@@ -154,4 +157,3 @@ protected:
 };
 }
 
-#endif // KOLABV2_KOLABBASE_H

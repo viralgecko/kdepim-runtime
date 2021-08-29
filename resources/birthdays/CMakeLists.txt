@@ -14,7 +14,7 @@ set( birthdayresource_srcs
 
 kcfg_generate_dbus_interface(${CMAKE_CURRENT_SOURCE_DIR}/birthdaysresource.kcfg org.kde.Akonadi.Birthdays.Settings)
 
-qt5_add_dbus_adaptor(birthdayresource_srcs
+qt_add_dbus_adaptor(birthdayresource_srcs
     ${CMAKE_CURRENT_BINARY_DIR}/org.kde.Akonadi.Birthdays.Settings.xml settings.h Settings
     )
 
@@ -51,20 +51,15 @@ install( FILES birthdaysresource.desktop DESTINATION "${KDE_INSTALL_DATAROOTDIR}
 
 
 ############################# Config plugin ################################
-set(birthdaysconfig_ui_SRCS)
-ki18n_wrap_ui(birthdaysconfig_ui_SRCS birthdaysconfigwidget.ui)
-set(birthdaysconfig_SRCS
+kcoreaddons_add_plugin(birthdaysconfig
+    INSTALL_NAMESPACE "akonadi/config"
+    )
+ki18n_wrap_ui(birthdaysconfig birthdaysconfigwidget.ui)
+target_sources(birthdaysconfig PRIVATE
     birthdaysconfigagentwidget.cpp
-    ${birthdaysconfig_ui_SRCS}
     ${birthdayresource_common_SRCS}
     )
 
-
-kcoreaddons_add_plugin(birthdaysconfig
-    SOURCES ${birthdaysconfig_SRCS}
-    JSON "birthdaysconfig.json"
-    INSTALL_NAMESPACE "akonadi/config"
-    )
 target_link_libraries(birthdaysconfig
     KF5::AkonadiCore
     KF5::CalendarCore

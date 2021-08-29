@@ -4,8 +4,7 @@
  * SPDX-License-Identifier: GPL-2.0-or-later
  */
 
-#ifndef ETESYNCCLIENTSTATE_H
-#define ETESYNCCLIENTSTATE_H
+#pragma once
 
 #include "etebaseadapter.h"
 #include "settings.h"
@@ -20,7 +19,11 @@ public:
     typedef std::unique_ptr<EteSyncClientState> Ptr;
     explicit EteSyncClientState(const QString &agentId, WId winId);
 
-    enum AccountStatus { OK, NEW_ACCOUNT, ERROR };
+    enum AccountStatus {
+        OK,
+        NEW_ACCOUNT,
+        ERROR,
+    };
 
     void init();
     void saveSettings();
@@ -79,4 +82,3 @@ private:
     QPointer<KWallet::Wallet> mWallet;
 };
 
-#endif // ETESYNCSETTINGS_H

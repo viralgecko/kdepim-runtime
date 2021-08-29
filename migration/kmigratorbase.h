@@ -4,8 +4,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef KMIGRATORBASE_H
-#define KMIGRATORBASE_H
+#pragma once
 
 #include <AkonadiCore/agentinstance.h>
 #include <QEventLoopLocker>
@@ -21,9 +20,19 @@ class KMigratorBase : public QObject
 {
     Q_OBJECT
 public:
-    enum MigrationState { None, Bridged, Complete };
+    enum MigrationState {
+        None,
+        Bridged,
+        Complete,
+    };
 
-    enum MessageType { Success, Skip, Info, Warning, Error };
+    enum MessageType {
+        Success,
+        Skip,
+        Info,
+        Warning,
+        Error,
+    };
 
     Q_ENUM(MigrationState)
 
@@ -65,4 +74,3 @@ private:
     QEventLoopLocker eventLoopLocker;
 };
 
-#endif

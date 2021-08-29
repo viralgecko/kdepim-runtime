@@ -171,7 +171,7 @@ public:
 
         KMBox::MBoxEntry::List deletedEntries;
         deletedEntries.reserve(deleteCount);
-        for (quint64 offset : qAsConst(mDeletedOffsets)) {
+        for (quint64 offset : std::as_const(mDeletedOffsets)) {
             deletedEntries << KMBox::MBoxEntry(offset);
         }
 
@@ -187,13 +187,13 @@ public:
             }
 
             // delete index data for changed entries
-            // readded below in an extra loop to handled cases where a new index is equal to an
+            // re-added below in an extra loop to handled cases where a new index is equal to an
             // old index of a different entry
             Q_FOREACH (const KMBox::MBoxEntry::Pair &entry, movedEntries) {
                 mIndexData.remove(entry.first.messageOffset());
             }
 
-            // readd index data for changed entries at their new position
+            // re-add index data for changed entries at their new position
             Q_FOREACH (const KMBox::MBoxEntry::Pair &entry, movedEntries) {
                 const KMIndexDataPtr data = indexData.value(entry.first.messageOffset());
                 mIndexData.insert(entry.second.messageOffset(), data);
@@ -256,13 +256,13 @@ private:
     MBox mMBox;
     QDateTime mModificationTime;
 
-    typedef QHash<quint64, KMIndexDataPtr> IndexDataHash;
+    using IndexDataHash = QHash<quint64, KMIndexDataPtr>;
     IndexDataHash mIndexData;
     bool mIndexDataLoaded;
     bool mHasIndexData;
 };
 
-typedef QSharedPointer<MBoxContext> MBoxPtr;
+using MBoxPtr = QSharedPointer<MBoxContext>;
 
 void MBoxContext::readIndexData()
 {
@@ -433,7 +433,7 @@ public:
 private:
     Maildir mMaildir;
 
-    typedef QHash<QString, KMIndexDataPtr> IndexDataHash;
+    using IndexDataHash = QHash<QString, KMIndexDataPtr>;
     IndexDataHash mIndexData;
     bool mIndexDataLoaded;
     bool mHasIndexData;
@@ -487,14 +487,19 @@ void MaildirContext::readIndexData()
     qCDebug(MIXEDMAILDIR_LOG) << "Read" << mIndexData.count() << "index entries from" << indexFileInfo.absoluteFilePath();
 }
 
-typedef QSharedPointer<MaildirContext> MaildirPtr;
+using MaildirPtr = QSharedPointer<MaildirContext>;
 
 class MixedMaildirStore::Private : public FileStore::Job::Visitor
 {
     MixedMaildirStore *const q;
 
 public:
-    enum FolderType { InvalidFolder, TopLevelFolder, MaildirFolder, MBoxFolder };
+    enum FolderType {
+        InvalidFolder,
+        TopLevelFolder,
+        MaildirFolder,
+        MBoxFolder,
+    };
 
     Private(MixedMaildirStore *parent)
         : q(parent)
@@ -530,10 +535,10 @@ public: // visitor interface implementation
     bool visit(FileStore::StoreCompactJob *job) override;
 
 public:
-    typedef QHash<QString, MBoxPtr> MBoxHash;
+    using MBoxHash = QHash<QString, MBoxPtr>;
     MBoxHash mMBoxes;
 
-    typedef QHash<QString, MaildirPtr> MaildirHash;
+    using MaildirHash = QHash<QString, MaildirPtr>;
     MaildirHash mMaildirs;
 };
 
@@ -1263,7 +1268,7 @@ bool MixedMaildirStore::Private::visit(FileStore::CollectionModifyJob *job)
     }
 
     // update collections in MBox contexts so they stay usable for purge
-    for (const MBoxPtr &mbox : qAsConst(mMBoxes)) {
+    for (const MBoxPtr &mbox : std::as_const(mMBoxes)) {
         if (mbox->mCollection.isValid()) {
             MBoxPtr updatedMBox = mbox;
             updatedMBox->mCollection = updateMBoxCollectionTree(mbox->mCollection, collection, renamedCollection);
@@ -1433,7 +1438,7 @@ bool MixedMaildirStore::Private::visit(FileStore::CollectionMoveJob *job)
     movedCollection.setParentCollection(targetCollection);
 
     // update collections in MBox contexts so they stay usable for purge
-    for (const MBoxPtr &mbox : qAsConst(mMBoxes)) {
+    for (const MBoxPtr &mbox : std::as_const(mMBoxes)) {
         if (mbox->mCollection.isValid()) {
             MBoxPtr updatedMBox = mbox;
             updatedMBox->mCollection = updateMBoxCollectionTree(mbox->mCollection, moveCollection, movedCollection);

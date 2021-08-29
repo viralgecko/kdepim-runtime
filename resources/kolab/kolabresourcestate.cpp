@@ -34,7 +34,7 @@ static Akonadi::Collection processAnnotations(const Akonadi::Collection &collect
         const QString icon = KolabHelpers::getIcon(folderType);
         if (!icon.isEmpty()) {
             // qCDebug(KOLABRESOURCE_LOG) << " setting icon " << icon;
-            auto *attr = col.attribute<Akonadi::EntityDisplayAttribute>(Akonadi::Collection::AddIfMissing);
+            auto attr = col.attribute<Akonadi::EntityDisplayAttribute>(Akonadi::Collection::AddIfMissing);
             attr->setIconName(icon);
         }
         if (folderType != Kolab::MailType) {
@@ -77,6 +77,7 @@ void KolabResourceState::collectionAttributesRetrieved(const Akonadi::Collection
 void KolabResourceState::collectionsRetrieved(const Akonadi::Collection::List &collections)
 {
     Akonadi::Collection::List modifiedCollections;
+    modifiedCollections.reserve(collections.count());
     for (const Akonadi::Collection &col : collections) {
         modifiedCollections << processAnnotations(col);
     }

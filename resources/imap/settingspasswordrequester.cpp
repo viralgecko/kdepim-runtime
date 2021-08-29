@@ -11,14 +11,15 @@
 #include <KMessageBox>
 
 #include "imapresource_debug.h"
+#include "imapresourcebase.h"
+#include "settings.h"
+#include <KAuthorized>
 #include <KPasswordDialog>
 #include <QDialogButtonBox>
 #include <QPushButton>
+#include <kwidgetsaddons_version.h>
 #include <kwindowsystem.h>
 #include <mailtransport/transportbase.h>
-
-#include "imapresourcebase.h"
-#include "settings.h"
 
 SettingsPasswordRequester::SettingsPasswordRequester(ImapResourceBase *resource, QObject *parent)
     : PasswordRequesterInterface(parent)
@@ -56,9 +57,9 @@ void SettingsPasswordRequester::askUserInput(const QString &serverError)
         "%1",
         serverError,
         m_resource->name());
-    QDialog *dialog = new QDialog(parent, Qt::Dialog);
+    auto dialog = new QDialog(parent, Qt::Dialog);
     dialog->setWindowTitle(i18nc("@title:window", "Could Not Authenticate"));
-    QDialogButtonBox *buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::No | QDialogButtonBox::Yes, dialog);
+    auto buttonBox = new QDialogButtonBox(QDialogButtonBox::Cancel | QDialogButtonBox::No | QDialogButtonBox::Yes, dialog);
     buttonBox->button(QDialogButtonBox::Yes)->setDefault(true);
 
     buttonBox->button(QDialogButtonBox::Yes)->setText(i18n("Account Settings"));
@@ -149,6 +150,7 @@ QString SettingsPasswordRequester::requestManualAuth(bool *userRejected)
     dlg->setModal(true);
     dlg->setPrompt(i18n("Please enter password for user '%1' on IMAP server '%2'.", m_resource->settings()->userName(), m_resource->settings()->imapServer()));
     dlg->setPassword(m_resource->settings()->password());
+    dlg->setRevealPasswordAvailable(KAuthorized::authorize(QStringLiteral("lineedit_reveal_password")));
     if (dlg->exec()) {
         if (userRejected) {
             *userRejected = false;

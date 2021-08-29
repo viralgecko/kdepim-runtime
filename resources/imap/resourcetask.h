@@ -5,8 +5,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef RESOURCETASK_H
-#define RESOURCETASK_H
+#pragma once
 
 #include <QObject>
 
@@ -30,7 +29,10 @@ class ResourceTask : public QObject
     Q_OBJECT
 
 public:
-    enum ActionIfNoSession { CancelIfNoSession, DeferIfNoSession };
+    enum ActionIfNoSession {
+        CancelIfNoSession,
+        DeferIfNoSession,
+    };
     Q_ENUM(ActionIfNoSession)
 
     explicit ResourceTask(ActionIfNoSession action, ResourceStateInterface::Ptr resource, QObject *parent = nullptr);
@@ -148,4 +150,3 @@ private:
     bool mCancelled = false;
 };
 
-#endif

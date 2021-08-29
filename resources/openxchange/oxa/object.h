@@ -6,8 +6,7 @@
     SPDX-License-Identifier: LGPL-2.0-or-later
 */
 
-#ifndef OXA_OBJECT_H
-#define OXA_OBJECT_H
+#pragma once
 
 #include "folder.h"
 
@@ -26,7 +25,7 @@ public:
     /**
      * Describes a list of objects.
      */
-    typedef QVector<Object> List;
+    using List = QVector<Object>;
 
     /**
      * Describes the status of the object.
@@ -80,4 +79,3 @@ private:
 
 Q_DECLARE_TYPEINFO(OXA::Object, Q_MOVABLE_TYPE);
 
-#endif

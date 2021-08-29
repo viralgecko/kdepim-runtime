@@ -5,8 +5,7 @@
 
 */
 
-#ifndef SERVERINFODIALOG_H
-#define SERVERINFODIALOG_H
+#pragma once
 
 #include <QDialog>
 #include <QTextBrowser>
@@ -31,7 +30,8 @@ public:
     ~ServerInfoDialog() override;
 
 private:
+    void writeConfig();
+    void readConfig();
     ServerInfoTextBrowser *const mTextBrowser;
 };
 
-#endif // SERVERINFODIALOG_H
