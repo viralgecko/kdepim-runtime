@@ -61,6 +61,7 @@ private Q_SLOTS:
      * Call this if you want the settings saved from this page.
      */
     void applySettings();
+    void slotIdentityCheckboxChanged();
     void slotMailCheckboxChanged();
     void slotEncryptionRadioChanged();
     void slotSubcriptionCheckboxChanged();

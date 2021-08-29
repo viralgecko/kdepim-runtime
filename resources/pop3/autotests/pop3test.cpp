@@ -49,20 +49,12 @@ void Pop3Test::initTestCase()
     //
     AgentType maildirType = AgentManager::self()->type(QStringLiteral("akonadi_maildir_resource"));
     auto agentCreateJob = new AgentInstanceCreateJob(maildirType);
-    const bool maildirCreateSuccess = agentCreateJob->exec();
-    if (!maildirCreateSuccess) {
-        qWarning() << "Failed to create maildir resource:" << agentCreateJob->errorString();
-    }
-    QVERIFY(maildirCreateSuccess);
+    QVERIFY(agentCreateJob->exec());
     mMaildirIdentifier = agentCreateJob->instance().identifier();
 
     AgentType popType = AgentManager::self()->type(QStringLiteral("akonadi_pop3_resource"));
     agentCreateJob = new AgentInstanceCreateJob(popType);
-    const bool pop3CreateSuccess = agentCreateJob->exec();
-    if (!pop3CreateSuccess) {
-        qWarning() << "Failed to create pop3 resource:" << agentCreateJob->errorString();
-    }
-    QVERIFY(pop3CreateSuccess);
+    QVERIFY(agentCreateJob->exec());
     mPop3Identifier = agentCreateJob->instance().identifier();
 
     //
@@ -81,7 +73,6 @@ void Pop3Test::initTestCase()
     mMaildirSettingsInterface = new OrgKdeAkonadiMaildirSettingsInterface(service, QStringLiteral("/Settings"), QDBusConnection::sessionBus(), this);
     QDBusReply<void> setPathReply = mMaildirSettingsInterface->setPath(maildirRootPath);
     QVERIFY(setPathReply.isValid());
-    mMaildirSettingsInterface->save();
     AgentManager::self()->instance(mMaildirIdentifier).reconfigure();
     QDBusReply<QString> getPathReply = mMaildirSettingsInterface->path();
     QCOMPARE(getPathReply.value(), maildirRootPath);
@@ -129,34 +120,29 @@ void Pop3Test::initTestCase()
     QCOMPARE(reply0.value(), 110u);
 
     mPOP3SettingsInterface->setPort(5989).waitForFinished();
-    mPOP3SettingsInterface->save();
     AgentManager::self()->instance(mPop3Identifier).reconfigure();
     QDBusReply<uint> reply = mPOP3SettingsInterface->port();
     QVERIFY(reply.isValid());
     QCOMPARE(reply.value(), 5989u);
 
     mPOP3SettingsInterface->setHost(QStringLiteral("localhost")).waitForFinished();
-    mPOP3SettingsInterface->save();
     AgentManager::self()->instance(mPop3Identifier).reconfigure();
     QDBusReply<QString> reply2 = mPOP3SettingsInterface->host();
     QVERIFY(reply2.isValid());
     QCOMPARE(reply2.value(), QLatin1String("localhost"));
     mPOP3SettingsInterface->setLogin(QStringLiteral("HansWurst")).waitForFinished();
-    mPOP3SettingsInterface->save();
     AgentManager::self()->instance(mPop3Identifier).reconfigure();
     QDBusReply<QString> reply3 = mPOP3SettingsInterface->login();
     QVERIFY(reply3.isValid());
     QCOMPARE(reply3.value(), QLatin1String("HansWurst"));
 
     mPOP3SettingsInterface->setUnitTestPassword(QStringLiteral("Geheim")).waitForFinished();
-    mPOP3SettingsInterface->save();
     AgentManager::self()->instance(mPop3Identifier).reconfigure();
     QDBusReply<QString> reply4 = mPOP3SettingsInterface->unitTestPassword();
     QVERIFY(reply4.isValid());
     QCOMPARE(reply4.value(), QLatin1String("Geheim"));
 
     mPOP3SettingsInterface->setTargetCollection(mMaildirCollection.id()).waitForFinished();
-    mPOP3SettingsInterface->save();
     AgentManager::self()->instance(mPop3Identifier).reconfigure();
     QDBusReply<qlonglong> reply5 = mPOP3SettingsInterface->targetCollection();
     QVERIFY(reply5.isValid());
@@ -165,12 +151,9 @@ void Pop3Test::initTestCase()
 
 void Pop3Test::cleanupTestCase()
 {
-    // test might have failed before thread got created
-    if (mFakeServerThread) {
-        mFakeServerThread->quit();
-        if (!mFakeServerThread->wait(10000)) {
-            qWarning() << "The fake server thread has not yet finished, what is wrong!?";
-        }
+    mFakeServerThread->quit();
+    if (!mFakeServerThread->wait(10000)) {
+        qWarning() << "The fake server thread has not yet finished, what is wrong!?";
     }
 }
 

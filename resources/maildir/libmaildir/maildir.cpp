@@ -574,7 +574,7 @@ QString Maildir::addEntry(const QByteArray &data)
     QString finalKey;
     QString curKey;
 
-    // QUuid doesn't return globally unique identifiers, therefore we query until we
+    // QUuid doesn't return globally unique identifiers, therefor we query until we
     // get one that doesn't exists yet
     do {
         uniqueKey = createUniqueFileName() + d->hostName;
@@ -714,7 +714,7 @@ Akonadi::Item::Flags Maildir::readEntryFlags(const QString &key) const
     const QRegularExpression rx = statusSeparatorRx();
     const int index = key.indexOf(rx);
     if (index != -1) {
-        const QStringView mailDirFlags = QStringView(key).mid(index + 3); // after "(:|!)2,"
+        const QStringRef mailDirFlags = key.midRef(index + 3); // after "(:|!)2,"
         const int flagSize(mailDirFlags.size());
         for (int i = 0; i < flagSize; ++i) {
             const QChar flag = mailDirFlags.at(i);

@@ -102,6 +102,10 @@ void AccountWidget::setupWidgets()
     connect(leaveOnServerCountSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AccountWidget::slotLeaveOnServerCountChanged);
     connect(leaveOnServerSizeCheck, &QCheckBox::toggled, this, &AccountWidget::slotEnableLeaveOnServerSize);
 
+    connect(filterOnServerSizeSpin, QOverload<int>::of(&QSpinBox::valueChanged), this, &AccountWidget::slotFilterOnServerSizeChanged);
+    connect(filterOnServerCheck, &QCheckBox::toggled, filterOnServerSizeSpin, &QSpinBox::setEnabled);
+    connect(filterOnServerCheck, &QCheckBox::clicked, this, &AccountWidget::slotFilterOnServerClicked);
+
     connect(checkCapabilities, &QPushButton::clicked, this, &AccountWidget::slotCheckPopCapabilities);
     encryptionButtonGroup = new QButtonGroup(page);
     encryptionButtonGroup->addButton(encryptionNone, Transport::EnumEncryption::None);
@@ -119,6 +123,9 @@ void AccountWidget::setupWidgets()
 
     connect(usePipeliningCheck, &QCheckBox::clicked, this, &AccountWidget::slotPipeliningClicked);
 
+    // FIXME: Hide widgets which are not supported yet
+    filterOnServerCheck->hide();
+    filterOnServerSizeSpin->hide();
 }
 
 void AccountWidget::loadSettings()
@@ -147,6 +154,8 @@ void AccountWidget::loadSettings()
     leaveOnServerSizeCheck->setEnabled(mSettings.leaveOnServer());
     leaveOnServerSizeCheck->setChecked(mSettings.leaveOnServerSize() >= 1);
     leaveOnServerSizeSpin->setValue(mSettings.leaveOnServerSize() >= 1 ? mSettings.leaveOnServerSize() : 10);
+    filterOnServerCheck->setChecked(mSettings.filterOnServer());
+    filterOnServerSizeSpin->setValue(mSettings.filterCheckSize());
     intervalCheck->setChecked(mSettings.intervalCheckEnabled());
     intervalSpin->setValue(mSettings.intervalCheckInterval());
     intervalSpin->setEnabled(mSettings.intervalCheckEnabled());
@@ -253,6 +262,21 @@ void AccountWidget::slotLeaveOnServerClicked()
     }
 }
 
+void AccountWidget::slotFilterOnServerClicked()
+{
+    if (mServerTest && !mServerTest->capabilities().contains(ServerTest::Top) && filterOnServerCheck->isChecked()) {
+        KMessageBox::information(topLevelWidget(),
+                                 i18n("The server does not seem to support "
+                                      "fetching message headers, but this is a "
+                                      "requirement for filtering messages on the "
+                                      "server.\n"
+                                      "Since some servers do not correctly "
+                                      "announce their capabilities you still "
+                                      "have the possibility to turn filtering "
+                                      "messages on the server on."));
+    }
+}
+
 void AccountWidget::slotPipeliningClicked()
 {
     if (usePipeliningCheck->isChecked()) {
@@ -326,7 +350,7 @@ void AccountWidget::slotPopCapabilities(const QVector<int> &encryptionTypes)
         KMessageBox::sorry(this, i18n("Unable to connect to the server, please verify the server address."));
     }
 
-    // If the servertest did not find any usable authentication modes, assume the
+    // If the servertest did not find any useable authentication modes, assume the
     // connection failed and don't disable any of the radioboxes.
     if (encryptionTypes.isEmpty()) {
         mServerTestFailed = true;
@@ -398,6 +422,19 @@ void AccountWidget::enablePopFeatures()
                                       "fetched messages on the server on."));
     }
 
+    if (mServerTest && !mServerTest->capabilities().contains(ServerTest::Top) && filterOnServerCheck->isChecked()) {
+        filterOnServerCheck->setChecked(false);
+        KMessageBox::information(topLevelWidget(),
+                                 i18n("The server does not seem to support "
+                                      "fetching message headers, but this is a "
+                                      "requirement for filtering messages on the "
+                                      "server; therefore, this option has been "
+                                      "disabled.\n"
+                                      "Since some servers do not correctly "
+                                      "announce their capabilities you still "
+                                      "have the possibility to turn filtering "
+                                      "messages on the server on."));
+    }
 }
 
 static void addAuthenticationItem(QComboBox *combo, int authenticationType)
@@ -426,6 +463,11 @@ void AccountWidget::slotLeaveOnServerDaysChanged(int value)
 void AccountWidget::slotLeaveOnServerCountChanged(int value)
 {
     leaveOnServerCountSpin->setSuffix(i18np(" message", " messages", value));
+}
+
+void AccountWidget::slotFilterOnServerSizeChanged(int value)
+{
+    filterOnServerSizeSpin->setSuffix(i18np(" byte", " bytes", value));
 }
 
 void AccountWidget::checkHighest(QButtonGroup *btnGroup)
@@ -466,6 +508,8 @@ void AccountWidget::saveSettings()
     mSettings.setLeaveOnServerDays(leaveOnServerCheck->isChecked() ? (leaveOnServerDaysCheck->isChecked() ? leaveOnServerDaysSpin->value() : -1) : 0);
     mSettings.setLeaveOnServerCount(leaveOnServerCheck->isChecked() ? (leaveOnServerCountCheck->isChecked() ? leaveOnServerCountSpin->value() : -1) : 0);
     mSettings.setLeaveOnServerSize(leaveOnServerCheck->isChecked() ? (leaveOnServerSizeCheck->isChecked() ? leaveOnServerSizeSpin->value() : -1) : 0);
+    mSettings.setFilterOnServer(filterOnServerCheck->isChecked());
+    mSettings.setFilterCheckSize(filterOnServerSizeSpin->value());
     mSettings.setTargetCollection(folderRequester->collection().id());
     mSettings.save();
 

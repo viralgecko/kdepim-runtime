@@ -337,7 +337,7 @@ void EteSyncResource::onReloadConfiguration()
 
 void EteSyncResource::initialiseDone(bool successful)
 {
-    qCDebug(ETESYNC_LOG) << "Resource initialised";
+    qCDebug(ETESYNC_LOG) << "Resource intialised";
     if (successful) {
         synchronize();
     }
