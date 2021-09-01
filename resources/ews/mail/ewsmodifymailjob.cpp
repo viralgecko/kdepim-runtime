@@ -70,7 +70,7 @@ void EwsModifyMailJob::start()
                 return req->responses();
             },
             [this](unsigned int progress) {
-                Q_EMIT setPercent(progress);
+                Q_EMIT reportPercent(progress);
             },
             [this](bool success, const QString &error) {
                 updateItemFinished(success, error);

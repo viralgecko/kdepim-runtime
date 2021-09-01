@@ -40,9 +40,7 @@ public:
 
     void start() override;
 Q_SIGNALS:
-    void status(int status, const QString &message = QString());
     void reportStatus(int status, const QString &message = QString());
-    void percent(int progress);
     void reportPercent(int progress);
 
 private:

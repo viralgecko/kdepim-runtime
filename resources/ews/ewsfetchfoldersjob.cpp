@@ -12,6 +12,7 @@
 #include <AkonadiCore/CollectionStatistics>
 #include <KCalendarCore/Event>
 #include <KCalendarCore/Todo>
+#include <KCalendarCore/Journal>
 #include <KContacts/Addressee>
 #include <KContacts/ContactGroup>
 #include <KMime/Message>
@@ -302,6 +303,14 @@ Collection EwsFetchFoldersJobPrivate::createFolderCollection(const EwsFolder &fo
     case EwsFolderTypeMail:
         if (contClass == QLatin1String("IPF.Note") || contClass.isEmpty()) {
             mimeTypes.append(KMime::Message::mimeType());
+        }
+        else if(contClass == QLatin1String("IPF.StickyNote"))
+        {
+            mimeTypes.append(QStringLiteral("text/x-vnd.akonadi.note"));
+        }
+        else if(contClass == QLatin1String("IPF.Journal"))
+        {
+            mimeTypes.append(KCalendarCore::Journal::journalMimeType());
         }
         break;
     default:

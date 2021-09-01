@@ -74,8 +74,6 @@ private Q_SLOTS:
     void checkedItemsFetchFinished(KJob *job);
     void tagSyncFinished(KJob *job);
 Q_SIGNALS:
-    void status(int status, const QString &message = QString());
-    void percent(int progress);
     void reportStatus(int status, const QString &message = QString());
     void reportPercent(ulong progress);
 

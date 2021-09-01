@@ -1466,12 +1466,12 @@ void EwsResource::setInitialReconnectTimeout(int timeout)
 template<class Job>
 void EwsResource::connectStatusSignals(Job *job)
 {
-    /*connect(job, &Job::reportStatus, this, [this](int s, const QString &message) {
+    connect(job, &Job::reportStatus, this, [this](int s, const QString &message) {
         Q_EMIT status(s, message);
     });
     connect(job, &Job::reportPercent, this, [this](int p) {
         Q_EMIT percent(p);
-    });*/
+    });
     Q_UNUSED(job);
 }
 

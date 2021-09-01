@@ -73,12 +73,12 @@ void EwsModifyItemFlagsJob::start()
             EwsItemHandler *handler = EwsItemHandler::itemHandler(static_cast<EwsItemType>(type));
             EwsModifyItemJob *job = handler->modifyItemJob(mClient, items[type], QSet<QByteArray>() << "FLAGS", this);
             connect(job, &EwsModifyItemJob::result, this, &EwsModifyItemFlagsJob::itemModifyFinished);
-            /*connect(job, &EwsModifyItemJob::reportStatus, this, [this](int s, const QString &message) {
+            connect(job, &EwsModifyItemJob::reportStatus, this, [this](int s, const QString &message) {
                 Q_EMIT reportStatus(s, message);
             });
             connect(job, &EwsModifyItemJob::reportPercent, this, [this](int p) {
                 Q_EMIT reportPercent(p);
-            });*/
+            });
 
             addSubjob(job);
             job->start();
