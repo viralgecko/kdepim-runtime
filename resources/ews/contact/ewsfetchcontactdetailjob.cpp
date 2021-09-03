@@ -55,7 +55,15 @@ void EwsFetchContactDetailJob::processItems(const EwsGetItemRequest::Response::L
         contact = Convert->parseVCard(mimeContent.toUtf8());
         contact.setSpousesName(ewsItem[EwsItemFieldSpouseName].toString());
         contact.setAnniversary(ewsItem[EwsItemFieldWeddingAnniversary].toDate());
-        contact.setImppList(ewsItem[EwsItemFieldImAddresses].value<KContacts::Impp::List>());
+        QStringList customs = contact.customs();
+        KContacts::Impp::List imppList;
+        QString skype = QStringLiteral("skype:");
+        QString imAddress = contact.custom(QStringLiteral("MS"),QStringLiteral("IMADDRESS"));
+        if(!imAddress.isEmpty())
+        {
+            contact.insertImpp(KContacts::Impp(QUrl(skype.append(imAddress))));
+            contact.insertCustom(QStringLiteral("SKYPE"),QStringLiteral("USERNAME"),imAddress);
+        }
         item.setPayload<Addressee>(contact);
 
         ++it;
